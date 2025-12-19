@@ -73,3 +73,6 @@ logs/
 
 # Local config (user overrides)
 config.local.toml
+
+# Test output
+results.json

@@ -1,0 +1,16 @@
+[plugin]
+name = "ram_plus"
+version = "1.0.0"
+description = "Recognize Anything Plus Plus - General purpose image tagging with ~6500 tags"
+entry_point = "RamPlusPlugin"
+python_requires = ">=3.11"
+
+[plugin.dependencies]
+torch = ">=2.0"
+torchvision = ">=0.15"
+timm = ">=0.9"
+
+[plugin.hardware]
+gpu_recommended = true
+min_ram_gb = 4
+min_vram_gb = 4

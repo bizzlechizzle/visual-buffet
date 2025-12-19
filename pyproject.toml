@@ -26,6 +26,8 @@ dependencies = [
     "click>=8.0",
     "rich>=13.0",
     "pillow>=10.0",
+    "psutil>=5.9",
+    "tomli-w>=1.0",
     "tomli>=2.0;python_version<'3.11'",
 ]
 
@@ -39,6 +41,17 @@ gui = [
     "fastapi>=0.110",
     "uvicorn>=0.29",
 ]
+ml = [
+    "torch>=2.0",
+    "torchvision>=0.15",
+    "timm>=0.9",
+]
+ram_plus = [
+    "torch>=2.0",
+    "torchvision>=0.15",
+    "timm>=0.9",
+    "recognize-anything @ git+https://github.com/xinyu1205/recognize-anything.git",
+]
 
 [project.scripts]
 imlage = "imlage.cli:main"
@@ -46,6 +59,9 @@ imlage = "imlage.cli:main"
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
+
+[tool.hatch.metadata]
+allow-direct-references = true
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/imlage"]

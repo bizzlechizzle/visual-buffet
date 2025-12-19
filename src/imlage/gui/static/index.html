@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IMLAGE</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-left">
+                <h1 class="logo">IMLAGE</h1>
+                <span class="version">v0.1.0</span>
+            </div>
+            <div class="header-right">
+                <button class="btn btn-secondary" id="settingsBtn">Settings</button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main">
+            <!-- Drop Zone -->
+            <div class="drop-zone" id="dropZone">
+                <div class="drop-zone-content">
+                    <div class="drop-zone-icon">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                            <polyline points="17 8 12 3 7 8"/>
+                            <line x1="12" y1="3" x2="12" y2="15"/>
+                        </svg>
+                    </div>
+                    <p class="drop-zone-text">Drop images here</p>
+                    <p class="drop-zone-hint">or click to browse</p>
+                    <p class="drop-zone-formats">Supports: JPG, PNG, WEBP, GIF</p>
+                </div>
+                <input type="file" id="fileInput" accept="image/*" multiple hidden>
+            </div>
+
+            <!-- Status Bar -->
+            <div class="status-bar" id="statusBar">
+                <div class="status-left">
+                    <span id="imageCount">0 images</span>
+                </div>
+                <div class="status-center" id="processingStatus"></div>
+                <div class="status-right">
+                    <button class="btn btn-primary" id="tagAllBtn" disabled>Tag All</button>
+                    <button class="btn btn-secondary" id="clearAllBtn" disabled>Clear</button>
+                </div>
+            </div>
+
+            <!-- Image Grid -->
+            <div class="image-grid" id="imageGrid"></div>
+        </main>
+
+        <!-- Lightbox Modal -->
+        <div class="lightbox" id="lightbox" hidden>
+            <div class="lightbox-overlay"></div>
+            <div class="lightbox-content">
+                <div class="lightbox-header">
+                    <button class="btn-icon" id="lightboxBack">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="19" y1="12" x2="5" y2="12"/>
+                            <polyline points="12 19 5 12 12 5"/>
+                        </svg>
+                        <span>Back</span>
+                    </button>
+                    <span class="lightbox-filename" id="lightboxFilename"></span>
+                    <button class="btn-icon" id="lightboxClose">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18"/>
+                            <line x1="6" y1="6" x2="18" y2="18"/>
+                        </svg>
+                    </button>
+                </div>
+                <div class="lightbox-body">
+                    <div class="lightbox-image-container">
+                        <img id="lightboxImage" src="" alt="">
+                        <div class="lightbox-metadata" id="lightboxMetadata"></div>
+                    </div>
+                    <div class="lightbox-tags-container">
+                        <h2 class="lightbox-tags-title">Tags by Plugin</h2>
+                        <div class="lightbox-tags" id="lightboxTags">
+                            <p class="no-tags">Click "Tag Image" to analyze</p>
+                        </div>
+                        <div class="lightbox-actions">
+                            <button class="btn btn-primary" id="lightboxTagBtn">Tag Image</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Modal -->
+        <div class="modal" id="settingsModal" hidden>
+            <div class="modal-overlay"></div>
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Settings</h2>
+                    <button class="btn-icon" id="settingsClose">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18"/>
+                            <line x1="6" y1="6" x2="18" y2="18"/>
+                        </svg>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!-- Plugins Section -->
+                    <section class="settings-section">
+                        <h3>Plugins</h3>
+                        <div class="plugins-list" id="pluginsList"></div>
+                    </section>
+
+                    <!-- Threshold Section -->
+                    <section class="settings-section">
+                        <h3>Confidence Threshold</h3>
+                        <div class="slider-container">
+                            <input type="range" id="thresholdSlider" min="0" max="100" value="50">
+                            <span class="slider-value" id="thresholdValue">0.50</span>
+                        </div>
+                        <p class="settings-hint">Only show tags above this confidence level</p>
+                    </section>
+
+                    <!-- Limit Section -->
+                    <section class="settings-section">
+                        <h3>Tag Limit</h3>
+                        <div class="slider-container">
+                            <input type="range" id="limitSlider" min="5" max="100" value="50">
+                            <span class="slider-value" id="limitValue">50</span>
+                        </div>
+                        <p class="settings-hint">Maximum tags per plugin</p>
+                    </section>
+
+                    <!-- Hardware Section -->
+                    <section class="settings-section">
+                        <h3>Hardware</h3>
+                        <div class="hardware-info" id="hardwareInfo"></div>
+                    </section>
+                </div>
+            </div>
+        </div>
+
+        <!-- Toast Container -->
+        <div class="toast-container" id="toastContainer"></div>
+    </div>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>

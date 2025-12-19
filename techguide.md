@@ -151,10 +151,79 @@ Results inform plugin batch sizes and model variant selection.
 
 When GUI mode is requested:
 
-1. FastAPI server starts on `localhost:8741`
+1. FastAPI server starts on `localhost:8420`
 2. Serves static frontend from `src/imlage/gui/static/`
 3. CLI becomes the backend via API endpoints
 4. Browser opens automatically (or user navigates manually)
+
+### Launching the GUI
+
+```bash
+# Default (opens browser automatically)
+imlage gui
+
+# Custom port
+imlage gui --port 9000
+
+# Without auto-opening browser
+imlage gui --no-browser
+```
+
+### API Endpoints
+
+| Method | Endpoint | Purpose |
+|--------|----------|---------|
+| GET | `/` | Serve main HTML page |
+| GET | `/api/status` | System status (hardware, plugins) |
+| GET | `/api/plugins` | List all plugins with availability |
+| GET | `/api/config` | Get configuration |
+| POST | `/api/upload` | Upload image for tagging |
+| GET | `/api/image/{id}` | Get full image data + results |
+| POST | `/api/tag/{id}` | Tag a specific image |
+| POST | `/api/tag-batch` | Tag multiple images |
+| DELETE | `/api/image/{id}` | Delete uploaded image |
+| DELETE | `/api/images` | Clear all images |
+
+### Frontend Design System (Braun/Ulm)
+
+The GUI follows Dieter Rams' Functional Minimalism principles.
+
+**Color Palette:**
+- Canvas: `#FAFAF8` (background)
+- Surface: `#FFFFFF` (cards)
+- Text Primary: `#1C1C1A`
+- Text Secondary: `#5C5C58`
+- Border: `#E2E1DE`
+
+**Functional Colors (semantic only):**
+- Success/High Confidence: `#4A8C5E`
+- Info/Medium Confidence: `#5A7A94`
+- Warning/Low Confidence: `#C9A227`
+- Error: `#B85C4A`
+
+**Rules:**
+- 8pt spacing grid
+- Border-radius max 4px
+- No colored accent buttons
+- No decorative shadows
+- No gradients
+- System sans-serif font only
+
+### Frontend State Management
+
+```javascript
+const state = {
+    images: new Map(),     // id -> {filename, thumbnail, results, ...}
+    selectedImage: null,   // For lightbox view
+    settings: {
+        threshold: 0.5,
+        limit: 50,
+        plugins: [],
+    },
+    hardware: null,
+    processing: false,
+};
+```
 
 ## Testing
 
