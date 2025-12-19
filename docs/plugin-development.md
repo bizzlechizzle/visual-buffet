@@ -62,17 +62,53 @@ IMLAGE generates these thumbnails for every imported image:
 | `preview` | 1080px | Lightbox preview |
 | `zoom` | 2048px | Lightbox zoom / full preview |
 
-These are stored in `~/.imlage/cache/thumbnails/` as WebP files.
+### Storage Location
+
+Thumbnails and tags are stored in an `imlage/` folder **next to each image**:
+
+```
+/photos/vacation/
+├── beach.jpg
+├── sunset.jpg
+└── imlage/
+    ├── beach_480.webp       # Grid thumbnail
+    ├── beach_1080.webp      # Preview
+    ├── beach_2048.webp      # Zoom
+    ├── beach_tags.json      # Saved tags
+    ├── sunset_480.webp
+    ├── sunset_1080.webp
+    ├── sunset_2048.webp
+    └── sunset_tags.json
+```
 
 ### Thumbnail Naming
 
 ```
-{image_id}_{resolution}.webp
+{image_stem}_{resolution}.webp
 
 Examples:
-  photo123_480.webp    # Grid thumbnail
-  photo123_1080.webp   # Preview
-  photo123_2048.webp   # Zoom
+  beach_480.webp    # Grid thumbnail
+  beach_1080.webp   # Preview
+  beach_2048.webp   # Zoom
+```
+
+### Tags File Format
+
+```json
+{
+  "file": "/photos/vacation/beach.jpg",
+  "filename": "beach.jpg",
+  "tagged_at": "2025-01-15T10:30:00.000000",
+  "results": {
+    "ram_plus": {
+      "tags": [{"label": "beach"}, {"label": "ocean"}],
+      "model": "ram_plus",
+      "version": "1.0.0",
+      "quality": "standard",
+      "resolutions": [1080]
+    }
+  }
+}
 ```
 
 ### Reuse for Tagging

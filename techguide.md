@@ -72,6 +72,25 @@ Hardware detection results cached at:
 
 Delete to force re-detection.
 
+### Thumbnail & Tag Storage
+
+Thumbnails and tags are stored in an `imlage/` folder next to each image:
+
+```
+/photos/vacation/
+├── beach.jpg
+└── imlage/
+    ├── beach_480.webp       # Grid thumbnail (quick quality)
+    ├── beach_1080.webp      # Preview (standard quality)
+    ├── beach_2048.webp      # Zoom (high quality)
+    └── beach_tags.json      # Saved tags
+```
+
+This keeps all generated data with the source images, making it:
+- Portable (move folder, data follows)
+- Backup-friendly (backup images, tags come along)
+- Easy to inspect/debug
+
 ### Plugin Config
 
 Each plugin has its own config section in the main config:
