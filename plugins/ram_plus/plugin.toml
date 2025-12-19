@@ -1,5 +1,6 @@
 [plugin]
 name = "ram_plus"
+display_name = "RAM++"
 version = "1.0.0"
 description = "Recognize Anything Plus Plus - General purpose image tagging with ~6500 tags"
 entry_point = "RamPlusPlugin"

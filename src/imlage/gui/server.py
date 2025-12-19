@@ -91,6 +91,7 @@ async def status():
         for meta in plugins:
             plugin_section = meta.get("plugin", {})
             name = plugin_section.get("name", "unknown")
+            display_name = plugin_section.get("display_name", name)
             try:
                 plugin = load_plugin(meta["_path"])
                 available = plugin.is_available()
@@ -99,6 +100,7 @@ async def status():
 
             plugin_status.append({
                 "name": name,
+                "display_name": display_name,
                 "version": plugin_section.get("version", "?"),
                 "description": plugin_section.get("description", ""),
                 "available": available,
@@ -131,6 +133,7 @@ async def get_plugins():
     for meta in plugins:
         plugin_section = meta.get("plugin", {})
         name = plugin_section.get("name", "unknown")
+        display_name = plugin_section.get("display_name", name)
 
         try:
             plugin = load_plugin(meta["_path"])
@@ -143,6 +146,7 @@ async def get_plugins():
 
         result.append({
             "name": name,
+            "display_name": display_name,
             "version": plugin_section.get("version", "?"),
             "description": plugin_section.get("description", ""),
             "available": available,

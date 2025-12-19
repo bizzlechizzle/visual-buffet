@@ -193,7 +193,7 @@ function renderPluginsList() {
         <div class="plugin-item">
             <div class="plugin-status-dot ${plugin.available ? 'available' : 'unavailable'}"></div>
             <div class="plugin-details">
-                <div class="plugin-item-name">${plugin.name}</div>
+                <div class="plugin-item-name">${plugin.display_name || plugin.name}</div>
                 <div class="plugin-item-desc">${plugin.description || 'No description'}</div>
             </div>
         </div>
@@ -275,6 +275,14 @@ function closeLightbox() {
     state.selectedImage = null;
 }
 
+/**
+ * Get display name for a plugin (falls back to plugin name if not found)
+ */
+function getPluginDisplayName(pluginName) {
+    const plugin = state.settings.plugins.find(p => p.name === pluginName);
+    return plugin ? (plugin.display_name || plugin.name) : pluginName;
+}
+
 function renderLightboxTags(image) {
     if (!image.results || !image.results.results) {
         elements.lightboxTags.innerHTML = '<p class="no-tags">Click "Tag Image" to analyze</p>';
@@ -287,12 +295,13 @@ function renderLightboxTags(image) {
     let html = '';
 
     for (const [pluginName, pluginResult] of Object.entries(results)) {
+        const displayName = getPluginDisplayName(pluginName);
         html += `<div class="plugin-result">`;
 
         if (pluginResult.error) {
             html += `
                 <div class="plugin-header">
-                    <span class="plugin-name">${pluginName}</span>
+                    <span class="plugin-name">${displayName}</span>
                 </div>
                 <p class="plugin-error">${pluginResult.error}</p>
             `;
@@ -302,7 +311,7 @@ function renderLightboxTags(image) {
 
             html += `
                 <div class="plugin-header">
-                    <span class="plugin-name">${pluginName}</span>
+                    <span class="plugin-name">${displayName}</span>
                     <span class="plugin-time">${timeMs.toFixed(0)}ms</span>
                 </div>
                 <div class="tags-list">
