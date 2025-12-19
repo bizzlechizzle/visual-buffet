@@ -17,6 +17,7 @@ const state = {
     },
     hardware: null,
     processing: false,
+    abortProcessing: false,
 };
 
 
@@ -33,7 +34,7 @@ const elements = {
     imageGrid: document.getElementById('imageGrid'),
     imageCount: document.getElementById('imageCount'),
     processingStatus: document.getElementById('processingStatus'),
-    tagAllBtn: document.getElementById('tagAllBtn'),
+    cancelBtn: document.getElementById('cancelBtn'),
     clearAllBtn: document.getElementById('clearAllBtn'),
 
     // Lightbox
@@ -206,7 +207,7 @@ function updateStatusBar() {
     const count = state.images.size;
     elements.imageCount.textContent = `${count} image${count !== 1 ? 's' : ''}`;
 
-    elements.tagAllBtn.disabled = count === 0 || state.processing;
+    elements.cancelBtn.hidden = !state.processing;
     elements.clearAllBtn.disabled = count === 0 || state.processing;
 }
 
@@ -540,10 +541,15 @@ async function autoTagImages(imageIds) {
     if (state.processing) return;
 
     state.processing = true;
+    state.abortProcessing = false;
     updateStatusBar();
 
     let completed = 0;
     for (const id of imageIds) {
+        if (state.abortProcessing) {
+            break;
+        }
+
         elements.processingStatus.textContent = `Tagging ${completed + 1} of ${imageIds.length}...`;
 
         try {
@@ -555,11 +561,17 @@ async function autoTagImages(imageIds) {
         completed++;
     }
 
+    const wasCancelled = state.abortProcessing;
     state.processing = false;
+    state.abortProcessing = false;
     elements.processingStatus.textContent = '';
     updateStatusBar();
 
-    showToast(`Tagged ${completed} image${completed !== 1 ? 's' : ''}`, 'success');
+    if (wasCancelled) {
+        showToast(`Cancelled after ${completed} image${completed !== 1 ? 's' : ''}`, 'info');
+    } else {
+        showToast(`Tagged ${completed} image${completed !== 1 ? 's' : ''}`, 'success');
+    }
 }
 
 async function tagSingleImage(imageId) {
@@ -601,33 +613,10 @@ async function tagSingleImage(imageId) {
     }
 }
 
-async function tagAllImages() {
-    if (state.processing) return;
-
-    state.processing = true;
-    elements.tagAllBtn.disabled = true;
-    elements.clearAllBtn.disabled = true;
-
-    const imageIds = Array.from(state.images.keys());
-    let completed = 0;
-
-    for (const id of imageIds) {
-        elements.processingStatus.textContent = `Processing ${completed + 1} of ${imageIds.length}...`;
-
-        try {
-            await tagSingleImage(id);
-        } catch (error) {
-            console.error(`Failed to tag image ${id}:`, error);
-        }
-
-        completed++;
+function cancelProcessing() {
+    if (state.processing) {
+        state.abortProcessing = true;
     }
-
-    state.processing = false;
-    elements.processingStatus.textContent = '';
-    updateStatusBar();
-
-    showToast(`Tagged ${completed} image${completed !== 1 ? 's' : ''}`, 'success');
 }
 
 async function clearAll() {
@@ -736,7 +725,7 @@ document.addEventListener('drop', async (e) => {
 });
 
 // Action buttons
-elements.tagAllBtn.addEventListener('click', tagAllImages);
+elements.cancelBtn.addEventListener('click', cancelProcessing);
 elements.clearAllBtn.addEventListener('click', clearAll);
 
 // Lightbox

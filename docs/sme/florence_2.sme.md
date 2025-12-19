@@ -136,7 +136,7 @@ The `-ft` (fine-tuned) variants are trained on additional downstream tasks and g
 | Hardware | torch_dtype | Notes |
 |----------|-------------|-------|
 | CUDA GPU | float16 | Recommended, fastest |
-| Apple Silicon | float32 | MPS support varies |
+| Apple Silicon | float32 | Required (float16 causes empty output + 40x slowdown) |
 | CPU | float32 | Required for CPU |
 
 ## Installation
