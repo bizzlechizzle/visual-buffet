@@ -6,7 +6,9 @@ Every utility script with purpose, usage, and line count. Keep scripts focused a
 
 | Script | Purpose | Lines | Usage |
 |--------|---------|-------|-------|
-| *No scripts yet* | — | — | — |
+| `scripts/generate_variants.py` | Generate test image variants at different resolutions/formats | 199 | `python scripts/generate_variants.py images/ output/` |
+| `scripts/analyze_results.py` | Analyze tagging results, calculate stability metrics, generate master tags | 402 | `python scripts/analyze_results.py test-results/` |
+| `scripts/run_quality_test.py` | Run full quality test pipeline (generate, tag, analyze) | 147 | `python scripts/run_quality_test.py images/ test-results/` |
 
 ## Adding a Script
 

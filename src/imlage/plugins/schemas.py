@@ -6,7 +6,55 @@ the core engine and plugins. All plugins must use these schemas.
 
 import json
 from dataclasses import asdict, dataclass, field
+from enum import Enum
 from typing import Any
+
+
+class TagQuality(str, Enum):
+    """Tag quality levels determining which resolution(s) to use.
+
+    Each plugin can have its own quality setting. Higher quality
+    uses more resolutions and merges results for maximum tag coverage.
+
+    Attributes:
+        QUICK: 480px thumbnail only. Fast, ~66% tag coverage.
+        STANDARD: 1080px preview. Balanced, ~87% tag coverage.
+        HIGH: Multiple resolutions merged. Thorough, ~98% tag coverage.
+
+    Resolution mapping:
+        QUICK    -> [480]
+        STANDARD -> [1080]
+        HIGH     -> [480, 1080, 2048]
+
+    Example:
+        >>> quality = TagQuality.STANDARD
+        >>> quality.resolutions
+        [1080]
+    """
+
+    QUICK = "quick"
+    STANDARD = "standard"
+    HIGH = "high"
+
+    @property
+    def resolutions(self) -> list[int]:
+        """Get resolution(s) for this quality level."""
+        return QUALITY_RESOLUTIONS[self]
+
+
+# Resolution mapping for each quality level
+QUALITY_RESOLUTIONS: dict[TagQuality, list[int]] = {
+    TagQuality.QUICK: [480],
+    TagQuality.STANDARD: [1080],
+    TagQuality.HIGH: [480, 1080, 2048],
+}
+
+# Standard thumbnail sizes generated for all images
+THUMBNAIL_SIZES: dict[str, int] = {
+    "grid": 480,      # Grid view thumbnails
+    "preview": 1080,  # Lightbox preview
+    "zoom": 2048,     # Lightbox zoom / full-res preview
+}
 
 
 @dataclass
@@ -71,6 +119,89 @@ class TagResult:
     def to_json(self) -> str:
         """Convert to JSON string."""
         return json.dumps(self.to_dict(), indent=2)
+
+
+@dataclass
+class MergedTag:
+    """A tag with metadata from multi-resolution merging.
+
+    Used when HIGH quality mode merges tags from multiple resolutions.
+
+    Attributes:
+        label: The tag text
+        confidence: Highest confidence score across resolutions (or None)
+        sources: Number of resolutions that found this tag
+        min_resolution: Smallest resolution where tag was found
+    """
+
+    label: str
+    confidence: float | None = None
+    sources: int = 1
+    min_resolution: int | None = None
+
+    def to_dict(self) -> dict:
+        """Convert to dictionary for JSON serialization."""
+        result = {"label": self.label}
+        if self.confidence is not None:
+            result["confidence"] = self.confidence
+        if self.sources > 1:
+            result["sources"] = self.sources
+        if self.min_resolution is not None:
+            result["min_resolution"] = self.min_resolution
+        return result
+
+
+def merge_tags(all_tags: list[Tag], resolutions_used: list[int] | None = None) -> list[MergedTag]:
+    """Merge tags from multiple resolutions into deduplicated list.
+
+    Tags found at multiple resolutions get higher implicit confidence.
+    Keeps the highest confidence score when duplicates have scores.
+
+    Args:
+        all_tags: List of Tag objects from all resolutions
+        resolutions_used: List of resolutions for min_resolution tracking
+
+    Returns:
+        List of MergedTag objects, sorted by sources (desc), confidence (desc)
+
+    Example:
+        >>> tags = [Tag("cat", 0.9), Tag("cat", 0.8), Tag("dog", 0.7)]
+        >>> merged = merge_tags(tags)
+        >>> merged[0].label
+        'cat'
+        >>> merged[0].sources
+        2
+    """
+    merged: dict[str, MergedTag] = {}
+
+    for tag in all_tags:
+        label = tag.label.lower().strip()
+        if not label:
+            continue
+
+        if label not in merged:
+            merged[label] = MergedTag(
+                label=label,
+                confidence=tag.confidence,
+                sources=1,
+                min_resolution=None,
+            )
+        else:
+            merged[label].sources += 1
+            # Keep highest confidence
+            if tag.confidence is not None:
+                if merged[label].confidence is None:
+                    merged[label].confidence = tag.confidence
+                else:
+                    merged[label].confidence = max(merged[label].confidence, tag.confidence)
+
+    # Sort by sources (more = better), then confidence, then label
+    result = sorted(
+        merged.values(),
+        key=lambda t: (-t.sources, -(t.confidence or 0), t.label),
+    )
+
+    return result
 
 
 @dataclass
