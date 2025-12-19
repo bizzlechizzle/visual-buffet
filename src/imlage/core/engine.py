@@ -45,14 +45,17 @@ class TaggingEngine:
         plugin_names: list[str] | None = None,
         threshold: float = 0.0,
         limit: int | None = None,
+        plugin_configs: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
         """Tag a single image.
 
         Args:
             image_path: Path to image file
             plugin_names: Plugins to use (None = all)
-            threshold: Minimum confidence to include
-            limit: Maximum tags per plugin
+            threshold: Default minimum confidence to include
+            limit: Default maximum tags per plugin
+            plugin_configs: Per-plugin settings dict:
+                { "plugin_name": { "threshold": 0.5, "limit": 50 } }
 
         Returns:
             Dict matching output contract:
@@ -88,15 +91,29 @@ class TaggingEngine:
             try:
                 result = plugin.tag(image_path)
 
+                # Get per-plugin config or use defaults
+                if plugin_configs and name in plugin_configs:
+                    config = plugin_configs[name]
+                    # Handle both dict and Pydantic model
+                    if hasattr(config, 'threshold'):
+                        plugin_threshold = config.threshold
+                        plugin_limit = config.limit
+                    else:
+                        plugin_threshold = config.get("threshold", threshold)
+                        plugin_limit = config.get("limit", limit)
+                else:
+                    plugin_threshold = threshold
+                    plugin_limit = limit
+
                 # Apply threshold filter
-                filtered_tags = [t for t in result.tags if t.confidence >= threshold]
+                filtered_tags = [t for t in result.tags if t.confidence >= plugin_threshold]
 
                 # Sort by confidence (highest first)
                 filtered_tags.sort(key=lambda t: t.confidence, reverse=True)
 
                 # Apply limit
-                if limit:
-                    filtered_tags = filtered_tags[:limit]
+                if plugin_limit:
+                    filtered_tags = filtered_tags[:plugin_limit]
 
                 result.tags = filtered_tags
                 results[name] = result.to_dict()

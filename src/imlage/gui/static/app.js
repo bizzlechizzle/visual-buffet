@@ -11,9 +11,9 @@ const state = {
     images: new Map(), // id -> { id, filename, thumbnail, width, height, format, results }
     selectedImage: null,
     settings: {
-        threshold: 0.5,
-        limit: 50,
-        plugins: [], // List of available plugins
+        plugins: [], // List of available plugins with their settings
+        // Per-plugin settings: { name: { enabled, threshold, limit } }
+        pluginSettings: {},
     },
     hardware: null,
     processing: false,
@@ -51,10 +51,6 @@ const elements = {
     settingsModal: document.getElementById('settingsModal'),
     settingsClose: document.getElementById('settingsClose'),
     pluginsList: document.getElementById('pluginsList'),
-    thresholdSlider: document.getElementById('thresholdSlider'),
-    thresholdValue: document.getElementById('thresholdValue'),
-    limitSlider: document.getElementById('limitSlider'),
-    limitValue: document.getElementById('limitValue'),
     hardwareInfo: document.getElementById('hardwareInfo'),
 
     // Toast
@@ -73,6 +69,17 @@ async function fetchStatus() {
 
         state.hardware = data.hardware;
         state.settings.plugins = data.plugins || [];
+
+        // Initialize per-plugin settings with defaults
+        for (const plugin of state.settings.plugins) {
+            if (!state.settings.pluginSettings[plugin.name]) {
+                state.settings.pluginSettings[plugin.name] = {
+                    enabled: plugin.available, // Enable by default if available
+                    threshold: 0.5,
+                    limit: 50,
+                };
+            }
+        }
 
         renderPluginsList();
         renderHardwareInfo();
@@ -102,13 +109,32 @@ async function uploadImage(file) {
 }
 
 async function tagImage(imageId) {
-    const params = new URLSearchParams({
-        threshold: state.settings.threshold,
-        limit: state.settings.limit,
-    });
+    // Get enabled plugins and their settings
+    const enabledPlugins = [];
+    const pluginConfigs = {};
 
-    const response = await fetch(`/api/tag/${imageId}?${params}`, {
+    for (const plugin of state.settings.plugins) {
+        const settings = state.settings.pluginSettings[plugin.name];
+        if (settings && settings.enabled && plugin.available) {
+            enabledPlugins.push(plugin.name);
+            pluginConfigs[plugin.name] = {
+                threshold: settings.threshold,
+                limit: settings.limit,
+            };
+        }
+    }
+
+    if (enabledPlugins.length === 0) {
+        throw new Error('No plugins enabled');
+    }
+
+    const response = await fetch(`/api/tag/${imageId}`, {
         method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            plugins: enabledPlugins,
+            plugin_configs: pluginConfigs,
+        }),
     });
 
     if (!response.ok) {
@@ -189,14 +215,81 @@ function renderPluginsList() {
         return;
     }
 
-    elements.pluginsList.innerHTML = state.settings.plugins.map(plugin => `
-        <div class="plugin-item">
-            <div class="plugin-status-dot ${plugin.available ? 'available' : 'unavailable'}"></div>
-            <div class="plugin-details">
-                <div class="plugin-item-name">${plugin.display_name || plugin.name}</div>
+    elements.pluginsList.innerHTML = state.settings.plugins.map(plugin => {
+        const settings = state.settings.pluginSettings[plugin.name] || { enabled: false, threshold: 0.5, limit: 50 };
+        const displayName = plugin.display_name || plugin.name;
+        const isAvailable = plugin.available;
+        const isEnabled = settings.enabled && isAvailable;
+
+        return `
+            <div class="plugin-card" data-plugin="${plugin.name}">
+                <div class="plugin-card-header">
+                    <div class="plugin-card-title">
+                        <span class="plugin-status-dot ${isAvailable ? 'available' : 'unavailable'}"></span>
+                        <span class="plugin-name">${displayName}</span>
+                    </div>
+                    <label class="toggle ${!isAvailable ? 'disabled' : ''}">
+                        <input type="checkbox"
+                            ${isEnabled ? 'checked' : ''}
+                            ${!isAvailable ? 'disabled' : ''}
+                            onchange="togglePlugin('${plugin.name}', this.checked)">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+                <div class="plugin-card-settings ${!isEnabled ? 'disabled' : ''}">
+                    <div class="plugin-setting">
+                        <label>Confidence Threshold</label>
+                        <div class="setting-control">
+                            <input type="range" min="0" max="100" value="${settings.threshold * 100}"
+                                ${!isEnabled ? 'disabled' : ''}
+                                oninput="updatePluginThreshold('${plugin.name}', this.value)">
+                            <span class="setting-value">${settings.threshold.toFixed(2)}</span>
+                        </div>
+                    </div>
+                    <div class="plugin-setting">
+                        <label>Tag Limit</label>
+                        <div class="setting-control">
+                            <input type="range" min="5" max="100" value="${settings.limit}"
+                                ${!isEnabled ? 'disabled' : ''}
+                                oninput="updatePluginLimit('${plugin.name}', this.value)">
+                            <span class="setting-value">${settings.limit}</span>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>
-    `).join('');
+        `;
+    }).join('');
+}
+
+function togglePlugin(pluginName, enabled) {
+    if (state.settings.pluginSettings[pluginName]) {
+        state.settings.pluginSettings[pluginName].enabled = enabled;
+        renderPluginsList();
+    }
+}
+
+function updatePluginThreshold(pluginName, value) {
+    if (state.settings.pluginSettings[pluginName]) {
+        state.settings.pluginSettings[pluginName].threshold = value / 100;
+        // Update display value
+        const card = document.querySelector(`[data-plugin="${pluginName}"]`);
+        if (card) {
+            const valueSpan = card.querySelector('.plugin-setting:first-child .setting-value');
+            if (valueSpan) valueSpan.textContent = (value / 100).toFixed(2);
+        }
+    }
+}
+
+function updatePluginLimit(pluginName, value) {
+    if (state.settings.pluginSettings[pluginName]) {
+        state.settings.pluginSettings[pluginName].limit = parseInt(value);
+        // Update display value
+        const card = document.querySelector(`[data-plugin="${pluginName}"]`);
+        if (card) {
+            const valueSpan = card.querySelector('.plugin-setting:last-child .setting-value');
+            if (valueSpan) valueSpan.textContent = value;
+        }
+    }
 }
 
 function renderHardwareInfo() {
@@ -528,16 +621,6 @@ function closeSettings() {
     elements.settingsModal.hidden = true;
 }
 
-function updateThreshold(value) {
-    state.settings.threshold = value / 100;
-    elements.thresholdValue.textContent = state.settings.threshold.toFixed(2);
-}
-
-function updateLimit(value) {
-    state.settings.limit = parseInt(value);
-    elements.limitValue.textContent = state.settings.limit;
-}
-
 
 // ============================================================================
 // Toast Notifications
@@ -646,22 +729,13 @@ elements.settingsBtn.addEventListener('click', openSettings);
 elements.settingsClose.addEventListener('click', closeSettings);
 elements.settingsModal.querySelector('.modal-overlay').addEventListener('click', closeSettings);
 
-elements.thresholdSlider.addEventListener('input', (e) => updateThreshold(e.target.value));
-elements.limitSlider.addEventListener('input', (e) => updateLimit(e.target.value));
-
 
 // ============================================================================
 // Initialize
 // ============================================================================
 
 async function init() {
-    // Set initial slider values
-    elements.thresholdSlider.value = state.settings.threshold * 100;
-    elements.thresholdValue.textContent = state.settings.threshold.toFixed(2);
-    elements.limitSlider.value = state.settings.limit;
-    elements.limitValue.textContent = state.settings.limit;
-
-    // Fetch system status
+    // Fetch system status (initializes per-plugin settings)
     await fetchStatus();
 
     // Initial render

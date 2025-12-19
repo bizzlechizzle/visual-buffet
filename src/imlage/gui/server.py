@@ -294,18 +294,30 @@ async def get_image_meta(image_id: str):
     }
 
 
+from pydantic import BaseModel
+
+
+class PluginConfig(BaseModel):
+    threshold: float = 0.5
+    limit: int = 50
+
+
+class TagRequest(BaseModel):
+    plugins: list[str] | None = None
+    plugin_configs: dict[str, PluginConfig] | None = None
+
+
 @app.post("/api/tag/{image_id}")
-async def tag_image(
-    image_id: str,
-    plugins: list[str] | None = None,
-    threshold: float = 0.5,
-    limit: int = 50,
-):
-    """Tag an uploaded image."""
+async def tag_image(image_id: str, request: TagRequest | None = None):
+    """Tag an uploaded image with per-plugin settings."""
     if image_id not in _sessions:
         raise HTTPException(404, "Image not found")
 
     session = _sessions[image_id]
+
+    # Extract settings from request
+    plugins = request.plugins if request else None
+    plugin_configs = request.plugin_configs if request else None
 
     try:
         # Write to temp file for processing
@@ -314,13 +326,12 @@ async def tag_image(
         tmp_path.write_bytes(session["data"])
 
         try:
-            # Run tagging
+            # Run tagging with per-plugin configs
             engine = get_engine()
             result = engine.tag_image(
                 tmp_path,
                 plugin_names=plugins,
-                threshold=threshold,
-                limit=limit,
+                plugin_configs=plugin_configs,
             )
 
             # Update filename in result
