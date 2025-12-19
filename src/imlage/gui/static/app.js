@@ -511,6 +511,8 @@ async function handleFiles(files) {
         return;
     }
 
+    // Upload all images first
+    const uploadedIds = [];
     for (const file of imageFiles) {
         try {
             const result = await uploadImage(file);
@@ -519,13 +521,45 @@ async function handleFiles(files) {
                 processing: false,
                 results: null,
             });
+            uploadedIds.push(result.id);
+            renderImageGrid(); // Update grid as each image uploads
         } catch (error) {
             showToast(`Failed to upload ${file.name}: ${error.message}`, 'error');
         }
     }
 
-    renderImageGrid();
-    showToast(`Uploaded ${imageFiles.length} image${imageFiles.length !== 1 ? 's' : ''}`);
+    showToast(`Processing ${uploadedIds.length} image${uploadedIds.length !== 1 ? 's' : ''}...`);
+
+    // Auto-start tagging queue for uploaded images
+    if (uploadedIds.length > 0 && !state.processing) {
+        autoTagImages(uploadedIds);
+    }
+}
+
+async function autoTagImages(imageIds) {
+    if (state.processing) return;
+
+    state.processing = true;
+    updateStatusBar();
+
+    let completed = 0;
+    for (const id of imageIds) {
+        elements.processingStatus.textContent = `Tagging ${completed + 1} of ${imageIds.length}...`;
+
+        try {
+            await tagSingleImage(id);
+        } catch (error) {
+            console.error(`Failed to tag image ${id}:`, error);
+        }
+
+        completed++;
+    }
+
+    state.processing = false;
+    elements.processingStatus.textContent = '';
+    updateStatusBar();
+
+    showToast(`Tagged ${completed} image${completed !== 1 ? 's' : ''}`, 'success');
 }
 
 async function tagSingleImage(imageId) {
