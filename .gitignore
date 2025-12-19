@@ -76,3 +76,4 @@ config.local.toml
 
 # Test output
 results.json
+**/imlage/
