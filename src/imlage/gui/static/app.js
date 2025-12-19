@@ -78,6 +78,7 @@ async function fetchStatus() {
                     enabled: plugin.available, // Enable by default if available
                     threshold: 0.5,
                     limit: 50,
+                    quality: 'standard', // quick | standard | high
                     providesConfidence: plugin.provides_confidence !== false,
                 };
             }
@@ -122,6 +123,7 @@ async function tagImage(imageId) {
             pluginConfigs[plugin.name] = {
                 threshold: settings.threshold,
                 limit: settings.limit,
+                quality: settings.quality || 'standard',
             };
         }
     }
@@ -222,7 +224,6 @@ function renderPluginsList() {
         const displayName = plugin.display_name || plugin.name;
         const isAvailable = plugin.available;
         const isEnabled = settings.enabled && isAvailable;
-        const providesConfidence = plugin.provides_confidence !== false;
 
         return `
             <div class="plugin-card" data-plugin="${plugin.name}">
@@ -241,6 +242,19 @@ function renderPluginsList() {
                 </div>
                 <div class="plugin-card-settings ${!isEnabled ? 'disabled' : ''}">
                     <div class="plugin-setting">
+                        <label>Quality</label>
+                        <div class="setting-control">
+                            <select class="quality-select"
+                                ${!isEnabled ? 'disabled' : ''}
+                                onchange="updatePluginQuality('${plugin.name}', this.value)">
+                                <option value="quick" ${settings.quality === 'quick' ? 'selected' : ''}>Quick</option>
+                                <option value="standard" ${settings.quality === 'standard' ? 'selected' : ''}>Standard</option>
+                                <option value="high" ${settings.quality === 'high' ? 'selected' : ''}>High</option>
+                                <option value="max" ${settings.quality === 'max' ? 'selected' : ''}>Max</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="plugin-setting">
                         <label>Tag Limit</label>
                         <div class="setting-control">
                             <input type="range" min="5" max="100" value="${settings.limit}"
@@ -249,9 +263,6 @@ function renderPluginsList() {
                             <span class="setting-value">${settings.limit}</span>
                         </div>
                     </div>
-                    ${!providesConfidence ? `
-                        <p class="plugin-note">Tags ordered by relevance (no confidence scores)</p>
-                    ` : ''}
                 </div>
             </div>
         `;
@@ -283,9 +294,15 @@ function updatePluginLimit(pluginName, value) {
         // Update display value
         const card = document.querySelector(`[data-plugin="${pluginName}"]`);
         if (card) {
-            const valueSpan = card.querySelector('.plugin-setting:last-child .setting-value');
+            const valueSpan = card.querySelector('.plugin-setting:last-of-type .setting-value');
             if (valueSpan) valueSpan.textContent = value;
         }
+    }
+}
+
+function updatePluginQuality(pluginName, value) {
+    if (state.settings.pluginSettings[pluginName]) {
+        state.settings.pluginSettings[pluginName].quality = value;
     }
 }
 

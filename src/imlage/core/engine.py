@@ -203,13 +203,17 @@ class TaggingEngine:
         Args:
             plugin: Plugin to use
             image_path: Original image path
-            resolution: Resolution to tag at
+            resolution: Resolution to tag at (0 = use original)
 
         Returns:
             List of Tag objects
         """
-        thumb_path = self._get_or_create_thumbnail(image_path, resolution)
-        result = plugin.tag(thumb_path)
+        if resolution == 0:
+            # Use original image directly
+            result = plugin.tag(image_path)
+        else:
+            thumb_path = self._get_or_create_thumbnail(image_path, resolution)
+            result = plugin.tag(thumb_path)
         return result.tags
 
     def _tag_with_quality(

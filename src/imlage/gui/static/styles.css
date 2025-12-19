@@ -818,6 +818,40 @@ body {
     background: var(--text-tertiary);
 }
 
+/* Quality Select Dropdown */
+.quality-select {
+    flex: 1;
+    height: 32px;
+    padding: 0 var(--space-3);
+    padding-right: var(--space-6);
+    font-family: inherit;
+    font-size: var(--font-size-sm);
+    color: var(--text-primary);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%235C5C58' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right var(--space-2) center;
+}
+
+.quality-select:hover {
+    border-color: var(--border-strong);
+}
+
+.quality-select:focus {
+    outline: none;
+    border-color: var(--text-tertiary);
+}
+
+.quality-select:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    background-color: var(--surface-hover);
+}
+
 .setting-value {
     min-width: 32px;
     font-size: var(--font-size-sm);

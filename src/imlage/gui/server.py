@@ -297,11 +297,13 @@ async def get_image_meta(image_id: str):
 
 
 from pydantic import BaseModel
+from typing import Literal
 
 
 class PluginConfig(BaseModel):
     threshold: float = 0.5
     limit: int = 50
+    quality: Literal["quick", "standard", "high", "max"] = "standard"
 
 
 class TagRequest(BaseModel):

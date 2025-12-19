@@ -76,4 +76,7 @@ config.local.toml
 
 # Test output
 results.json
+
+# Generated imlage folders (thumbnails/tags next to images)
 **/imlage/
+!src/imlage/

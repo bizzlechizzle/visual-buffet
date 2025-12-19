@@ -27,23 +27,25 @@ Each plugin can have its own quality setting:
 
 | Quality | Resolution(s) | Speed | Tag Coverage | Use Case |
 |---------|---------------|-------|--------------|----------|
-| `quick` | 480px | ~3x faster | ~66% | Bulk imports, rough sorting |
-| `standard` | 1080px | Baseline | ~87% | Daily use (default) |
-| `high` | 480 + 1080 + 2048px | ~3x slower | ~98% | Final archive, important images |
+| `quick` | 1080px | Fastest | ~87% | Bulk imports, rough sorting |
+| `standard` | 480 + 2048px | Fast | ~92% | Daily use (default) |
+| `high` | 480 + 1080 + 2048px | Slow | ~96% | Important images |
+| `max` | 480 + 1080 + 2048 + 4096 + original | Slowest | 100% | Final archive, maximum coverage |
 
 ### Resolution Selection
 
 ```
-Quality Level    Resolutions Used    Processing
-─────────────    ────────────────    ──────────────────
-quick            [480]               Single pass
-standard         [1080]              Single pass
-high             [480, 1080, 2048]   Three passes, merged
+Quality Level    Resolutions Used                    Processing
+─────────────    ──────────────────────────────────  ──────────────────
+quick            [1080]                              Single pass
+standard         [480, 2048]                         Two passes, merged
+high             [480, 1080, 2048]                   Three passes, merged
+max              [480, 1080, 2048, 4096, original]   Five passes, merged
 ```
 
-### Tag Merging (HIGH Mode)
+### Tag Merging (STANDARD and HIGH Modes)
 
-When using `high` quality, tags from all resolutions are merged:
+When using `standard` or `high` quality, tags from multiple resolutions are merged:
 
 - Duplicate tags are deduplicated (case-insensitive)
 - Highest confidence score is kept
@@ -113,14 +115,15 @@ Examples:
 
 ### Reuse for Tagging
 
-The tagging system reuses UI thumbnails - no extra files needed:
+The tagging system reuses thumbnails where possible:
 
 ```
-Quality    Uses Thumbnail
-───────    ──────────────
-quick      grid (480px)
-standard   preview (1080px)
-high       grid + preview + zoom
+Quality     Uses
+───────     ─────────────────────────────────────────────
+quick       preview (1080px)
+standard    grid (480px) + zoom (2048px)
+high        grid + preview + zoom
+max         grid + preview + zoom + ultra (4096) + original
 ```
 
 ## Plugin Structure

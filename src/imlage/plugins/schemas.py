@@ -17,17 +17,19 @@ class TagQuality(str, Enum):
     uses more resolutions and merges results for maximum tag coverage.
 
     Attributes:
-        QUICK: 480px thumbnail only. Fast, ~66% tag coverage.
-        STANDARD: 1080px preview. Balanced, ~87% tag coverage.
-        HIGH: Multiple resolutions merged. Thorough, ~98% tag coverage.
+        QUICK: 1080px preview only. Fast, ~87% tag coverage.
+        STANDARD: 480px + 2048px merged. Balanced, ~92% coverage.
+        HIGH: All standard thumbnails (480 + 1080 + 2048) merged. ~96% coverage.
+        MAX: All resolutions (480 + 1080 + 2048 + 4096 + original). 100% coverage.
 
-    Resolution mapping:
-        QUICK    -> [480]
-        STANDARD -> [1080]
+    Resolution mapping (0 = original image):
+        QUICK    -> [1080]
+        STANDARD -> [480, 2048]
         HIGH     -> [480, 1080, 2048]
+        MAX      -> [480, 1080, 2048, 4096, 0]
 
     Example:
-        >>> quality = TagQuality.STANDARD
+        >>> quality = TagQuality.QUICK
         >>> quality.resolutions
         [1080]
     """
@@ -35,18 +37,24 @@ class TagQuality(str, Enum):
     QUICK = "quick"
     STANDARD = "standard"
     HIGH = "high"
+    MAX = "max"
 
     @property
     def resolutions(self) -> list[int]:
-        """Get resolution(s) for this quality level."""
+        """Get resolution(s) for this quality level.
+
+        Note: 0 indicates the original image should be used.
+        """
         return QUALITY_RESOLUTIONS[self]
 
 
 # Resolution mapping for each quality level
+# Note: 0 = use original image (optimized but full resolution)
 QUALITY_RESOLUTIONS: dict[TagQuality, list[int]] = {
-    TagQuality.QUICK: [480],
-    TagQuality.STANDARD: [1080],
+    TagQuality.QUICK: [1080],
+    TagQuality.STANDARD: [480, 2048],
     TagQuality.HIGH: [480, 1080, 2048],
+    TagQuality.MAX: [480, 1080, 2048, 4096, 0],
 }
 
 # Standard thumbnail sizes generated for all images
@@ -54,6 +62,7 @@ THUMBNAIL_SIZES: dict[str, int] = {
     "grid": 480,      # Grid view thumbnails
     "preview": 1080,  # Lightbox preview
     "zoom": 2048,     # Lightbox zoom / full-res preview
+    "ultra": 4096,    # Ultra quality for MAX mode tagging
 }
 
 
