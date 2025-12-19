@@ -1,0 +1,31 @@
+[plugin]
+name = "florence_2"
+display_name = "Florence-2"
+version = "1.0.0"
+description = "Microsoft Florence-2 vision foundation model for image tagging and captioning"
+entry_point = "Florence2Plugin"
+python_requires = ">=3.11"
+# Florence-2 does NOT provide confidence scores - it outputs text only
+provides_confidence = false
+
+[plugin.dependencies]
+torch = ">=2.0"
+torchvision = ">=0.15"
+transformers = ">=4.40.0,<4.50.0"
+einops = ">=0.7.0"
+
+[plugin.hardware]
+gpu_recommended = true
+min_ram_gb = 4
+min_vram_gb = 2
+
+[plugin.config]
+# Model variant: base, large, base-ft, large-ft
+model_variant = "florence-2-large-ft"
+# Task prompt for tagging:
+#   <MORE_DETAILED_CAPTION> - Rich descriptions, 20-50 tags (RECOMMENDED)
+#   <DETAILED_CAPTION> - Moderate descriptions, 10-20 tags
+#   <DENSE_REGION_CAPTION> - Region-specific phrases, 15-30 tags
+#   <OD> - Object detection only, 2-5 tags (limited vocabulary)
+#   <CAPTION> - Brief description, 5-10 tags
+task_prompt = "<MORE_DETAILED_CAPTION>"
