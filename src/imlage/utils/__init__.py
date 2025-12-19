@@ -6,7 +6,16 @@ This module contains:
 """
 
 from .config import get_config_path, get_value, load_config, save_config, set_value
-from .image import expand_paths, is_supported_image, load_image, validate_image
+from .image import (
+    RAW_EXTENSIONS,
+    STANDARD_EXTENSIONS,
+    SUPPORTED_EXTENSIONS,
+    expand_paths,
+    is_raw_image,
+    is_supported_image,
+    load_image,
+    validate_image,
+)
 
 __all__ = [
     "load_config",
@@ -18,4 +27,8 @@ __all__ = [
     "validate_image",
     "expand_paths",
     "is_supported_image",
+    "is_raw_image",
+    "RAW_EXTENSIONS",
+    "STANDARD_EXTENSIONS",
+    "SUPPORTED_EXTENSIONS",
 ]

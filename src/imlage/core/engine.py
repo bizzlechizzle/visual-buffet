@@ -197,7 +197,7 @@ class TaggingEngine:
         plugin: PluginBase,
         image_path: Path,
         resolution: int,
-    ) -> list[Tag]:
+    ) -> tuple[list[Tag], float]:
         """Run plugin on image at specific resolution.
 
         Args:
@@ -206,7 +206,7 @@ class TaggingEngine:
             resolution: Resolution to tag at (0 = use original)
 
         Returns:
-            List of Tag objects
+            Tuple of (tags, inference_time_ms)
         """
         if resolution == 0:
             # Use original image directly
@@ -214,14 +214,14 @@ class TaggingEngine:
         else:
             thumb_path = self._get_or_create_thumbnail(image_path, resolution)
             result = plugin.tag(thumb_path)
-        return result.tags
+        return result.tags, result.inference_time_ms or 0.0
 
     def _tag_with_quality(
         self,
         plugin: PluginBase,
         image_path: Path,
         quality: TagQuality,
-    ) -> tuple[list[Tag], list[int]]:
+    ) -> tuple[list[Tag], list[int], float]:
         """Tag image using quality-based resolution selection.
 
         Args:
@@ -230,16 +230,18 @@ class TaggingEngine:
             quality: Quality level (QUICK, STANDARD, HIGH)
 
         Returns:
-            Tuple of (tags, resolutions_used)
+            Tuple of (tags, resolutions_used, total_inference_time_ms)
         """
         resolutions = quality.resolutions
         all_tags: list[Tag] = []
+        total_time_ms = 0.0
 
         for resolution in resolutions:
-            tags = self._tag_at_resolution(plugin, image_path, resolution)
+            tags, time_ms = self._tag_at_resolution(plugin, image_path, resolution)
             all_tags.extend(tags)
+            total_time_ms += time_ms
 
-        return all_tags, resolutions
+        return all_tags, resolutions, total_time_ms
 
     def tag_image(
         self,
@@ -335,7 +337,7 @@ class TaggingEngine:
 
                 # Tag using quality-based resolution or original
                 if use_thumbnails:
-                    all_tags, resolutions_used = self._tag_with_quality(
+                    all_tags, resolutions_used, inference_time_ms = self._tag_with_quality(
                         plugin, image_path, quality
                     )
 
@@ -355,6 +357,7 @@ class TaggingEngine:
                     filtered_tags = result.tags
                     resolutions_used = []
                     quality = TagQuality.STANDARD
+                    inference_time_ms = result.inference_time_ms or 0.0
 
                 # Apply threshold filter (only for tags with confidence scores)
                 filtered_tags = [
@@ -379,6 +382,7 @@ class TaggingEngine:
                     "version": plugin_info.version,
                     "quality": quality.value,
                     "resolutions": resolutions_used,
+                    "inference_time_ms": round(inference_time_ms, 2),
                 }
 
             except Exception as e:

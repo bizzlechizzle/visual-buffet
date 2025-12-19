@@ -43,13 +43,29 @@ class TestIsSupportedImage:
         assert is_supported_image(Path("image.png")) is True
         assert is_supported_image(Path("image.webp")) is True
         assert is_supported_image(Path("image.heic")) is True
+        assert is_supported_image(Path("image.tif")) is True
+        assert is_supported_image(Path("image.tiff")) is True
+        assert is_supported_image(Path("image.bmp")) is True
+
+    def test_supported_raw_formats(self):
+        """Test RAW camera formats return True."""
+        assert is_supported_image(Path("image.arw")) is True
+        assert is_supported_image(Path("image.cr2")) is True
+        assert is_supported_image(Path("image.cr3")) is True
+        assert is_supported_image(Path("image.nef")) is True
+        assert is_supported_image(Path("image.dng")) is True
+        assert is_supported_image(Path("image.orf")) is True
+        assert is_supported_image(Path("image.rw2")) is True
+        assert is_supported_image(Path("image.raf")) is True
+        assert is_supported_image(Path("image.pef")) is True
+        assert is_supported_image(Path("image.srw")) is True
 
     def test_unsupported_formats(self):
         """Test unsupported formats return False."""
         assert is_supported_image(Path("image.txt")) is False
         assert is_supported_image(Path("image.pdf")) is False
         assert is_supported_image(Path("image.gif")) is False
-        assert is_supported_image(Path("image.bmp")) is False
+        assert is_supported_image(Path("image.psd")) is False
 
     def test_case_insensitive(self):
         """Test format check is case insensitive."""

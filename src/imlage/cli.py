@@ -158,8 +158,13 @@ def _print_result(result: dict) -> None:
         time_ms = plugin_result.get("inference_time_ms", 0)
         console.print(f"  [cyan]{plugin_name}[/cyan] [dim]({time_ms:.0f}ms)[/dim]:")
 
-        # Format tags nicely
-        tag_str = " • ".join(f"{t['label']} ({t['confidence']:.2f})" for t in tags[:10])
+        # Format tags nicely (handle None confidence)
+        def fmt_tag(t):
+            if t.get("confidence") is not None:
+                return f"{t['label']} ({t['confidence']:.2f})"
+            return t["label"]
+
+        tag_str = " • ".join(fmt_tag(t) for t in tags[:10])
         console.print(f"    {tag_str}")
 
         if len(tags) > 10:

@@ -157,6 +157,30 @@ async function clearAllImages() {
     await fetch('/api/images', { method: 'DELETE' });
 }
 
+async function fetchExistingImages() {
+    try {
+        const response = await fetch('/api/images');
+        const data = await response.json();
+
+        for (const image of data.images || []) {
+            state.images.set(image.id, {
+                id: image.id,
+                filename: image.filename,
+                width: image.width,
+                height: image.height,
+                format: image.format,
+                thumbnail: image.thumbnail,
+                processing: false,
+                results: image.results ? { results: image.results } : null,
+            });
+        }
+
+        renderImageGrid();
+    } catch (error) {
+        console.error('Failed to fetch existing images:', error);
+    }
+}
+
 
 // ============================================================================
 // UI Rendering
@@ -515,7 +539,21 @@ async function getFilesFromDataTransfer(items) {
 
 async function handleFiles(files) {
     // Filter for image files - check both MIME type and extension
-    const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.bmp', '.tiff', '.tif'];
+    // Standard formats + RAW camera formats
+    const imageExtensions = [
+        // Standard formats
+        '.jpg', '.jpeg', '.png', '.gif', '.webp', '.bmp', '.tiff', '.tif', '.heic', '.heif',
+        // RAW camera formats
+        '.arw',  // Sony
+        '.cr2', '.cr3',  // Canon
+        '.nef',  // Nikon
+        '.dng',  // Adobe Digital Negative
+        '.orf',  // Olympus
+        '.rw2',  // Panasonic
+        '.raf',  // Fujifilm
+        '.pef',  // Pentax
+        '.srw',  // Samsung
+    ];
     const imageFiles = Array.from(files).filter(f => {
         // Check MIME type
         if (f.type.startsWith('image/')) return true;
@@ -779,6 +817,9 @@ elements.settingsModal.querySelector('.modal-overlay').addEventListener('click',
 async function init() {
     // Fetch system status (initializes per-plugin settings)
     await fetchStatus();
+
+    // Load any existing images from server
+    await fetchExistingImages();
 
     // Initial render
     renderImageGrid();

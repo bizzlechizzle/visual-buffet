@@ -11,6 +11,7 @@ import uuid
 from pathlib import Path
 from typing import Any
 
+import rawpy
 from fastapi import FastAPI, File, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse
@@ -21,6 +22,7 @@ from ..core.engine import TaggingEngine
 from ..core.hardware import detect_hardware, get_recommended_batch_size
 from ..plugins.loader import discover_plugins, get_plugins_dir, load_plugin
 from ..utils.config import load_config
+from ..utils.image import RAW_EXTENSIONS, SUPPORTED_EXTENSIONS
 
 # App instance
 app = FastAPI(
@@ -165,57 +167,116 @@ async def get_config():
     return cfg
 
 
+def _is_raw_filename(filename: str) -> bool:
+    """Check if filename has a RAW extension."""
+    if not filename:
+        return False
+    ext = Path(filename).suffix.lower()
+    return ext in RAW_EXTENSIONS
+
+
+def _is_supported_filename(filename: str) -> bool:
+    """Check if filename has a supported image extension."""
+    if not filename:
+        return False
+    ext = Path(filename).suffix.lower()
+    return ext in SUPPORTED_EXTENSIONS
+
+
 @app.post("/api/upload")
 async def upload_image(file: UploadFile = File(...)):
     """Upload an image for tagging."""
     try:
-        # Validate file type
-        if not file.content_type or not file.content_type.startswith("image/"):
-            raise HTTPException(400, "Invalid file type. Must be an image.")
-
         # Read file
         contents = await file.read()
+        filename = file.filename or "unknown"
+        is_raw = _is_raw_filename(filename)
+        is_supported = _is_supported_filename(filename)
 
-        # Validate it's a valid image
-        try:
-            img = Image.open(io.BytesIO(contents))
-            img.verify()
-            # Re-open after verify
-            img = Image.open(io.BytesIO(contents))
-        except Exception:
-            raise HTTPException(400, "Invalid image file")
+        # Validate file type - allow image/* MIME or any supported extension
+        if not is_supported:
+            if not file.content_type or not file.content_type.startswith("image/"):
+                raise HTTPException(400, f"Unsupported file type: {Path(filename).suffix}")
 
         # Generate unique ID
         image_id = str(uuid.uuid4())[:8]
 
-        # Create thumbnail and save to disk cache
-        thumb = img.copy()
-        thumb.thumbnail((200, 200))
+        # Validate and get image info
+        if is_raw:
+            # RAW file: write to temp, process with rawpy
+            ext = Path(filename).suffix.lower()
+            tmp_raw_path = CACHE_DIR / f"upload_{image_id}{ext}"
+            tmp_raw_path.write_bytes(contents)
+
+            try:
+                with rawpy.imread(str(tmp_raw_path)) as raw:
+                    # Get dimensions from raw sizes
+                    width, height = raw.sizes.width, raw.sizes.height
+                    # Generate thumbnail using half-size for speed
+                    rgb = raw.postprocess(
+                        use_camera_wb=True,
+                        half_size=True,
+                        output_bps=8,
+                    )
+                img = Image.fromarray(rgb)
+                img_format = ext.upper().lstrip(".")
+            except Exception as e:
+                tmp_raw_path.unlink(missing_ok=True)
+                raise HTTPException(400, f"Invalid RAW file: {e}")
+            finally:
+                tmp_raw_path.unlink(missing_ok=True)
+        else:
+            # Standard image: use Pillow
+            try:
+                img = Image.open(io.BytesIO(contents))
+                img.verify()
+                # Re-open after verify
+                img = Image.open(io.BytesIO(contents))
+                width, height = img.width, img.height
+                img_format = img.format or "JPEG"
+            except Exception:
+                raise HTTPException(400, "Invalid image file")
 
         # Convert to RGB if necessary (for JPEG saving)
-        if thumb.mode in ("RGBA", "P"):
-            thumb = thumb.convert("RGB")
+        if img.mode in ("RGBA", "P"):
+            img = img.convert("RGB")
 
+        # Create grid thumbnail (200px for grid display)
+        thumb = img.copy()
+        thumb.thumbnail((200, 200))
         thumb_path = THUMB_DIR / f"{image_id}.jpg"
         thumb.save(thumb_path, format="JPEG", quality=85)
 
+        # Create preview image for lightbox (1920px max)
+        preview = img.copy()
+        max_preview = 1920
+        if preview.width > max_preview or preview.height > max_preview:
+            preview.thumbnail((max_preview, max_preview), Image.Resampling.LANCZOS)
+        preview_path = CACHE_DIR / f"preview_{image_id}.jpg"
+        preview.save(preview_path, format="JPEG", quality=90)
+
+        # Get original file extension for temp file creation during tagging
+        original_ext = Path(filename).suffix.lower() or ".jpg"
+
         # Store in session
         _sessions[image_id] = {
-            "filename": file.filename,
+            "filename": filename,
             "data": contents,
-            "width": img.width,
-            "height": img.height,
-            "format": img.format or "JPEG",
+            "width": width,
+            "height": height,
+            "format": img_format,
+            "original_ext": original_ext,
             "thumb_path": thumb_path,
+            "preview_path": preview_path,
             "results": None,
         }
 
         return {
             "id": image_id,
-            "filename": file.filename,
-            "width": img.width,
-            "height": img.height,
-            "format": img.format or "JPEG",
+            "filename": filename,
+            "width": width,
+            "height": height,
+            "format": img_format,
             "thumbnail": f"/api/thumbnail/{image_id}",
         }
 
@@ -246,35 +307,87 @@ async def get_thumbnail(image_id: str):
 
 @app.get("/api/image/{image_id}")
 async def get_image(image_id: str):
-    """Get full image data as file."""
+    """Get full image data as file (converted to displayable format for RAW)."""
     if image_id not in _sessions:
         raise HTTPException(404, "Image not found")
 
     session = _sessions[image_id]
     img_data = session["data"]
-    img_format = session["format"].lower()
+    original_ext = session.get("original_ext", ".jpg").lower()
 
-    # Write to temp file and serve
-    temp_path = CACHE_DIR / f"full_{image_id}.{img_format}"
-    temp_path.write_bytes(img_data)
+    # Check if we have a cached preview
+    preview_path = session.get("preview_path")
+    if preview_path and preview_path.exists():
+        return FileResponse(
+            preview_path,
+            media_type="image/jpeg",
+            filename=Path(session["filename"]).stem + ".jpg",
+            headers={"Cache-Control": "private, max-age=3600"},
+        )
 
-    # Determine MIME type
-    mime_types = {
-        "jpeg": "image/jpeg",
-        "jpg": "image/jpeg",
-        "png": "image/png",
-        "gif": "image/gif",
-        "webp": "image/webp",
-        "bmp": "image/bmp",
-    }
-    mime_type = mime_types.get(img_format, f"image/{img_format}")
+    # For RAW files, convert to JPEG for browser display
+    if original_ext in RAW_EXTENSIONS:
+        # Write RAW to temp, convert with rawpy
+        tmp_raw_path = CACHE_DIR / f"raw_{image_id}{original_ext}"
+        tmp_raw_path.write_bytes(img_data)
 
-    return FileResponse(
-        temp_path,
-        media_type=mime_type,
-        filename=session["filename"],
-        headers={"Cache-Control": "private, max-age=3600"},
-    )
+        try:
+            with rawpy.imread(str(tmp_raw_path)) as raw:
+                # Full quality processing for display
+                rgb = raw.postprocess(
+                    use_camera_wb=True,
+                    half_size=False,
+                    output_bps=8,
+                )
+            img = Image.fromarray(rgb)
+
+            # Create preview at reasonable size (max 1920px)
+            max_size = 1920
+            if img.width > max_size or img.height > max_size:
+                img.thumbnail((max_size, max_size), Image.Resampling.LANCZOS)
+
+            # Save as JPEG
+            preview_path = CACHE_DIR / f"preview_{image_id}.jpg"
+            img.save(preview_path, format="JPEG", quality=90)
+
+            # Cache the preview path
+            session["preview_path"] = preview_path
+
+            return FileResponse(
+                preview_path,
+                media_type="image/jpeg",
+                filename=Path(session["filename"]).stem + ".jpg",
+                headers={"Cache-Control": "private, max-age=3600"},
+            )
+        except Exception as e:
+            raise HTTPException(500, f"Failed to convert RAW file: {e}")
+        finally:
+            tmp_raw_path.unlink(missing_ok=True)
+    else:
+        # Standard image - serve directly
+        img_format = session["format"].lower()
+        temp_path = CACHE_DIR / f"full_{image_id}.{img_format}"
+        temp_path.write_bytes(img_data)
+
+        # Determine MIME type
+        mime_types = {
+            "jpeg": "image/jpeg",
+            "jpg": "image/jpeg",
+            "png": "image/png",
+            "gif": "image/gif",
+            "webp": "image/webp",
+            "bmp": "image/bmp",
+            "tiff": "image/tiff",
+            "tif": "image/tiff",
+        }
+        mime_type = mime_types.get(img_format, f"image/{img_format}")
+
+        return FileResponse(
+            temp_path,
+            media_type=mime_type,
+            filename=session["filename"],
+            headers={"Cache-Control": "private, max-age=3600"},
+        )
 
 
 @app.get("/api/image/{image_id}/meta")
@@ -324,18 +437,21 @@ async def tag_image(image_id: str, request: TagRequest | None = None):
     plugin_configs = request.plugin_configs if request else None
 
     try:
-        # Write to temp file for processing
-        img_format = session["format"].lower()
-        tmp_path = CACHE_DIR / f"tag_{image_id}.{img_format}"
+        # Write to temp file for processing - use original extension for RAW support
+        original_ext = session.get("original_ext", ".jpg")
+        tmp_path = CACHE_DIR / f"tag_{image_id}{original_ext}"
         tmp_path.write_bytes(session["data"])
 
         try:
             # Run tagging with per-plugin configs
+            # Note: save_tags=False because GUI stores results in memory,
+            # and tmp_path is a temp file that gets cleaned up anyway
             engine = get_engine()
             result = engine.tag_image(
                 tmp_path,
                 plugin_names=plugins,
                 plugin_configs=plugin_configs,
+                save_tags=False,
             )
 
             # Update filename in result
@@ -392,18 +508,43 @@ async def delete_image(image_id: str):
     if thumb_path and thumb_path.exists():
         thumb_path.unlink(missing_ok=True)
 
+    # Clean up preview file
+    preview_path = session.get("preview_path")
+    if preview_path and preview_path.exists():
+        preview_path.unlink(missing_ok=True)
+
     del _sessions[image_id]
     return {"status": "deleted"}
+
+
+@app.get("/api/images")
+async def list_images():
+    """List all uploaded images."""
+    images = []
+    for image_id, session in _sessions.items():
+        images.append({
+            "id": image_id,
+            "filename": session["filename"],
+            "width": session["width"],
+            "height": session["height"],
+            "format": session["format"],
+            "thumbnail": f"/api/thumbnail/{image_id}",
+            "results": session.get("results"),
+        })
+    return {"images": images}
 
 
 @app.delete("/api/images")
 async def clear_images():
     """Clear all uploaded images."""
-    # Clean up all thumbnail files
+    # Clean up all thumbnail and preview files
     for session in _sessions.values():
         thumb_path = session.get("thumb_path")
         if thumb_path and thumb_path.exists():
             thumb_path.unlink(missing_ok=True)
+        preview_path = session.get("preview_path")
+        if preview_path and preview_path.exists():
+            preview_path.unlink(missing_ok=True)
 
     _sessions.clear()
     return {"status": "cleared"}

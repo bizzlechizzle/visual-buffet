@@ -3,19 +3,38 @@
 Handles:
 - Validating image formats
 - Loading images with Pillow
+- Loading RAW images with rawpy
 - Expanding globs/folders to file lists
 - Generating thumbnails at standard sizes
 """
 
 from pathlib import Path
 
+import rawpy
 from PIL import Image
 
 from ..exceptions import ImageError
 from ..plugins.schemas import THUMBNAIL_SIZES
 
-# Supported image extensions
-SUPPORTED_EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp", ".heic", ".heif"}
+# RAW image extensions (camera-specific formats)
+RAW_EXTENSIONS = {
+    ".arw",  # Sony
+    ".cr2",  # Canon
+    ".cr3",  # Canon (newer)
+    ".nef",  # Nikon
+    ".dng",  # Adobe Digital Negative
+    ".orf",  # Olympus
+    ".rw2",  # Panasonic
+    ".raf",  # Fujifilm
+    ".pef",  # Pentax
+    ".srw",  # Samsung
+}
+
+# Standard image extensions (Pillow-native)
+STANDARD_EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp", ".heic", ".heif", ".tif", ".tiff", ".bmp"}
+
+# All supported extensions
+SUPPORTED_EXTENSIONS = STANDARD_EXTENSIONS | RAW_EXTENSIONS
 
 # Default thumbnail format and quality
 THUMBNAIL_FORMAT = "webp"
@@ -32,6 +51,18 @@ def is_supported_image(path: Path) -> bool:
         True if supported image format
     """
     return path.suffix.lower() in SUPPORTED_EXTENSIONS
+
+
+def is_raw_image(path: Path) -> bool:
+    """Check if file is a RAW image format.
+
+    Args:
+        path: Path to check
+
+    Returns:
+        True if RAW format requiring rawpy
+    """
+    return path.suffix.lower() in RAW_EXTENSIONS
 
 
 def validate_image(path: Path) -> None:
@@ -57,8 +88,15 @@ def validate_image(path: Path) -> None:
 
     # Try to open to verify it's a valid image
     try:
-        with Image.open(path) as img:
-            img.verify()
+        if is_raw_image(path):
+            # Validate RAW files with rawpy
+            with rawpy.imread(str(path)) as raw:
+                # Just opening validates the file
+                pass
+        else:
+            # Validate standard images with Pillow
+            with Image.open(path) as img:
+                img.verify()
     except Exception as e:
         raise ImageError(f"Cannot read image {path}: {e}")
 
@@ -78,7 +116,20 @@ def load_image(path: Path) -> Image.Image:
     validate_image(path)
 
     try:
-        img = Image.open(path)
+        if is_raw_image(path):
+            # Load RAW files with rawpy, convert to PIL Image
+            with rawpy.imread(str(path)) as raw:
+                # Postprocess RAW to RGB array
+                rgb = raw.postprocess(
+                    use_camera_wb=True,
+                    half_size=False,
+                    no_auto_bright=False,
+                    output_bps=8,
+                )
+            img = Image.fromarray(rgb)
+        else:
+            img = Image.open(path)
+
         # Convert to RGB if necessary (handles RGBA, grayscale, etc.)
         if img.mode != "RGB":
             img = img.convert("RGB")
@@ -177,36 +228,53 @@ def generate_thumbnail(
         ImageError: If thumbnail generation fails
     """
     try:
-        with Image.open(source_path) as img:
-            # Convert to RGB if needed
-            if img.mode in ("RGBA", "P"):
-                img = img.convert("RGB")
+        # Load image (RAW or standard)
+        if is_raw_image(source_path):
+            with rawpy.imread(str(source_path)) as raw:
+                # Use half_size=True for faster thumbnail generation from RAW
+                rgb = raw.postprocess(
+                    use_camera_wb=True,
+                    half_size=True,
+                    no_auto_bright=False,
+                    output_bps=8,
+                )
+            img = Image.fromarray(rgb)
+        else:
+            img = Image.open(source_path)
 
-            # Calculate new size
-            new_width, new_height = get_resized_dimensions(
-                img.width, img.height, max_long_side
-            )
+        # Convert to RGB if needed
+        if img.mode in ("RGBA", "P"):
+            img = img.convert("RGB")
 
-            # Skip if would upscale
-            if new_width >= img.width and new_height >= img.height:
-                # Just copy/convert the original
-                resized = img
-            else:
-                resized = img.resize((new_width, new_height), Image.LANCZOS)
+        # Calculate new size
+        new_width, new_height = get_resized_dimensions(
+            img.width, img.height, max_long_side
+        )
 
-            # Ensure output directory exists
-            output_path.parent.mkdir(parents=True, exist_ok=True)
+        # Skip if would upscale
+        if new_width >= img.width and new_height >= img.height:
+            # Just copy/convert the original
+            resized = img
+        else:
+            resized = img.resize((new_width, new_height), Image.LANCZOS)
 
-            # Save based on format
-            ext = output_path.suffix.lower()
-            if ext == ".webp":
-                resized.save(output_path, "WEBP", quality=quality, method=4)
-            elif ext in (".jpg", ".jpeg"):
-                resized.save(output_path, "JPEG", quality=quality, optimize=True)
-            else:
-                resized.save(output_path, quality=quality)
+        # Ensure output directory exists
+        output_path.parent.mkdir(parents=True, exist_ok=True)
 
-            return output_path
+        # Save based on format
+        ext = output_path.suffix.lower()
+        if ext == ".webp":
+            resized.save(output_path, "WEBP", quality=quality, method=4)
+        elif ext in (".jpg", ".jpeg"):
+            resized.save(output_path, "JPEG", quality=quality, optimize=True)
+        else:
+            resized.save(output_path, quality=quality)
+
+        # Close non-context-managed image
+        if not is_raw_image(source_path):
+            img.close()
+
+        return output_path
 
     except Exception as e:
         raise ImageError(f"Failed to generate thumbnail: {e}")

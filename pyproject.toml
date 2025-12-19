@@ -29,6 +29,7 @@ dependencies = [
     "psutil>=5.9",
     "tomli-w>=1.0",
     "tomli>=2.0;python_version<'3.11'",
+    "rawpy>=0.19",
 ]
 
 [project.optional-dependencies]
