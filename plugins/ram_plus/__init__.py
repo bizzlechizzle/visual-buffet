@@ -160,16 +160,14 @@ class RamPlusPlugin(PluginBase):
                 tags_str, _ = inference_ram(image_tensor, self._model)
 
             # Parse results - RAM++ returns pipe-separated tags string
+            # Tags are ordered by relevance (first = most relevant)
+            # RAM++ does NOT provide confidence scores - only tag names
             detected_tags = [t.strip() for t in tags_str.split("|") if t.strip()]
 
-            # Create Tag objects with decreasing confidence
-            # RAM++ doesn't provide individual confidence scores,
-            # so we assign based on order (first tags are most confident)
+            # Create Tag objects without confidence (None indicates no score available)
             results = []
-            for i, tag_label in enumerate(detected_tags):
-                # Confidence decreases from 0.99 to 0.50
-                confidence = max(0.50, 0.99 - (i * 0.02))
-                results.append(Tag(label=tag_label, confidence=round(confidence, 4)))
+            for tag_label in detected_tags:
+                results.append(Tag(label=tag_label, confidence=None))
 
             return results
 

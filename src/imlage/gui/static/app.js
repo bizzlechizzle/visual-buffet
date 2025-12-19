@@ -77,6 +77,7 @@ async function fetchStatus() {
                     enabled: plugin.available, // Enable by default if available
                     threshold: 0.5,
                     limit: 50,
+                    providesConfidence: plugin.provides_confidence !== false,
                 };
             }
         }
@@ -220,6 +221,7 @@ function renderPluginsList() {
         const displayName = plugin.display_name || plugin.name;
         const isAvailable = plugin.available;
         const isEnabled = settings.enabled && isAvailable;
+        const providesConfidence = plugin.provides_confidence !== false;
 
         return `
             <div class="plugin-card" data-plugin="${plugin.name}">
@@ -238,15 +240,6 @@ function renderPluginsList() {
                 </div>
                 <div class="plugin-card-settings ${!isEnabled ? 'disabled' : ''}">
                     <div class="plugin-setting">
-                        <label>Confidence Threshold</label>
-                        <div class="setting-control">
-                            <input type="range" min="0" max="100" value="${settings.threshold * 100}"
-                                ${!isEnabled ? 'disabled' : ''}
-                                oninput="updatePluginThreshold('${plugin.name}', this.value)">
-                            <span class="setting-value">${settings.threshold.toFixed(2)}</span>
-                        </div>
-                    </div>
-                    <div class="plugin-setting">
                         <label>Tag Limit</label>
                         <div class="setting-control">
                             <input type="range" min="5" max="100" value="${settings.limit}"
@@ -255,6 +248,9 @@ function renderPluginsList() {
                             <span class="setting-value">${settings.limit}</span>
                         </div>
                     </div>
+                    ${!providesConfidence ? `
+                        <p class="plugin-note">Tags ordered by relevance (no confidence scores)</p>
+                    ` : ''}
                 </div>
             </div>
         `;
@@ -408,14 +404,20 @@ function renderLightboxTags(image) {
                 </div>
                 <div class="tags-list">
                     ${tags.map(tag => {
-                        const conf = tag.confidence;
-                        const confClass = conf >= 0.8 ? 'high-confidence' : conf >= 0.6 ? 'medium-confidence' : '';
-                        return `
-                            <span class="tag ${confClass}">
-                                ${tag.label}
-                                <span class="tag-confidence">${conf.toFixed(2)}</span>
-                            </span>
-                        `;
+                        // Only show confidence if provided
+                        const hasConfidence = tag.confidence !== undefined && tag.confidence !== null;
+                        if (hasConfidence) {
+                            const conf = tag.confidence;
+                            const confClass = conf >= 0.8 ? 'high-confidence' : conf >= 0.6 ? 'medium-confidence' : '';
+                            return `
+                                <span class="tag ${confClass}">
+                                    ${tag.label}
+                                    <span class="tag-confidence">${conf.toFixed(2)}</span>
+                                </span>
+                            `;
+                        } else {
+                            return `<span class="tag">${tag.label}</span>`;
+                        }
                     }).join('')}
                 </div>
             `;

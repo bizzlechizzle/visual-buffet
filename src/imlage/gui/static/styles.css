@@ -826,6 +826,13 @@ body {
     color: var(--text-secondary);
 }
 
+.plugin-note {
+    font-size: var(--font-size-xs);
+    color: var(--text-tertiary);
+    font-style: italic;
+    margin: 0;
+}
+
 
 /* Hardware Info */
 .hardware-info {

@@ -92,6 +92,7 @@ async def status():
             plugin_section = meta.get("plugin", {})
             name = plugin_section.get("name", "unknown")
             display_name = plugin_section.get("display_name", name)
+            provides_confidence = plugin_section.get("provides_confidence", True)
             try:
                 plugin = load_plugin(meta["_path"])
                 available = plugin.is_available()
@@ -104,6 +105,7 @@ async def status():
                 "version": plugin_section.get("version", "?"),
                 "description": plugin_section.get("description", ""),
                 "available": available,
+                "provides_confidence": provides_confidence,
             })
 
         return {

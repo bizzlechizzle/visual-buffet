@@ -5,6 +5,8 @@ version = "1.0.0"
 description = "Recognize Anything Plus Plus - General purpose image tagging with ~6500 tags"
 entry_point = "RamPlusPlugin"
 python_requires = ">=3.11"
+# RAM++ outputs tags in order of relevance but does NOT provide confidence scores
+provides_confidence = false
 
 [plugin.dependencies]
 torch = ">=2.0"

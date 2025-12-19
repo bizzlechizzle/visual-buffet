@@ -105,11 +105,16 @@ class TaggingEngine:
                     plugin_threshold = threshold
                     plugin_limit = limit
 
-                # Apply threshold filter
-                filtered_tags = [t for t in result.tags if t.confidence >= plugin_threshold]
+                # Apply threshold filter (only for tags with confidence scores)
+                filtered_tags = [
+                    t for t in result.tags
+                    if t.confidence is None or t.confidence >= plugin_threshold
+                ]
 
-                # Sort by confidence (highest first)
-                filtered_tags.sort(key=lambda t: t.confidence, reverse=True)
+                # Sort by confidence (highest first) if confidence is available
+                # Tags without confidence keep their original order (relevance order)
+                if filtered_tags and filtered_tags[0].confidence is not None:
+                    filtered_tags.sort(key=lambda t: t.confidence or 0, reverse=True)
 
                 # Apply limit
                 if plugin_limit:

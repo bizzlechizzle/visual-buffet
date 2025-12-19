@@ -11,24 +11,28 @@ from typing import Any
 
 @dataclass
 class Tag:
-    """A single tag with confidence score.
+    """A single tag with optional confidence score.
 
     Attributes:
         label: The tag text (e.g., "dog", "outdoor")
-        confidence: How confident the model is (0.0 to 1.0)
+        confidence: How confident the model is (0.0 to 1.0), or None if not provided
 
     Example:
         >>> tag = Tag(label="cat", confidence=0.95)
         >>> tag.label
         'cat'
+        >>> tag_no_conf = Tag(label="dog", confidence=None)
     """
 
     label: str
-    confidence: float
+    confidence: float | None = None
 
     def to_dict(self) -> dict:
         """Convert to dictionary for JSON serialization."""
-        return {"label": self.label, "confidence": self.confidence}
+        result = {"label": self.label}
+        if self.confidence is not None:
+            result["confidence"] = self.confidence
+        return result
 
 
 @dataclass
