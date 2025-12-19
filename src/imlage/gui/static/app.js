@@ -194,7 +194,6 @@ function renderPluginsList() {
             <div class="plugin-status-dot ${plugin.available ? 'available' : 'unavailable'}"></div>
             <div class="plugin-details">
                 <div class="plugin-item-name">${plugin.display_name || plugin.name}</div>
-                <div class="plugin-item-desc">${plugin.description || 'No description'}</div>
             </div>
         </div>
     `).join('');

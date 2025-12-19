@@ -69,11 +69,36 @@ def _save_cache(profile: HardwareProfile) -> None:
         json.dump(data, f, indent=2)
 
 
+def _get_cpu_model() -> str:
+    """Get CPU model name, with macOS-specific handling."""
+    # Try platform.processor() first
+    cpu_model = platform.processor()
+
+    # On macOS with Apple Silicon, platform.processor() returns just "arm"
+    # Use sysctl to get the actual chip name
+    if platform.system() == "Darwin" and (not cpu_model or cpu_model == "arm"):
+        try:
+            import subprocess
+
+            result = subprocess.run(
+                ["sysctl", "-n", "machdep.cpu.brand_string"],
+                capture_output=True,
+                text=True,
+                timeout=5,
+            )
+            if result.returncode == 0 and result.stdout.strip():
+                return result.stdout.strip()
+        except Exception:
+            pass
+
+    return cpu_model or "Unknown"
+
+
 def _detect_all() -> HardwareProfile:
     """Perform full hardware detection."""
     try:
         # CPU detection
-        cpu_model = platform.processor() or "Unknown"
+        cpu_model = _get_cpu_model()
         cpu_cores = psutil.cpu_count(logical=False) or 1
 
         # RAM detection
