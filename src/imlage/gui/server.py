@@ -3,8 +3,9 @@
 Serves the web interface and handles API requests for tagging.
 """
 
-import base64
+import atexit
 import io
+import shutil
 import tempfile
 import uuid
 from pathlib import Path
@@ -39,6 +40,21 @@ app.add_middleware(
 
 # Static files directory
 STATIC_DIR = Path(__file__).parent / "static"
+
+# Create temp cache directory for thumbnails (wiped on each startup)
+CACHE_DIR = Path(tempfile.mkdtemp(prefix="imlage_cache_"))
+THUMB_DIR = CACHE_DIR / "thumbnails"
+THUMB_DIR.mkdir(exist_ok=True)
+
+
+def cleanup_cache():
+    """Clean up the cache directory on exit."""
+    if CACHE_DIR.exists():
+        shutil.rmtree(CACHE_DIR, ignore_errors=True)
+
+
+# Register cleanup on exit
+atexit.register(cleanup_cache)
 
 # In-memory storage for uploaded images and results
 _sessions: dict[str, dict[str, Any]] = {}
@@ -166,12 +182,16 @@ async def upload_image(file: UploadFile = File(...)):
         # Generate unique ID
         image_id = str(uuid.uuid4())[:8]
 
-        # Create thumbnail (base64)
+        # Create thumbnail and save to disk cache
         thumb = img.copy()
         thumb.thumbnail((200, 200))
-        thumb_buffer = io.BytesIO()
-        thumb.save(thumb_buffer, format="JPEG", quality=85)
-        thumb_b64 = base64.b64encode(thumb_buffer.getvalue()).decode()
+
+        # Convert to RGB if necessary (for JPEG saving)
+        if thumb.mode in ("RGBA", "P"):
+            thumb = thumb.convert("RGB")
+
+        thumb_path = THUMB_DIR / f"{image_id}.jpg"
+        thumb.save(thumb_path, format="JPEG", quality=85)
 
         # Store in session
         _sessions[image_id] = {
@@ -179,8 +199,8 @@ async def upload_image(file: UploadFile = File(...)):
             "data": contents,
             "width": img.width,
             "height": img.height,
-            "format": img.format,
-            "thumbnail": f"data:image/jpeg;base64,{thumb_b64}",
+            "format": img.format or "JPEG",
+            "thumb_path": thumb_path,
             "results": None,
         }
 
@@ -189,8 +209,8 @@ async def upload_image(file: UploadFile = File(...)):
             "filename": file.filename,
             "width": img.width,
             "height": img.height,
-            "format": img.format,
-            "thumbnail": f"data:image/jpeg;base64,{thumb_b64}",
+            "format": img.format or "JPEG",
+            "thumbnail": f"/api/thumbnail/{image_id}",
         }
 
     except HTTPException:
@@ -199,17 +219,65 @@ async def upload_image(file: UploadFile = File(...)):
         raise HTTPException(500, f"Upload failed: {str(e)}")
 
 
+@app.get("/api/thumbnail/{image_id}")
+async def get_thumbnail(image_id: str):
+    """Get thumbnail image file."""
+    if image_id not in _sessions:
+        raise HTTPException(404, "Image not found")
+
+    session = _sessions[image_id]
+    thumb_path = session.get("thumb_path")
+
+    if not thumb_path or not thumb_path.exists():
+        raise HTTPException(404, "Thumbnail not found")
+
+    return FileResponse(
+        thumb_path,
+        media_type="image/jpeg",
+        headers={"Cache-Control": "private, max-age=3600"},
+    )
+
+
 @app.get("/api/image/{image_id}")
 async def get_image(image_id: str):
-    """Get full image data."""
+    """Get full image data as file."""
     if image_id not in _sessions:
         raise HTTPException(404, "Image not found")
 
     session = _sessions[image_id]
     img_data = session["data"]
+    img_format = session["format"].lower()
 
-    # Convert to base64
-    b64 = base64.b64encode(img_data).decode()
+    # Write to temp file and serve
+    temp_path = CACHE_DIR / f"full_{image_id}.{img_format}"
+    temp_path.write_bytes(img_data)
+
+    # Determine MIME type
+    mime_types = {
+        "jpeg": "image/jpeg",
+        "jpg": "image/jpeg",
+        "png": "image/png",
+        "gif": "image/gif",
+        "webp": "image/webp",
+        "bmp": "image/bmp",
+    }
+    mime_type = mime_types.get(img_format, f"image/{img_format}")
+
+    return FileResponse(
+        temp_path,
+        media_type=mime_type,
+        filename=session["filename"],
+        headers={"Cache-Control": "private, max-age=3600"},
+    )
+
+
+@app.get("/api/image/{image_id}/meta")
+async def get_image_meta(image_id: str):
+    """Get image metadata and results (without image data)."""
+    if image_id not in _sessions:
+        raise HTTPException(404, "Image not found")
+
+    session = _sessions[image_id]
 
     return {
         "id": image_id,
@@ -217,7 +285,7 @@ async def get_image(image_id: str):
         "width": session["width"],
         "height": session["height"],
         "format": session["format"],
-        "data": f"data:image/{session['format'].lower()};base64,{b64}",
+        "thumbnail": f"/api/thumbnail/{image_id}",
         "results": session.get("results"),
     }
 
@@ -237,12 +305,9 @@ async def tag_image(
 
     try:
         # Write to temp file for processing
-        with tempfile.NamedTemporaryFile(
-            suffix=f".{session['format'].lower()}",
-            delete=False,
-        ) as tmp:
-            tmp.write(session["data"])
-            tmp_path = Path(tmp.name)
+        img_format = session["format"].lower()
+        tmp_path = CACHE_DIR / f"tag_{image_id}.{img_format}"
+        tmp_path.write_bytes(session["data"])
 
         try:
             # Run tagging
@@ -301,6 +366,13 @@ async def delete_image(image_id: str):
     if image_id not in _sessions:
         raise HTTPException(404, "Image not found")
 
+    session = _sessions[image_id]
+
+    # Clean up thumbnail file
+    thumb_path = session.get("thumb_path")
+    if thumb_path and thumb_path.exists():
+        thumb_path.unlink(missing_ok=True)
+
     del _sessions[image_id]
     return {"status": "deleted"}
 
@@ -308,6 +380,12 @@ async def delete_image(image_id: str):
 @app.delete("/api/images")
 async def clear_images():
     """Clear all uploaded images."""
+    # Clean up all thumbnail files
+    for session in _sessions.values():
+        thumb_path = session.get("thumb_path")
+        if thumb_path and thumb_path.exists():
+            thumb_path.unlink(missing_ok=True)
+
     _sessions.clear()
     return {"status": "cleared"}
 

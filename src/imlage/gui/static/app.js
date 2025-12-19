@@ -27,6 +27,9 @@ const state = {
 const elements = {
     dropZone: document.getElementById('dropZone'),
     fileInput: document.getElementById('fileInput'),
+    folderInput: document.getElementById('folderInput'),
+    browseFilesBtn: document.getElementById('browseFilesBtn'),
+    browseFolderBtn: document.getElementById('browseFolderBtn'),
     imageGrid: document.getElementById('imageGrid'),
     imageCount: document.getElementById('imageCount'),
     processingStatus: document.getElementById('processingStatus'),
@@ -111,16 +114,6 @@ async function tagImage(imageId) {
     if (!response.ok) {
         const error = await response.json();
         throw new Error(error.detail || 'Tagging failed');
-    }
-
-    return response.json();
-}
-
-async function getFullImage(imageId) {
-    const response = await fetch(`/api/image/${imageId}`);
-
-    if (!response.ok) {
-        throw new Error('Failed to load image');
     }
 
     return response.json();
@@ -258,14 +251,16 @@ async function openLightbox(imageId) {
         <span>Format: ${image.format}</span>
     `;
 
-    // Load full image
+    // Load full image (now served as a file)
     try {
-        const fullImage = await getFullImage(imageId);
-        elements.lightboxImage.src = fullImage.data;
+        elements.lightboxImage.src = `/api/image/${imageId}`;
+
+        // Get metadata including results
+        const meta = await fetch(`/api/image/${imageId}/meta`).then(r => r.json());
 
         // Update results if available
-        if (fullImage.results) {
-            image.results = fullImage.results;
+        if (meta.results) {
+            image.results = meta.results;
             state.images.set(imageId, image);
         }
     } catch (error) {
@@ -338,11 +333,78 @@ function renderLightboxTags(image) {
 // Image Handling
 // ============================================================================
 
+/**
+ * Recursively get files from DataTransferItemList (supports dropped folders)
+ */
+async function getFilesFromDataTransfer(items) {
+    const files = [];
+    const entries = [];
+
+    // Get all entries first
+    for (const item of items) {
+        if (item.webkitGetAsEntry) {
+            const entry = item.webkitGetAsEntry();
+            if (entry) entries.push(entry);
+        } else if (item.getAsFile) {
+            const file = item.getAsFile();
+            if (file) files.push(file);
+        }
+    }
+
+    // Process entries (may include directories)
+    async function processEntry(entry) {
+        if (entry.isFile) {
+            return new Promise((resolve) => {
+                entry.file((file) => resolve([file]), () => resolve([]));
+            });
+        } else if (entry.isDirectory) {
+            const dirReader = entry.createReader();
+            const dirFiles = [];
+
+            // Read directory entries in batches (readEntries may not return all at once)
+            const readBatch = () => new Promise((resolve) => {
+                dirReader.readEntries(async (entries) => {
+                    if (entries.length === 0) {
+                        resolve();
+                    } else {
+                        for (const e of entries) {
+                            const subFiles = await processEntry(e);
+                            dirFiles.push(...subFiles);
+                        }
+                        await readBatch(); // Continue reading
+                        resolve();
+                    }
+                }, () => resolve());
+            });
+
+            await readBatch();
+            return dirFiles;
+        }
+        return [];
+    }
+
+    // Process all entries
+    for (const entry of entries) {
+        const entryFiles = await processEntry(entry);
+        files.push(...entryFiles);
+    }
+
+    return files;
+}
+
 async function handleFiles(files) {
-    const imageFiles = Array.from(files).filter(f => f.type.startsWith('image/'));
+    // Filter for image files - check both MIME type and extension
+    const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.bmp', '.tiff', '.tif'];
+    const imageFiles = Array.from(files).filter(f => {
+        // Check MIME type
+        if (f.type.startsWith('image/')) return true;
+        // Fallback to extension check (for folder selections where MIME may not be set)
+        const ext = f.name.toLowerCase().substring(f.name.lastIndexOf('.'));
+        return imageExtensions.includes(ext);
+    });
 
     if (imageFiles.length === 0) {
-        showToast('No valid image files selected', 'error');
+        showToast('No valid image files found', 'error');
         return;
     }
 
@@ -490,9 +552,17 @@ function showToast(message, type = 'info') {
 // Event Listeners
 // ============================================================================
 
-// Drop zone
-elements.dropZone.addEventListener('click', () => elements.fileInput.click());
+// Drop zone - browse buttons
+elements.browseFilesBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    elements.fileInput.click();
+});
+elements.browseFolderBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    elements.folderInput.click();
+});
 elements.fileInput.addEventListener('change', (e) => handleFiles(e.target.files));
+elements.folderInput.addEventListener('change', (e) => handleFiles(e.target.files));
 
 elements.dropZone.addEventListener('dragover', (e) => {
     e.preventDefault();
@@ -503,18 +573,38 @@ elements.dropZone.addEventListener('dragleave', () => {
     elements.dropZone.classList.remove('drag-over');
 });
 
-elements.dropZone.addEventListener('drop', (e) => {
+elements.dropZone.addEventListener('drop', async (e) => {
     e.preventDefault();
     elements.dropZone.classList.remove('drag-over');
-    handleFiles(e.dataTransfer.files);
+
+    // Handle dropped items - may include folders
+    const items = e.dataTransfer.items;
+    if (items && items.length > 0) {
+        const files = await getFilesFromDataTransfer(items);
+        if (files.length > 0) {
+            handleFiles(files);
+        } else {
+            showToast('No valid image files found', 'error');
+        }
+    } else {
+        handleFiles(e.dataTransfer.files);
+    }
 });
 
 // Global drag and drop
 document.addEventListener('dragover', (e) => e.preventDefault());
-document.addEventListener('drop', (e) => {
+document.addEventListener('drop', async (e) => {
     e.preventDefault();
     if (e.target !== elements.dropZone && !elements.dropZone.contains(e.target)) {
-        handleFiles(e.dataTransfer.files);
+        const items = e.dataTransfer.items;
+        if (items && items.length > 0) {
+            const files = await getFilesFromDataTransfer(items);
+            if (files.length > 0) {
+                handleFiles(files);
+            }
+        } else {
+            handleFiles(e.dataTransfer.files);
+        }
     }
 });
 

@@ -194,6 +194,12 @@ body {
     background: var(--surface-active);
 }
 
+.btn-sm {
+    height: 36px;
+    padding: 0 var(--space-4);
+    font-size: var(--font-size-sm);
+}
+
 .btn-icon {
     display: inline-flex;
     align-items: center;
@@ -272,9 +278,10 @@ body {
     margin-bottom: var(--space-2);
 }
 
-.drop-zone-hint {
-    font-size: var(--font-size-sm);
-    color: var(--text-secondary);
+.drop-zone-buttons {
+    display: flex;
+    gap: var(--space-3);
+    justify-content: center;
     margin-bottom: var(--space-3);
 }
 
