@@ -81,6 +81,8 @@ class Florence2Plugin(PluginBase):
                 "gpu": False,
                 "min_ram_gb": 4,
             },
+            provides_confidence=False,  # Florence-2 returns tags without confidence scores
+            recommended_threshold=0.0,  # No threshold needed since no confidence
         )
 
     def is_available(self) -> bool:
@@ -213,6 +215,7 @@ class Florence2Plugin(PluginBase):
                 model_id,
                 torch_dtype=self._torch_dtype,
                 trust_remote_code=True,
+                attn_implementation="eager",  # Required for transformers 4.47+
             ).to(self._device)
 
             self._model.eval()

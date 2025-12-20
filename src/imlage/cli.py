@@ -352,13 +352,13 @@ def hardware(refresh: bool) -> None:
 
         # Recommendations
         batch_size = get_recommended_batch_size(profile)
-        console.print(f"\n[bold]Recommendations:[/bold]")
+        console.print("\n[bold]Recommendations:[/bold]")
         console.print(f"  Batch size: {batch_size}")
 
         if profile.gpu_type:
-            console.print(f"  [green]GPU acceleration available[/green]")
+            console.print("  [green]GPU acceleration available[/green]")
         else:
-            console.print(f"  [yellow]CPU-only mode (slower)[/yellow]")
+            console.print("  [yellow]CPU-only mode (slower)[/yellow]")
 
     except Exception as e:
         console.print(f"[red]Hardware detection failed: {e}[/red]")
@@ -464,7 +464,7 @@ def gui(host: str, port: int, no_browser: bool) -> None:
     from imlage.gui import app
 
     url = f"http://{host}:{port}"
-    console.print(f"\n[bold]IMLAGE GUI[/bold]")
+    console.print("\n[bold]IMLAGE GUI[/bold]")
     console.print(f"Starting server at [cyan]{url}[/cyan]")
     console.print("[dim]Press Ctrl+C to stop[/dim]\n")
 

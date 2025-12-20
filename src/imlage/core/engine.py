@@ -18,9 +18,9 @@ from ..plugins.base import PluginBase
 from ..plugins.loader import load_all_plugins
 from ..plugins.schemas import Tag, TagQuality, merge_tags
 from ..utils.image import (
+    THUMBNAIL_FORMAT,
     generate_thumbnail,
     validate_image,
-    THUMBNAIL_FORMAT,
 )
 
 # Folder name for imlage data stored alongside images
@@ -316,16 +316,36 @@ class TaggingEngine:
         results: dict[str, Any] = {}
         for name, plugin in plugins.items():
             try:
+                # Get plugin's recommended threshold (from PluginInfo)
+                plugin_info = plugin.get_info()
+                recommended = plugin_info.recommended_threshold
+
                 # Get per-plugin config or use defaults
                 config = plugin_configs.get(name, {}) if plugin_configs else {}
 
                 # Handle both dict and Pydantic model
                 if hasattr(config, 'threshold'):
-                    plugin_threshold = config.threshold
+                    # Pydantic model - check if threshold is None (use recommended)
+                    explicit_threshold = config.threshold
+                    if explicit_threshold is not None:
+                        plugin_threshold = explicit_threshold
+                    else:
+                        # Use plugin's recommended threshold
+                        plugin_threshold = recommended
                     plugin_limit = config.limit
                     quality_str = getattr(config, 'quality', None)
                 else:
-                    plugin_threshold = config.get("threshold", threshold)
+                    # Dict config - use plugin's recommended threshold if no explicit threshold
+                    # This is critical for SigLIP which needs 0.01, not 0.5
+                    explicit_threshold = config.get("threshold")
+                    if explicit_threshold is not None:
+                        plugin_threshold = explicit_threshold
+                    elif threshold > 0 and recommended > 0:
+                        # User set a global threshold but plugin has a recommendation
+                        # Use the plugin's recommendation (it knows its output range)
+                        plugin_threshold = recommended
+                    else:
+                        plugin_threshold = threshold if threshold > 0 else recommended
                     plugin_limit = config.get("limit", limit)
                     quality_str = config.get("quality")
 
@@ -374,8 +394,7 @@ class TaggingEngine:
                 if plugin_limit:
                     filtered_tags = filtered_tags[:plugin_limit]
 
-                # Build result dict
-                plugin_info = plugin.get_info()
+                # Build result dict (plugin_info already fetched at loop start)
                 results[name] = {
                     "tags": [t.to_dict() for t in filtered_tags],
                     "model": plugin_info.name,

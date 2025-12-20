@@ -46,6 +46,8 @@ class RamPlusPlugin(PluginBase):
                 "gpu": False,  # Works on CPU, but GPU recommended
                 "min_ram_gb": 4,
             },
+            provides_confidence=False,  # RAM++ returns tags without confidence scores
+            recommended_threshold=0.0,  # No threshold needed since no confidence
         )
 
     def is_available(self) -> bool:
@@ -112,8 +114,8 @@ class RamPlusPlugin(PluginBase):
 
             # Try to import the RAM model
             try:
-                from ram.models import ram_plus
                 from ram import get_transform
+                from ram.models import ram_plus
 
                 model_path = self.get_model_path() / MODEL_NAME
 

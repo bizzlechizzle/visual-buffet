@@ -6,11 +6,11 @@ Calculates stability scores, cross-plugin agreement, and generates master tag li
 Usage: python scripts/analyze_results.py test-results/
 """
 
-import sys
 import json
-from pathlib import Path
+import sys
 from collections import defaultdict
 from datetime import datetime
+from pathlib import Path
 
 
 def load_results(results_dir: Path) -> dict:

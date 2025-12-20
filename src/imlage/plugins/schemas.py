@@ -222,12 +222,17 @@ class PluginInfo:
         version: Semantic version (e.g., "1.0.0")
         description: Human-readable description
         hardware_reqs: Dict of requirements {"gpu": bool, "min_ram_gb": int}
+        provides_confidence: Whether this plugin returns confidence scores
+        recommended_threshold: Default confidence threshold for this plugin.
+            SigLIP uses sigmoid (0.01-0.05), others use 0.0.
     """
 
     name: str
     version: str
     description: str
     hardware_reqs: dict[str, Any] = field(default_factory=dict)
+    provides_confidence: bool = False
+    recommended_threshold: float = 0.0
 
     def to_dict(self) -> dict:
         """Convert to dictionary."""

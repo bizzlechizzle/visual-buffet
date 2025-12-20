@@ -1,18 +1,15 @@
 """Tests for hardware detection."""
 
-import json
-import tempfile
-from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pytest
 
 from imlage.core.hardware import (
-    detect_hardware,
-    get_recommended_batch_size,
-    _detect_gpu,
     CACHE_DIR,
     CACHE_FILE,
+    _detect_gpu,
+    detect_hardware,
+    get_recommended_batch_size,
 )
 from imlage.plugins.schemas import HardwareProfile
 

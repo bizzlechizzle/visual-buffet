@@ -6,14 +6,14 @@ Requires: Pillow, pillow-avif-plugin
 Usage: python scripts/generate_variants.py images/ test-results/variants/
 """
 
-import sys
 import json
-from pathlib import Path
+import sys
 from datetime import datetime
+from pathlib import Path
 
 try:
-    from PIL import Image
     import pillow_avif  # noqa: F401 - registers AVIF support
+    from PIL import Image
 except ImportError:
     print("Required: pip install Pillow pillow-avif-plugin")
     sys.exit(1)

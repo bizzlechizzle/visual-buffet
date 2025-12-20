@@ -9,7 +9,7 @@ import shutil
 import tempfile
 import uuid
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
 
 import rawpy
 from fastapi import FastAPI, File, HTTPException, UploadFile
@@ -17,10 +17,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from PIL import Image
+from pydantic import BaseModel
 
 from ..core.engine import TaggingEngine
 from ..core.hardware import detect_hardware, get_recommended_batch_size
-from ..plugins.loader import discover_plugins, get_plugins_dir, load_plugin
+from ..plugins.loader import discover_plugins, load_plugin
 from ..utils.config import load_config
 from ..utils.image import RAW_EXTENSIONS, SUPPORTED_EXTENSIONS
 
@@ -61,10 +62,20 @@ atexit.register(cleanup_cache)
 # In-memory storage for uploaded images and results
 _sessions: dict[str, dict[str, Any]] = {}
 
+# Singleton engine instance (prevents reloading models on every request)
+_engine: TaggingEngine | None = None
+
 
 def get_engine() -> TaggingEngine:
-    """Get or create tagging engine."""
-    return TaggingEngine()
+    """Get or create tagging engine (singleton).
+
+    Models are loaded lazily when first used, and stay in memory.
+    This prevents constant model reloading that causes OOM.
+    """
+    global _engine
+    if _engine is None:
+        _engine = TaggingEngine()
+    return _engine
 
 
 # Mount static files
@@ -94,12 +105,17 @@ async def status():
             plugin_section = meta.get("plugin", {})
             name = plugin_section.get("name", "unknown")
             display_name = plugin_section.get("display_name", name)
-            provides_confidence = plugin_section.get("provides_confidence", True)
             try:
                 plugin = load_plugin(meta["_path"])
                 available = plugin.is_available()
+                # Get plugin info for confidence/threshold settings
+                info = plugin.get_info()
+                provides_confidence = info.provides_confidence
+                recommended_threshold = info.recommended_threshold
             except Exception:
                 available = False
+                provides_confidence = False
+                recommended_threshold = 0.0
 
             plugin_status.append({
                 "name": name,
@@ -108,6 +124,7 @@ async def status():
                 "description": plugin_section.get("description", ""),
                 "available": available,
                 "provides_confidence": provides_confidence,
+                "recommended_threshold": recommended_threshold,
             })
 
         return {
@@ -165,6 +182,33 @@ async def get_config():
     """Get current configuration."""
     cfg = load_config()
     return cfg
+
+
+class GUISettings(BaseModel):
+    """GUI plugin settings that persist across sessions."""
+
+    plugin_settings: dict[str, dict] = {}
+
+
+@app.get("/api/settings")
+async def get_settings():
+    """Get saved GUI settings."""
+    from ..utils.config import get_value, load_config
+
+    cfg = load_config()
+    gui_settings = get_value(cfg, "gui", {})
+    return {"plugin_settings": gui_settings.get("plugin_settings", {})}
+
+
+@app.post("/api/settings")
+async def save_settings(settings: GUISettings):
+    """Save GUI settings to config file."""
+    from ..utils.config import load_config, save_config, set_value
+
+    cfg = load_config()
+    set_value(cfg, "gui.plugin_settings", settings.plugin_settings)
+    save_config(cfg)
+    return {"status": "saved"}
 
 
 def _is_raw_filename(filename: str) -> bool:
@@ -409,12 +453,10 @@ async def get_image_meta(image_id: str):
     }
 
 
-from pydantic import BaseModel
-from typing import Literal
-
-
 class PluginConfig(BaseModel):
-    threshold: float = 0.5
+    # None means use plugin's recommended threshold
+    # SigLIP needs 0.01, others use 0.0 (no filtering)
+    threshold: float | None = None
     limit: int = 50
     quality: Literal["quick", "standard", "high", "max"] = "standard"
 

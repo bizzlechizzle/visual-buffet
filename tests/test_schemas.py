@@ -1,6 +1,5 @@
 """Tests for plugin schemas."""
 
-import pytest
 
 from imlage.plugins.schemas import HardwareProfile, PluginInfo, Tag, TagResult
 

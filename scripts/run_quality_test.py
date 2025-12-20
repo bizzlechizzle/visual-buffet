@@ -8,11 +8,11 @@ Run complete tag quality test pipeline.
 Usage: python scripts/run_quality_test.py images/ test-results/
 """
 
-import sys
-import subprocess
 import json
-from pathlib import Path
+import subprocess
+import sys
 from datetime import datetime
+from pathlib import Path
 
 
 def run_command(cmd: list[str], description: str) -> bool:
@@ -49,7 +49,7 @@ def main():
     venv_python = Path(__file__).parent.parent / ".venv" / "bin" / "python"
     venv_imlage = Path(__file__).parent.parent / ".venv" / "bin" / "imlage"
 
-    print(f"\nTag Quality Test Pipeline")
+    print("\nTag Quality Test Pipeline")
     print(f"Source: {source_dir}")
     print(f"Output: {output_dir}")
     print(f"Started: {datetime.now().isoformat()}")
@@ -135,7 +135,7 @@ def main():
     print(f"\n{'='*60}")
     print("PIPELINE COMPLETE")
     print(f"{'='*60}")
-    print(f"\nOutputs:")
+    print("\nOutputs:")
     print(f"  Variants: {variants_dir}/")
     print(f"  Tagging:  {tagging_dir}/")
     print(f"  Analysis: {output_dir / 'analysis.json'}")

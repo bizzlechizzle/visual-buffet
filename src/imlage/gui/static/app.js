@@ -71,16 +71,40 @@ async function fetchStatus() {
         state.hardware = data.hardware;
         state.settings.plugins = data.plugins || [];
 
-        // Initialize per-plugin settings with defaults
+        // Load saved settings from server
+        let savedSettings = {};
+        try {
+            const settingsResponse = await fetch('/api/settings');
+            const settingsData = await settingsResponse.json();
+            savedSettings = settingsData.plugin_settings || {};
+        } catch (e) {
+            console.warn('Could not load saved settings:', e);
+        }
+
+        // Initialize per-plugin settings - use saved values or defaults
         for (const plugin of state.settings.plugins) {
             if (!state.settings.pluginSettings[plugin.name]) {
-                state.settings.pluginSettings[plugin.name] = {
-                    enabled: plugin.available, // Enable by default if available
-                    threshold: 0.5,
-                    limit: 50,
-                    quality: 'standard', // quick | standard | high
-                    providesConfidence: plugin.provides_confidence !== false,
-                };
+                const saved = savedSettings[plugin.name];
+                if (saved) {
+                    // Use saved settings
+                    state.settings.pluginSettings[plugin.name] = {
+                        enabled: saved.enabled ?? plugin.available,
+                        threshold: saved.threshold ?? plugin.recommended_threshold ?? 0.0,
+                        limit: saved.limit ?? 50,
+                        quality: saved.quality ?? 'standard',
+                        providesConfidence: plugin.provides_confidence !== false,
+                    };
+                } else {
+                    // Use plugin's recommended_threshold (critical for SigLIP which needs 0.01)
+                    const threshold = plugin.recommended_threshold ?? 0.0;
+                    state.settings.pluginSettings[plugin.name] = {
+                        enabled: plugin.available,
+                        threshold: threshold,
+                        limit: 50,
+                        quality: 'standard',
+                        providesConfidence: plugin.provides_confidence !== false,
+                    };
+                }
             }
         }
 
@@ -151,6 +175,20 @@ async function tagImage(imageId) {
 
 async function deleteImage(imageId) {
     await fetch(`/api/image/${imageId}`, { method: 'DELETE' });
+}
+
+async function saveSettings() {
+    try {
+        await fetch('/api/settings', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                plugin_settings: state.settings.pluginSettings,
+            }),
+        });
+    } catch (error) {
+        console.error('Failed to save settings:', error);
+    }
 }
 
 async function clearAllImages() {
@@ -244,7 +282,9 @@ function renderPluginsList() {
     }
 
     elements.pluginsList.innerHTML = state.settings.plugins.map(plugin => {
-        const settings = state.settings.pluginSettings[plugin.name] || { enabled: false, threshold: 0.5, limit: 50 };
+        // Use plugin's recommended_threshold if settings not initialized
+        const defaultThreshold = plugin.recommended_threshold ?? 0.0;
+        const settings = state.settings.pluginSettings[plugin.name] || { enabled: false, threshold: defaultThreshold, limit: 50 };
         const displayName = plugin.display_name || plugin.name;
         const isAvailable = plugin.available;
         const isEnabled = settings.enabled && isAvailable;
@@ -265,6 +305,17 @@ function renderPluginsList() {
                     </label>
                 </div>
                 <div class="plugin-card-settings ${!isEnabled ? 'disabled' : ''}">
+                    ${plugin.provides_confidence ? `
+                    <div class="plugin-setting">
+                        <label>Threshold</label>
+                        <div class="setting-control">
+                            <input type="range" min="0" max="100" value="${Math.round(settings.threshold * 100)}"
+                                ${!isEnabled ? 'disabled' : ''}
+                                oninput="updatePluginThreshold('${plugin.name}', this.value)">
+                            <span class="setting-value">${settings.threshold.toFixed(2)}</span>
+                        </div>
+                    </div>
+                    ` : ''}
                     <div class="plugin-setting">
                         <label>Quality</label>
                         <div class="setting-control">
@@ -297,36 +348,48 @@ function togglePlugin(pluginName, enabled) {
     if (state.settings.pluginSettings[pluginName]) {
         state.settings.pluginSettings[pluginName].enabled = enabled;
         renderPluginsList();
+        saveSettings(); // Persist to disk
     }
 }
 
 function updatePluginThreshold(pluginName, value) {
     if (state.settings.pluginSettings[pluginName]) {
         state.settings.pluginSettings[pluginName].threshold = value / 100;
-        // Update display value
+        // Update display value - find the threshold setting specifically
         const card = document.querySelector(`[data-plugin="${pluginName}"]`);
         if (card) {
-            const valueSpan = card.querySelector('.plugin-setting:first-child .setting-value');
-            if (valueSpan) valueSpan.textContent = (value / 100).toFixed(2);
+            const thresholdSetting = Array.from(card.querySelectorAll('.plugin-setting'))
+                .find(el => el.querySelector('label')?.textContent === 'Threshold');
+            if (thresholdSetting) {
+                const valueSpan = thresholdSetting.querySelector('.setting-value');
+                if (valueSpan) valueSpan.textContent = (value / 100).toFixed(2);
+            }
         }
+        saveSettings(); // Persist to disk
     }
 }
 
 function updatePluginLimit(pluginName, value) {
     if (state.settings.pluginSettings[pluginName]) {
         state.settings.pluginSettings[pluginName].limit = parseInt(value);
-        // Update display value
+        // Update display value - find the limit setting specifically
         const card = document.querySelector(`[data-plugin="${pluginName}"]`);
         if (card) {
-            const valueSpan = card.querySelector('.plugin-setting:last-of-type .setting-value');
-            if (valueSpan) valueSpan.textContent = value;
+            const limitSetting = Array.from(card.querySelectorAll('.plugin-setting'))
+                .find(el => el.querySelector('label')?.textContent === 'Tag Limit');
+            if (limitSetting) {
+                const valueSpan = limitSetting.querySelector('.setting-value');
+                if (valueSpan) valueSpan.textContent = value;
+            }
         }
+        saveSettings(); // Persist to disk
     }
 }
 
 function updatePluginQuality(pluginName, value) {
     if (state.settings.pluginSettings[pluginName]) {
         state.settings.pluginSettings[pluginName].quality = value;
+        saveSettings(); // Persist to disk
     }
 }
 

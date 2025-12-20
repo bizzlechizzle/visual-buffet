@@ -30,6 +30,7 @@ dependencies = [
     "tomli-w>=1.0",
     "tomli>=2.0;python_version<'3.11'",
     "rawpy>=0.19",
+    "packaging>=21.0",
 ]
 
 [project.optional-dependencies]
@@ -52,6 +53,27 @@ ram_plus = [
     "torchvision>=0.15",
     "timm>=0.9",
     "recognize-anything @ git+https://github.com/xinyu1205/recognize-anything.git",
+]
+florence_2 = [
+    "torch>=2.0",
+    "torchvision>=0.15",
+    "transformers>=4.40.0,<4.50.0",
+    "einops>=0.7.0",
+]
+siglip = [
+    "torch>=2.0",
+    "torchvision>=0.15",
+    "transformers>=4.47.0,<4.50.0",
+    "accelerate>=0.25.0",
+    "sentencepiece>=0.1.99",
+    "protobuf>=3.20.0",
+]
+siglip_quantized = [
+    "torch>=2.0",
+    "torchvision>=0.15",
+    "transformers>=4.47.0",
+    "accelerate>=0.25.0",
+    "bitsandbytes>=0.41.0",
 ]
 
 [project.scripts]
