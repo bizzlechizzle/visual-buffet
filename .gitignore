@@ -52,6 +52,7 @@ htmlcov/
 .AppleDouble
 .LSOverride
 ._*
+.smbdelete*
 
 # Windows
 Thumbs.db
