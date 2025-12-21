@@ -1,148 +1,102 @@
-# IMLAGE
+# Universal Development Standards
 
-Image Machine Learning Aggregate — A universal CLI/GUI that compares visual tagging results from local ML tools.
+Consistent, maintainable code across all projects.
 
-## Three-Doc Stack
+## Instruction Files
 
-This project uses three core instruction files. Read them in order before any task:
+| File | Location | Purpose |
+|------|----------|---------|
+| `CLAUDE.md` | Root | Universal rules (this file) |
+| `techguide.md` | Root | Project-specific details (import via `@techguide.md`) |
+| `.claude/rules/*.md` | .claude/rules/ | Modular, path-scoped rules |
 
-| File | Purpose | Modify? |
-|------|---------|---------|
-| **CLAUDE.md** (this file) | Project rules, architecture, constraints, reference index | Never |
-| **@techguide.md** | Implementation details, build setup, environment config, deep troubleshooting | Never |
-| **@lilbits.md** | Script registry — every utility script with purpose, usage, line count | Never |
-
-These three files are the complete instruction set. All other docs are reference material consulted on-demand.
-
-**If any of these files are missing, empty, or unreadable: STOP and report to human. Do not proceed.**
-
-## Quick Context
-
-- **Mission**: Compare visual tagging results across local ML tools
-- **Current**: Pre-release, foundation phase
-- **Target**: CLI-first tool with optional web GUI for comparing ML tagger outputs
-- **Persona**: Researcher/creator comparing which tagger works best for their images
-- **Runtime**: Python >=3.11
-
-## Core Principles
-
-1. **CLI First, GUI Second** — CLI is the primary interface; GUI is a convenience layer
-2. **Nothing Hardcoded** — Tools are plugins with their own settings; paths, models, options all configurable
-3. **Flexible Input** — Single file, single folder, multi-folder; drag-drop supported in GUI
-4. **Plugin Architecture** — Each ML tool is a plugin that can be installed, configured, updated, removed
-5. **SME Files** — Each plugin gets a Subject Matter Expert file documenting its capabilities and quirks
-6. **Performance Scaling** — Detect user hardware, adjust batch sizes and model variants accordingly
-7. **Use Existing Tools** — Bundle proven binaries rather than reinvent; check hardware with established utilities
-
-## Output Contract
-
-All plugins return:
-```json
-{"tags": [{"label": "string", "confidence": 0.0}]}
-```
-
-CLI aggregates into:
-```json
-{"file": "path", "results": {"plugin_name": {"tags": [...]}}}
-```
-
-## Data Ownership
-
-All processing local. No cloud APIs. Images never leave machine.
+Files load in order. Missing files are skipped.
 
 ## Boot Sequence
 
-1. Read this file (CLAUDE.md) completely
-2. Read @techguide.md for implementation details
-3. Read @lilbits.md for script registry
-4. Read the task request
-5. **Then** touch code — not before
+1. Read this file completely
+2. Read `@techguide.md` if it exists
+3. Read the task
+4. Begin implementation
 
-## Commands
+## Commands & Gotchas
 
-```bash
-# Package management
-uv sync                  # Install dependencies
-uv run imlage --help     # Run CLI
+Define in `@techguide.md`. Every project must document:
+- Build, test, lint, and run commands
+- Critical gotchas (non-obvious failures, environment quirks)
+- Troubleshooting steps for common issues
 
-# Development
-uv run pytest            # Run tests
-uv run ruff check .      # Lint
-uv run ruff format .     # Format
-```
-
-> **Note**: Verify these commands match `pyproject.toml` scripts before relying on them.
+Use hooks (settings.json) for formatting/linting—not CLAUDE.md.
 
 ## Development Rules
 
-1. **Scope Discipline** — Only implement what the current request describes; no surprise features
-2. **Plugin-First** — Every change must serve the plugin architecture or comparison workflows
-3. **Prefer Open Source + Verify Licenses** — Default to open tools, log every dependency license
-4. **Local-First** — Assume zero connectivity; no cloud ML services
-5. **One Script = One Function** — Keep each script focused, under ~300 lines, recorded in lilbits.md
-6. **No AI in Docs** — Never mention Claude, ChatGPT, Codex, or similar in user-facing docs or UI
-7. **Keep It Simple** — Favor obvious code, minimal abstraction, fewer files
-8. **Binary Dependencies Welcome** — App size is not a concern; bundle ML models and binaries freely
-9. **Verify Build Before Done** — After any implementation work, run tests and confirm the CLI works
+1. **Scope Discipline** — Only implement what the request describes
+2. **Verify Before Done** — Run build and tests; incomplete until passing
+3. **Keep It Simple** — Favor obvious code, minimal abstraction, fewer files
+4. **One Script = One Purpose** — Keep scripts focused (~300 lines guideline)
+5. **Open Source First** — Prefer open tools unless project specifies otherwise
+6. **Binaries Welcome** — Use ffmpeg, exiftool, etc. when appropriate for the environment
+7. **Respect Folder Structure** — Place files in designated directories (templates in `templates/`, scripts in `scripts/`, etc.)
+8. **Build Complete** — No "V2" or deferred features. Plan thoroughly, build once. ("Buy once, cry once")
+
+## Security
+
+- Validate all external input at system boundaries (APIs, CLI, file reads)
+- Never log secrets, credentials, or PII
+- Use parameterized queries for databases
+- Escape output to prevent injection (XSS, SQL, command)
 
 ## Do Not
 
-- Add cloud/remote ML services
-- Hardcode plugin paths or model locations
-- Process images without user action
-- Store images outside user-specified locations
-- Invent new features beyond what the task authorizes
-- Add dependencies without logging licenses
-- Mention AI assistants in UI, user docs, or exports
-- Leave TODOs or unexplained generated code in production branches
-- **Modify or remove core instruction files** — CLAUDE.md, techguide.md, and lilbits.md are protected
-- **Assume when uncertain** — If a task is ambiguous or conflicts with these rules, stop and ask
+- Invent features beyond what the task authorizes
+- Hardcode paths, credentials, or environment-specific values
+- Leave TODOs or unexplained code in production
+- **Assume when uncertain** — Stop and ask
+- **Modify CLAUDE.md** — This file is managed centrally; changes require explicit approval
 
 ## Stop and Ask When
 
-- Adding a new plugin
-- Changing output schema
-- Task requires modifying CLAUDE.md, techguide.md, or lilbits.md
 - Task conflicts with a rule in this file
 - Referenced file or path doesn't exist
-- Task scope is unclear or seems to exceed "one feature"
-- You're about to delete code without understanding why it exists
+- Task scope is unclear or spans multiple features
+- About to delete code without understanding why it exists
+- Schema, API, or breaking change not explicitly authorized
 
-## Critical Gotchas
+## Code Quality
 
-| Gotcha | Details |
-|--------|---------|
-| **Plugin isolation** | Each plugin runs in its own subprocess to prevent model conflicts |
-| **Output normalization** | All plugins MUST return the standard output contract format |
-| **Hardware detection** | Run once at startup, cache results, let user override |
-| **Model files** | Large model files live outside git; document download/setup in plugin SME |
+### Prefer
+- Explicit over implicit
+- Pure functions where possible
+- Descriptive names over comments
+- Early returns over deep nesting
 
-## File Naming Conventions
+### Avoid
+- Magic numbers and strings
+- Global mutable state
+- Premature abstraction
 
-| Type | Convention | Example |
-|------|------------|---------|
-| Python modules | snake_case | `tag_service.py` |
-| CLI commands | kebab-case | `imlage tag-image` |
-| Plugins | snake_case directory | `plugins/ram_plus/` |
-| SME files | plugin name + .sme.md | `ram_plus.sme.md` |
-| Tests | test_ prefix | `test_tag_service.py` |
+## Testing
 
-## Change Protocols
+- Write tests for new functionality
+- Run affected tests (files touched or related) before marking complete
+- Test edge cases and error paths
 
-| Change Type | Required Steps |
-|-------------|----------------|
-| New plugin | Create plugin dir, implement interface, add SME file |
-| Schema change | Update output contract in this file, update all plugins |
-| New dependency | Log license in commit message; verify offline functionality |
+## Git
 
-## Troubleshooting
+- Atomic commits (one logical change)
+- Messages explain what and why
+- Never force push to main/master
+- Never commit secrets or .env files
 
-| Problem | Solution |
-|---------|----------|
-| Plugin not found | Check `plugins/` directory and `plugin.toml` config |
-| Model missing | Run plugin setup command, check SME file for download instructions |
-| Hardware not detected | Check `~/.imlage/hardware.json`, delete to re-detect |
+## Path-Scoped Rules
 
-## Contact Surface
+Rules in `.claude/rules/` can target specific paths:
 
-All prompts funnel through this CLAUDE.md. Do not copy instructions elsewhere.
+```yaml
+---
+paths: src/api/**/*.ts
+---
+# Rules here apply only to matching files
+```
+
+Common globs: `**/*.ts` (all), `src/**/*` (directory), `*.md` (root only)
