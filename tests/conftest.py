@@ -73,8 +73,8 @@ min_ram_gb = 2
 """Mock plugin for testing."""
 
 from pathlib import Path
-from imlage.plugins.base import PluginBase
-from imlage.plugins.schemas import PluginInfo, Tag, TagResult
+from visual_buffet.plugins.base import PluginBase
+from visual_buffet.plugins.schemas import PluginInfo, Tag, TagResult
 
 
 class MockPlugin(PluginBase):

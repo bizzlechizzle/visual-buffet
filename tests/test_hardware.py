@@ -4,14 +4,14 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from imlage.core.hardware import (
+from visual_buffet.core.hardware import (
     CACHE_DIR,
     CACHE_FILE,
     _detect_gpu,
     detect_hardware,
     get_recommended_batch_size,
 )
-from imlage.plugins.schemas import HardwareProfile
+from visual_buffet.plugins.schemas import HardwareProfile
 
 
 class TestGPUDetection:
@@ -74,11 +74,11 @@ class TestGPUDetection:
 class TestDetectHardware:
     """Tests for main hardware detection function."""
 
-    @patch("imlage.core.hardware._detect_gpu")
-    @patch("imlage.core.hardware.psutil")
-    @patch("imlage.core.hardware.platform")
-    @patch("imlage.core.hardware._save_cache")
-    @patch("imlage.core.hardware.CACHE_FILE")
+    @patch("visual_buffet.core.hardware._detect_gpu")
+    @patch("visual_buffet.core.hardware.psutil")
+    @patch("visual_buffet.core.hardware.platform")
+    @patch("visual_buffet.core.hardware._save_cache")
+    @patch("visual_buffet.core.hardware.CACHE_FILE")
     def test_detect_hardware_fresh(
         self, mock_cache_file, mock_save, mock_platform, mock_psutil, mock_gpu
     ):
@@ -101,8 +101,8 @@ class TestDetectHardware:
         assert profile.ram_total_gb == 16.0
         assert profile.gpu_type == "cuda"
 
-    @patch("imlage.core.hardware._load_cached")
-    @patch("imlage.core.hardware.CACHE_FILE")
+    @patch("visual_buffet.core.hardware._load_cached")
+    @patch("visual_buffet.core.hardware.CACHE_FILE")
     def test_detect_hardware_cached(self, mock_cache_file, mock_load):
         """Test hardware detection from cache."""
         mock_cache_file.exists.return_value = True
@@ -196,7 +196,7 @@ class TestCacheConstants:
 
     def test_cache_dir_in_home(self):
         """Test cache dir is in home directory."""
-        assert ".imlage" in str(CACHE_DIR)
+        assert ".visual-buffet" in str(CACHE_DIR)
 
     def test_cache_file_name(self):
         """Test cache file has correct name."""

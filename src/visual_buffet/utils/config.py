@@ -1,8 +1,8 @@
 """Configuration file management.
 
 Config is stored in TOML format at:
-- macOS/Linux: ~/.config/imlage/config.toml
-- Windows: %APPDATA%\\imlage\\config.toml
+- macOS/Linux: ~/.config/visual-buffet/config.toml
+- Windows: %APPDATA%\\visual-buffet\\config.toml
 
 Usage:
     config = load_config()
@@ -29,7 +29,7 @@ def get_config_dir() -> Path:
         base = Path.home() / "AppData" / "Roaming"
     else:
         base = Path.home() / ".config"
-    return base / "imlage"
+    return base / "visual-buffet"
 
 
 def get_config_path() -> Path:

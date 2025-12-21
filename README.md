@@ -1,17 +1,17 @@
-# IMLAGE
+# Visual Buffet
 
-**Image Machine Learning Aggregate** - Compare visual tagging results from local ML tools.
+**Compare visual tagging results from local ML tools.**
 
 ## Overview
 
-IMLAGE is a CLI-first application that processes images through multiple ML tagging plugins and aggregates comparative results. Everything runs locally with no cloud dependencies.
+Visual Buffet is a CLI-first application that processes images through multiple ML tagging plugins and aggregates comparative results. Everything runs locally with no cloud dependencies.
 
 ## Installation
 
 ```bash
 # Clone the repository
-git clone https://github.com/bizzlechizzle/imlage.git
-cd imlage
+git clone https://github.com/bizzlechizzle/visual-buffet.git
+cd visual-buffet
 
 # Create virtual environment
 python3 -m venv .venv
@@ -31,22 +31,22 @@ pip install -e ".[ram_plus]"
 
 ```bash
 # Tag a single image
-imlage tag photo.jpg
+visual-buffet tag photo.jpg
 
 # Tag multiple images
-imlage tag ./photos --recursive
+visual-buffet tag ./photos --recursive
 
 # Save results to file
-imlage tag photo.jpg -o results.json
+visual-buffet tag photo.jpg -o results.json
 
 # List available plugins
-imlage plugins list
+visual-buffet plugins list
 
 # Setup a plugin
-imlage plugins setup ram_plus
+visual-buffet plugins setup ram_plus
 
 # Show hardware capabilities
-imlage hardware
+visual-buffet hardware
 ```
 
 ## Commands
@@ -65,17 +65,17 @@ imlage hardware
 
 ## Web GUI
 
-IMLAGE includes a web-based GUI for visual comparison of tagging results.
+Visual Buffet includes a web-based GUI for visual comparison of tagging results.
 
 ```bash
 # Launch GUI (opens browser automatically)
-imlage gui
+visual-buffet gui
 
 # Custom port
-imlage gui --port 9000
+visual-buffet gui --port 9000
 
 # Without auto-opening browser
-imlage gui --no-browser
+visual-buffet gui --no-browser
 ```
 
 ### GUI Features
@@ -102,7 +102,7 @@ General-purpose image tagging with ~6500 tags.
 
 ```bash
 # Setup
-imlage plugins setup ram_plus
+visual-buffet plugins setup ram_plus
 
 # Requirements
 pip install -e ".[ram_plus]"

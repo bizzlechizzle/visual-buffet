@@ -1,7 +1,7 @@
 """Hardware detection for performance scaling.
 
 Detects CPU, RAM, and GPU capabilities. Results are cached to
-~/.imlage/hardware.json to avoid re-detection on every run.
+~/.visual-buffet/hardware.json to avoid re-detection on every run.
 
 Usage:
     profile = detect_hardware()
@@ -20,7 +20,7 @@ from ..exceptions import HardwareDetectionError
 from ..plugins.schemas import HardwareProfile
 
 # Cache location
-CACHE_DIR = Path.home() / ".imlage"
+CACHE_DIR = Path.home() / ".visual-buffet"
 CACHE_FILE = CACHE_DIR / "hardware.json"
 
 

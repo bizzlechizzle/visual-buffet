@@ -6,10 +6,10 @@ from unittest.mock import patch
 
 from PIL import Image
 
-from imlage.core.engine import TaggingEngine
-from imlage.exceptions import PluginError
-from imlage.plugins.base import PluginBase
-from imlage.plugins.schemas import PluginInfo, Tag, TagResult
+from visual_buffet.core.engine import TaggingEngine
+from visual_buffet.exceptions import PluginError
+from visual_buffet.plugins.base import PluginBase
+from visual_buffet.plugins.schemas import PluginInfo, Tag, TagResult
 
 
 class MockPlugin(PluginBase):
@@ -49,7 +49,7 @@ class TestTaggingEngineInit:
 
     def test_engine_init_no_plugins(self):
         """Test engine initialization with no plugins."""
-        with patch("imlage.core.engine.load_all_plugins", return_value=[]):
+        with patch("visual_buffet.core.engine.load_all_plugins", return_value=[]):
             engine = TaggingEngine()
             assert engine.plugins == {}
 
@@ -61,7 +61,7 @@ class TestTaggingEngineInit:
                 MockPlugin(Path(tmpdir), "plugin2"),
             ]
 
-            with patch("imlage.core.engine.load_all_plugins", return_value=mock_plugins):
+            with patch("visual_buffet.core.engine.load_all_plugins", return_value=mock_plugins):
                 engine = TaggingEngine()
 
             assert len(engine.plugins) == 2
@@ -82,7 +82,7 @@ class TestTagImage:
 
             mock_plugins = [MockPlugin(Path(tmpdir))]
 
-            with patch("imlage.core.engine.load_all_plugins", return_value=mock_plugins):
+            with patch("visual_buffet.core.engine.load_all_plugins", return_value=mock_plugins):
                 engine = TaggingEngine()
                 result = engine.tag_image(test_image)
 
@@ -102,7 +102,7 @@ class TestTagImage:
                 MockPlugin(Path(tmpdir), "plugin2"),
             ]
 
-            with patch("imlage.core.engine.load_all_plugins", return_value=mock_plugins):
+            with patch("visual_buffet.core.engine.load_all_plugins", return_value=mock_plugins):
                 engine = TaggingEngine()
                 result = engine.tag_image(test_image)
 
@@ -121,7 +121,7 @@ class TestTagImage:
                 MockPlugin(Path(tmpdir), "plugin2"),
             ]
 
-            with patch("imlage.core.engine.load_all_plugins", return_value=mock_plugins):
+            with patch("visual_buffet.core.engine.load_all_plugins", return_value=mock_plugins):
                 engine = TaggingEngine()
                 result = engine.tag_image(test_image, plugin_names=["plugin1"])
 
@@ -137,7 +137,7 @@ class TestTagImage:
 
             mock_plugins = [MockPlugin(Path(tmpdir))]
 
-            with patch("imlage.core.engine.load_all_plugins", return_value=mock_plugins):
+            with patch("visual_buffet.core.engine.load_all_plugins", return_value=mock_plugins):
                 engine = TaggingEngine()
                 result = engine.tag_image(test_image, threshold=0.7)
 
@@ -154,7 +154,7 @@ class TestTagImage:
 
             mock_plugins = [MockPlugin(Path(tmpdir))]
 
-            with patch("imlage.core.engine.load_all_plugins", return_value=mock_plugins):
+            with patch("visual_buffet.core.engine.load_all_plugins", return_value=mock_plugins):
                 engine = TaggingEngine()
                 result = engine.tag_image(test_image, limit=2)
 
@@ -172,7 +172,7 @@ class TestTagImage:
                 MockPlugin(Path(tmpdir), "unavailable", available=False),
             ]
 
-            with patch("imlage.core.engine.load_all_plugins", return_value=mock_plugins):
+            with patch("visual_buffet.core.engine.load_all_plugins", return_value=mock_plugins):
                 engine = TaggingEngine()
                 result = engine.tag_image(test_image)
 
@@ -192,7 +192,7 @@ class TestTagBatch:
 
             mock_plugins = [MockPlugin(Path(tmpdir))]
 
-            with patch("imlage.core.engine.load_all_plugins", return_value=mock_plugins):
+            with patch("visual_buffet.core.engine.load_all_plugins", return_value=mock_plugins):
                 engine = TaggingEngine()
                 results = engine.tag_batch([test_image])
 
@@ -212,7 +212,7 @@ class TestTagBatch:
 
             mock_plugins = [MockPlugin(Path(tmpdir))]
 
-            with patch("imlage.core.engine.load_all_plugins", return_value=mock_plugins):
+            with patch("visual_buffet.core.engine.load_all_plugins", return_value=mock_plugins):
                 engine = TaggingEngine()
                 results = engine.tag_batch(images)
 
@@ -232,7 +232,7 @@ class TestTagBatch:
 
             mock_plugins = [MockPlugin(Path(tmpdir))]
 
-            with patch("imlage.core.engine.load_all_plugins", return_value=mock_plugins):
+            with patch("visual_buffet.core.engine.load_all_plugins", return_value=mock_plugins):
                 engine = TaggingEngine()
                 results = engine.tag_batch([valid_image, invalid_image])
 
@@ -244,7 +244,7 @@ class TestTagBatch:
 
     def test_tag_batch_empty_list(self):
         """Test batch tagging with empty list."""
-        with patch("imlage.core.engine.load_all_plugins", return_value=[]):
+        with patch("visual_buffet.core.engine.load_all_plugins", return_value=[]):
             engine = TaggingEngine()
             results = engine.tag_batch([])
 
@@ -274,7 +274,7 @@ class TestTaggingEnginePluginErrors:
 
             mock_plugins = [ErrorPlugin(Path(tmpdir))]
 
-            with patch("imlage.core.engine.load_all_plugins", return_value=mock_plugins):
+            with patch("visual_buffet.core.engine.load_all_plugins", return_value=mock_plugins):
                 engine = TaggingEngine()
                 result = engine.tag_image(test_image)
 
@@ -295,7 +295,7 @@ class TestTaggingEngineOutput:
 
             mock_plugins = [MockPlugin(Path(tmpdir))]
 
-            with patch("imlage.core.engine.load_all_plugins", return_value=mock_plugins):
+            with patch("visual_buffet.core.engine.load_all_plugins", return_value=mock_plugins):
                 engine = TaggingEngine()
                 result = engine.tag_image(test_image)
 
@@ -320,7 +320,7 @@ class TestTaggingEngineOutput:
 
             mock_plugins = [MockPlugin(Path(tmpdir))]
 
-            with patch("imlage.core.engine.load_all_plugins", return_value=mock_plugins):
+            with patch("visual_buffet.core.engine.load_all_plugins", return_value=mock_plugins):
                 engine = TaggingEngine()
                 results = engine.tag_batch([test_image])
 

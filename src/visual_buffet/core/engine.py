@@ -23,8 +23,8 @@ from ..utils.image import (
     validate_image,
 )
 
-# Folder name for imlage data stored alongside images
-IMLAGE_FOLDER = "imlage"
+# Folder name for visual-buffet data stored alongside images
+VISUAL_BUFFET_FOLDER = "visual-buffet"
 
 
 class TaggingEngine:
@@ -37,11 +37,11 @@ class TaggingEngine:
     - STANDARD: 1080px preview (balanced, ~87% tag coverage)
     - HIGH: Multiple resolutions merged (~98% tag coverage)
 
-    Thumbnails and tags are saved in an 'imlage/' folder next to each image:
+    Thumbnails and tags are saved in a 'visual-buffet/' folder next to each image:
 
         /photos/vacation/
         ├── beach.jpg
-        └── imlage/
+        └── visual-buffet/
             ├── beach_480.webp
             ├── beach_1080.webp
             ├── beach_2048.webp
@@ -81,18 +81,18 @@ class TaggingEngine:
         """Get a plugin by name."""
         return self._plugins.get(name)
 
-    def _get_imlage_dir(self, image_path: Path) -> Path:
-        """Get the imlage folder for an image (next to the image).
+    def _get_data_dir(self, image_path: Path) -> Path:
+        """Get the visual-buffet folder for an image (next to the image).
 
         Args:
             image_path: Path to the source image
 
         Returns:
-            Path to imlage folder (e.g., /photos/imlage/)
+            Path to visual-buffet folder (e.g., /photos/visual-buffet/)
         """
-        imlage_dir = image_path.parent / IMLAGE_FOLDER
-        imlage_dir.mkdir(parents=True, exist_ok=True)
-        return imlage_dir
+        data_dir = image_path.parent / VISUAL_BUFFET_FOLDER
+        data_dir.mkdir(parents=True, exist_ok=True)
+        return data_dir
 
     def _get_thumbnail_path(
         self,
@@ -108,7 +108,7 @@ class TaggingEngine:
         Returns:
             Path where thumbnail should be stored
         """
-        imlage_dir = self._get_imlage_dir(image_path)
+        imlage_dir = self._get_data_dir(image_path)
         return imlage_dir / f"{image_path.stem}_{resolution}.{THUMBNAIL_FORMAT}"
 
     def _get_tags_path(self, image_path: Path) -> Path:
@@ -120,7 +120,7 @@ class TaggingEngine:
         Returns:
             Path where tags should be stored
         """
-        imlage_dir = self._get_imlage_dir(image_path)
+        imlage_dir = self._get_data_dir(image_path)
         return imlage_dir / f"{image_path.stem}_tags.json"
 
     def _get_or_create_thumbnail(
@@ -130,7 +130,7 @@ class TaggingEngine:
     ) -> Path:
         """Get or create a thumbnail at the specified resolution.
 
-        Thumbnails are stored in an 'imlage/' folder next to the source image.
+        Thumbnails are stored in a 'visual-buffet/' folder next to the source image.
 
         Args:
             image_path: Original image path
@@ -290,8 +290,8 @@ class TaggingEngine:
             }
 
         Side effects:
-            - Creates thumbnails in {image_dir}/imlage/
-            - Saves tags to {image_dir}/imlage/{image_stem}_tags.json
+            - Creates thumbnails in {image_dir}/visual-buffet/
+            - Saves tags to {image_dir}/visual-buffet/{image_stem}_tags.json
         """
         # Validate image
         validate_image(image_path)
@@ -463,7 +463,7 @@ class TaggingEngine:
         """Generate all standard thumbnails for an image.
 
         Creates thumbnails at 480px, 1080px, and 2048px in the
-        imlage/ folder next to the image.
+        visual-buffet/ folder next to the image.
 
         Args:
             image_path: Path to source image

@@ -1,4 +1,4 @@
-"""FastAPI server for IMLAGE GUI.
+"""FastAPI server for Visual Buffet GUI.
 
 Serves the web interface and handles API requests for tagging.
 """
@@ -27,8 +27,8 @@ from ..utils.image import RAW_EXTENSIONS, SUPPORTED_EXTENSIONS
 
 # App instance
 app = FastAPI(
-    title="IMLAGE",
-    description="Image Machine Learning Aggregate",
+    title="Visual Buffet",
+    description="Compare visual tagging results from local ML tools",
     version="0.1.0",
 )
 
@@ -45,7 +45,7 @@ app.add_middleware(
 STATIC_DIR = Path(__file__).parent / "static"
 
 # Create temp cache directory for thumbnails (wiped on each startup)
-CACHE_DIR = Path(tempfile.mkdtemp(prefix="imlage_cache_"))
+CACHE_DIR = Path(tempfile.mkdtemp(prefix="visual_buffet_cache_"))
 THUMB_DIR = CACHE_DIR / "thumbnails"
 THUMB_DIR.mkdir(exist_ok=True)
 

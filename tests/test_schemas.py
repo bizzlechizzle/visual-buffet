@@ -1,7 +1,7 @@
 """Tests for plugin schemas."""
 
 
-from imlage.plugins.schemas import HardwareProfile, PluginInfo, Tag, TagResult
+from visual_buffet.plugins.schemas import HardwareProfile, PluginInfo, Tag, TagResult
 
 
 class TestTag:

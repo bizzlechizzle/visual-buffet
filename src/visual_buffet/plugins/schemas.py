@@ -243,7 +243,7 @@ class PluginInfo:
 class HardwareProfile:
     """Detected hardware capabilities.
 
-    Cached to ~/.imlage/hardware.json after first detection.
+    Cached to ~/.visual-buffet/hardware.json after first detection.
 
     Attributes:
         cpu_model: CPU name (e.g., "Apple M2 Pro")

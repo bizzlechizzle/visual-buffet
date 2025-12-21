@@ -6,15 +6,15 @@ from unittest.mock import patch
 
 import pytest
 
-from imlage.exceptions import PluginError, PluginNotFoundError
-from imlage.plugins.base import PluginBase
-from imlage.plugins.loader import (
+from visual_buffet.exceptions import PluginError, PluginNotFoundError
+from visual_buffet.plugins.base import PluginBase
+from visual_buffet.plugins.loader import (
     discover_plugins,
     get_plugins_dir,
     load_all_plugins,
     load_plugin,
 )
-from imlage.plugins.schemas import PluginInfo, Tag, TagResult
+from visual_buffet.plugins.schemas import PluginInfo, Tag, TagResult
 
 
 class MockPlugin(PluginBase):
@@ -79,7 +79,7 @@ class TestDiscoverPlugins:
     def test_discover_no_plugins(self):
         """Test discovery with no plugins."""
         with tempfile.TemporaryDirectory() as tmpdir:
-            with patch("imlage.plugins.loader.get_plugins_dir", return_value=Path(tmpdir)):
+            with patch("visual_buffet.plugins.loader.get_plugins_dir", return_value=Path(tmpdir)):
                 plugins = discover_plugins()
             assert plugins == []
 
@@ -104,7 +104,7 @@ entry_point = "TestPlugin"
             # Create __init__.py
             (plugin_dir / "__init__.py").write_text("")
 
-            with patch("imlage.plugins.loader.get_plugins_dir", return_value=Path(tmpdir)):
+            with patch("visual_buffet.plugins.loader.get_plugins_dir", return_value=Path(tmpdir)):
                 plugins = discover_plugins()
 
             assert len(plugins) == 1
@@ -118,7 +118,7 @@ entry_point = "TestPlugin"
             invalid_dir.mkdir()
             (invalid_dir / "__init__.py").write_text("")
 
-            with patch("imlage.plugins.loader.get_plugins_dir", return_value=Path(tmpdir)):
+            with patch("visual_buffet.plugins.loader.get_plugins_dir", return_value=Path(tmpdir)):
                 plugins = discover_plugins()
 
             assert plugins == []
@@ -181,7 +181,7 @@ class TestLoadAllPlugins:
     def test_load_all_empty(self):
         """Test loading all with no plugins."""
         with tempfile.TemporaryDirectory() as tmpdir:
-            with patch("imlage.plugins.loader.get_plugins_dir", return_value=Path(tmpdir)):
+            with patch("visual_buffet.plugins.loader.get_plugins_dir", return_value=Path(tmpdir)):
                 plugins = load_all_plugins()
 
             assert plugins == []
@@ -195,7 +195,7 @@ class TestLoadAllPlugins:
             (broken_dir / "plugin.toml").write_text("[plugin]\nname = 'broken'")
             # Missing __init__.py
 
-            with patch("imlage.plugins.loader.get_plugins_dir", return_value=Path(tmpdir)):
+            with patch("visual_buffet.plugins.loader.get_plugins_dir", return_value=Path(tmpdir)):
                 plugins = load_all_plugins()
 
             assert plugins == []

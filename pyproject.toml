@@ -1,7 +1,7 @@
 [project]
-name = "imlage"
+name = "visual-buffet"
 version = "0.1.0"
-description = "Image Machine Learning Aggregate - Compare visual tagging results from local ML tools"
+description = "Visual Buffet - Compare visual tagging results from local ML tools"
 readme = "README.md"
 license = { text = "MIT" }
 requires-python = ">=3.11"
@@ -77,7 +77,7 @@ siglip_quantized = [
 ]
 
 [project.scripts]
-imlage = "imlage.cli:main"
+visual-buffet = "visual_buffet.cli:main"
 
 [build-system]
 requires = ["hatchling"]
@@ -87,7 +87,7 @@ build-backend = "hatchling.build"
 allow-direct-references = true
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/imlage"]
+packages = ["src/visual_buffet"]
 
 [tool.ruff]
 target-version = "py311"

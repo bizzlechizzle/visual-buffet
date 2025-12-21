@@ -4,7 +4,7 @@ import tempfile
 from pathlib import Path
 from unittest.mock import patch
 
-from imlage.utils.config import (
+from visual_buffet.utils.config import (
     DEFAULT_CONFIG,
     get_config_path,
     get_value,
@@ -20,7 +20,7 @@ class TestConfigPath:
     def test_get_config_path_default(self):
         """Test default config path is in user config directory."""
         path = get_config_path()
-        assert "imlage" in str(path)
+        assert "visual-buffet" in str(path)
         assert path.name == "config.toml"
 
 
@@ -52,7 +52,7 @@ class TestLoadConfig:
         with tempfile.TemporaryDirectory() as tmpdir:
             config_path = Path(tmpdir) / "nonexistent.toml"
 
-            with patch("imlage.utils.config.get_config_path", return_value=config_path):
+            with patch("visual_buffet.utils.config.get_config_path", return_value=config_path):
                 config = load_config()
 
             # Should match default config structure
@@ -75,7 +75,7 @@ enabled = ["ram_plus"]
 """
             )
 
-            with patch("imlage.utils.config.get_config_path", return_value=config_path):
+            with patch("visual_buffet.utils.config.get_config_path", return_value=config_path):
                 config = load_config()
 
             assert config["general"]["default_threshold"] == 0.7
@@ -91,7 +91,7 @@ class TestSaveConfig:
         with tempfile.TemporaryDirectory() as tmpdir:
             config_path = Path(tmpdir) / "subdir" / "config.toml"
 
-            with patch("imlage.utils.config.get_config_path", return_value=config_path):
+            with patch("visual_buffet.utils.config.get_config_path", return_value=config_path):
                 config = {"general": {"threshold": 0.8}}
                 save_config(config)
 
@@ -102,7 +102,7 @@ class TestSaveConfig:
         with tempfile.TemporaryDirectory() as tmpdir:
             config_path = Path(tmpdir) / "config.toml"
 
-            with patch("imlage.utils.config.get_config_path", return_value=config_path):
+            with patch("visual_buffet.utils.config.get_config_path", return_value=config_path):
                 config = {
                     "general": {"default_threshold": 0.75},
                     "plugins": {"enabled": ["ram_plus", "wd14"]},
@@ -213,7 +213,7 @@ class TestConfigRoundTrip:
                 },
             }
 
-            with patch("imlage.utils.config.get_config_path", return_value=config_path):
+            with patch("visual_buffet.utils.config.get_config_path", return_value=config_path):
                 save_config(original)
                 loaded = load_config()
 

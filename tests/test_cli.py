@@ -9,7 +9,7 @@ import pytest
 from click.testing import CliRunner
 from PIL import Image
 
-from imlage.cli import main
+from visual_buffet.cli import main
 
 
 @pytest.fixture
@@ -41,7 +41,7 @@ class TestMainCommand:
         """Test --help flag."""
         result = runner.invoke(main, ["--help"])
         assert result.exit_code == 0
-        assert "IMLAGE" in result.output
+        assert "Visual Buffet" in result.output
 
     def test_debug_flag(self, runner):
         """Test --debug flag is accepted."""
@@ -82,7 +82,7 @@ class TestTagCommand:
             assert result.exit_code != 0
             assert "No images found" in result.output
 
-    @patch("imlage.cli.TaggingEngine")
+    @patch("visual_buffet.cli.TaggingEngine")
     def test_tag_no_plugins_available(self, mock_engine_class, runner, test_image):
         """Test tag command with no plugins."""
         mock_engine = MagicMock()
@@ -93,7 +93,7 @@ class TestTagCommand:
         assert result.exit_code != 0
         assert "No plugins" in result.output
 
-    @patch("imlage.cli.TaggingEngine")
+    @patch("visual_buffet.cli.TaggingEngine")
     def test_tag_success(self, mock_engine_class, runner, test_image):
         """Test successful tagging."""
         mock_plugin = MagicMock()
@@ -119,7 +119,7 @@ class TestTagCommand:
         result = runner.invoke(main, ["tag", str(test_image)])
         assert result.exit_code == 0
 
-    @patch("imlage.cli.TaggingEngine")
+    @patch("visual_buffet.cli.TaggingEngine")
     def test_tag_output_file(self, mock_engine_class, runner, test_image):
         """Test tagging with output file."""
         mock_plugin = MagicMock()
@@ -159,7 +159,7 @@ class TestPluginsCommand:
         assert "setup" in result.output
         assert "info" in result.output
 
-    @patch("imlage.cli.discover_plugins")
+    @patch("visual_buffet.cli.discover_plugins")
     def test_plugins_list_empty(self, mock_discover, runner):
         """Test plugins list with no plugins."""
         mock_discover.return_value = []
@@ -167,8 +167,8 @@ class TestPluginsCommand:
         assert result.exit_code == 0
         assert "No plugins found" in result.output
 
-    @patch("imlage.cli.discover_plugins")
-    @patch("imlage.cli.load_plugin")
+    @patch("visual_buffet.cli.discover_plugins")
+    @patch("visual_buffet.cli.load_plugin")
     def test_plugins_list_with_plugins(self, mock_load, mock_discover, runner):
         """Test plugins list with available plugins."""
         mock_discover.return_value = [
@@ -192,7 +192,7 @@ class TestPluginsCommand:
 
     def test_plugins_setup_not_found(self, runner):
         """Test plugins setup with non-existent plugin."""
-        with patch("imlage.cli.get_plugins_dir") as mock_dir:
+        with patch("visual_buffet.cli.get_plugins_dir") as mock_dir:
             with tempfile.TemporaryDirectory() as tmpdir:
                 mock_dir.return_value = Path(tmpdir)
                 result = runner.invoke(main, ["plugins", "setup", "nonexistent"])
@@ -202,7 +202,7 @@ class TestPluginsCommand:
 
     def test_plugins_info_not_found(self, runner):
         """Test plugins info with non-existent plugin."""
-        with patch("imlage.cli.get_plugins_dir") as mock_dir:
+        with patch("visual_buffet.cli.get_plugins_dir") as mock_dir:
             with tempfile.TemporaryDirectory() as tmpdir:
                 mock_dir.return_value = Path(tmpdir)
                 result = runner.invoke(main, ["plugins", "info", "nonexistent"])
@@ -220,11 +220,11 @@ class TestHardwareCommand:
         assert result.exit_code == 0
         assert "--refresh" in result.output
 
-    @patch("imlage.cli.detect_hardware")
-    @patch("imlage.cli.get_recommended_batch_size")
+    @patch("visual_buffet.cli.detect_hardware")
+    @patch("visual_buffet.cli.get_recommended_batch_size")
     def test_hardware_display(self, mock_batch, mock_detect, runner):
         """Test hardware detection display."""
-        from imlage.plugins.schemas import HardwareProfile
+        from visual_buffet.plugins.schemas import HardwareProfile
 
         mock_detect.return_value = HardwareProfile(
             cpu_model="Test CPU",
@@ -255,8 +255,8 @@ class TestConfigCommand:
         assert "set" in result.output
         assert "get" in result.output
 
-    @patch("imlage.cli.load_config")
-    @patch("imlage.utils.config.get_config_path")
+    @patch("visual_buffet.cli.load_config")
+    @patch("visual_buffet.utils.config.get_config_path")
     def test_config_show(self, mock_path, mock_load, runner):
         """Test config show command."""
         mock_path.return_value = Path("/fake/config.toml")
@@ -266,8 +266,8 @@ class TestConfigCommand:
         assert result.exit_code == 0
         assert "threshold" in result.output
 
-    @patch("imlage.cli.load_config")
-    @patch("imlage.cli.save_config")
+    @patch("visual_buffet.cli.load_config")
+    @patch("visual_buffet.cli.save_config")
     def test_config_set(self, mock_save, mock_load, runner):
         """Test config set command."""
         mock_load.return_value = {"general": {"threshold": 0.5}}
@@ -277,7 +277,7 @@ class TestConfigCommand:
         assert "Set" in result.output
         mock_save.assert_called_once()
 
-    @patch("imlage.cli.load_config")
+    @patch("visual_buffet.cli.load_config")
     def test_config_get(self, mock_load, runner):
         """Test config get command."""
         mock_load.return_value = {"general": {"threshold": 0.5}}
@@ -286,7 +286,7 @@ class TestConfigCommand:
         assert result.exit_code == 0
         assert "0.5" in result.output
 
-    @patch("imlage.cli.load_config")
+    @patch("visual_buffet.cli.load_config")
     def test_config_get_missing_key(self, mock_load, runner):
         """Test config get with missing key."""
         mock_load.return_value = {"general": {"threshold": 0.5}}
@@ -301,7 +301,7 @@ class TestCLIEdgeCases:
 
     def test_keyboard_interrupt(self, runner, test_image):
         """Test KeyboardInterrupt handling."""
-        with patch("imlage.cli.TaggingEngine") as mock_engine_class:
+        with patch("visual_buffet.cli.TaggingEngine") as mock_engine_class:
             mock_engine = MagicMock()
             mock_engine.plugins = {"mock": MagicMock()}
             mock_engine.plugins["mock"].is_available.return_value = True
@@ -314,9 +314,9 @@ class TestCLIEdgeCases:
 
     def test_imlage_error_handling(self, runner, test_image):
         """Test ImlageError handling."""
-        from imlage.exceptions import ImlageError
+        from visual_buffet.exceptions import ImlageError
 
-        with patch("imlage.cli.TaggingEngine") as mock_engine_class:
+        with patch("visual_buffet.cli.TaggingEngine") as mock_engine_class:
             mock_engine = MagicMock()
             mock_engine.plugins = {"mock": MagicMock()}
             mock_engine.plugins["mock"].is_available.return_value = True

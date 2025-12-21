@@ -1,4 +1,4 @@
-"""IMLAGE CLI entry point.
+"""Visual Buffet CLI entry point.
 
 Commands:
     tag       Tag image(s) using configured plugins
@@ -15,23 +15,23 @@ import click
 from rich.console import Console
 from rich.table import Table
 
-from imlage import __version__
-from imlage.core.engine import TaggingEngine
-from imlage.core.hardware import detect_hardware, get_recommended_batch_size
-from imlage.exceptions import ImlageError
-from imlage.plugins.loader import discover_plugins, get_plugins_dir, load_plugin
-from imlage.utils.config import get_value, load_config, save_config, set_value
-from imlage.utils.image import expand_paths
+from visual_buffet import __version__
+from visual_buffet.core.engine import TaggingEngine
+from visual_buffet.core.hardware import detect_hardware, get_recommended_batch_size
+from visual_buffet.exceptions import ImlageError
+from visual_buffet.plugins.loader import discover_plugins, get_plugins_dir, load_plugin
+from visual_buffet.utils.config import get_value, load_config, save_config, set_value
+from visual_buffet.utils.image import expand_paths
 
 console = Console()
 
 
 @click.group()
-@click.version_option(version=__version__, prog_name="imlage")
+@click.version_option(version=__version__, prog_name="visual-buffet")
 @click.option("--debug", is_flag=True, help="Enable debug logging")
 @click.pass_context
 def main(ctx: click.Context, debug: bool) -> None:
-    """IMLAGE - Compare visual tagging results from local ML tools."""
+    """Visual Buffet - Compare visual tagging results from local ML tools."""
     ctx.ensure_object(dict)
     ctx.obj["debug"] = debug
 
@@ -68,11 +68,11 @@ def tag(
 
     Examples:
 
-        imlage tag photo.jpg
+        visual-buffet tag photo.jpg
 
-        imlage tag ./photos --recursive
+        visual-buffet tag ./photos --recursive
 
-        imlage tag *.jpg -o results.json
+        visual-buffet tag *.jpg -o results.json
     """
     try:
         # Expand paths to file list
@@ -89,8 +89,8 @@ def tag(
 
         if not engine.plugins:
             console.print("[red]No plugins available[/red]")
-            console.print("Run 'imlage plugins list' to see available plugins")
-            console.print("Run 'imlage plugins setup <name>' to set up a plugin")
+            console.print("Run 'visual-buffet plugins list' to see available plugins")
+            console.print("Run 'visual-buffet plugins setup <name>' to set up a plugin")
             sys.exit(1)
 
         # Check if any plugins are available
@@ -98,7 +98,7 @@ def tag(
         if not available:
             console.print("[yellow]No plugins are ready to use[/yellow]")
             for name, p in engine.plugins.items():
-                console.print(f"  - {name}: Run 'imlage plugins setup {name}'")
+                console.print(f"  - {name}: Run 'visual-buffet plugins setup {name}'")
             sys.exit(1)
 
         # Filter to requested plugins
@@ -291,7 +291,7 @@ def plugins_info(name: str) -> None:
             console.print("[green]✓ Ready to use[/green]")
         else:
             console.print("[yellow]⚠ Setup required[/yellow]")
-            console.print(f"  Run: imlage plugins setup {name}")
+            console.print(f"  Run: visual-buffet plugins setup {name}")
 
         # Hardware requirements
         if info.hardware_reqs:
@@ -379,7 +379,7 @@ def config() -> None:
 @config.command("show")
 def config_show() -> None:
     """Show current configuration."""
-    from imlage.utils.config import get_config_path
+    from visual_buffet.utils.config import get_config_path
 
     cfg = load_config()
     console.print(f"[dim]Config file: {get_config_path()}[/dim]\n")
@@ -443,28 +443,28 @@ def config_get(key: str) -> None:
 def gui(host: str, port: int, no_browser: bool) -> None:
     """Launch the web GUI.
 
-    Opens a browser window with the IMLAGE interface.
+    Opens a browser window with the Visual Buffet interface.
 
     Examples:
 
-        imlage gui
+        visual-buffet gui
 
-        imlage gui --port 9000
+        visual-buffet gui --port 9000
 
-        imlage gui --no-browser
+        visual-buffet gui --no-browser
     """
     try:
         import uvicorn
     except ImportError:
         console.print("[red]GUI dependencies not installed[/red]")
-        console.print("Install with: pip install 'imlage[gui]'")
+        console.print("Install with: pip install 'visual-buffet[gui]'")
         console.print("  or: pip install fastapi uvicorn")
         sys.exit(1)
 
-    from imlage.gui import app
+    from visual_buffet.gui import app
 
     url = f"http://{host}:{port}"
-    console.print("\n[bold]IMLAGE GUI[/bold]")
+    console.print("\n[bold]Visual Buffet GUI[/bold]")
     console.print(f"Starting server at [cyan]{url}[/cyan]")
     console.print("[dim]Press Ctrl+C to stop[/dim]\n")
 

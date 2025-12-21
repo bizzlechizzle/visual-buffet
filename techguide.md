@@ -1,4 +1,4 @@
-# IMLAGE Technical Guide
+# Visual Buffet Technical Guide
 
 Implementation details, build setup, environment configuration, and troubleshooting.
 
@@ -14,8 +14,8 @@ Implementation details, build setup, environment configuration, and troubleshoot
 
 ```bash
 # Clone and enter
-git clone https://github.com/bizzlechizzle/imlage.git
-cd imlage
+git clone https://github.com/bizzlechizzle/visual-buffet.git
+cd visual-buffet
 
 # Install with uv (recommended)
 uv sync
@@ -31,20 +31,20 @@ pip install -e .
 uv sync --dev
 
 # Verify installation
-uv run imlage --version
+uv run visual-buffet --version
 uv run pytest
 ```
 
 ## Project Structure
 
 ```
-imlage/
+visual-buffet/
 ├── CLAUDE.md           # Project rules (read first)
 ├── techguide.md        # This file
 ├── lilbits.md          # Script registry
 ├── pyproject.toml      # Project config and dependencies
 ├── src/
-│   └── imlage/
+│   └── visual-buffet/
 │       ├── __init__.py
 │       ├── cli.py      # CLI entry point
 │       ├── core/       # Core logic
@@ -61,25 +61,25 @@ imlage/
 
 ### User Config Location
 
-- macOS: `~/.config/imlage/config.toml`
-- Linux: `~/.config/imlage/config.toml`
-- Windows: `%APPDATA%\imlage\config.toml`
+- macOS: `~/.config/visual-buffet/config.toml`
+- Linux: `~/.config/visual-buffet/config.toml`
+- Windows: `%APPDATA%\visual-buffet\config.toml`
 
 ### Hardware Cache
 
 Hardware detection results cached at:
-- `~/.imlage/hardware.json`
+- `~/.visual-buffet/hardware.json`
 
 Delete to force re-detection.
 
 ### Thumbnail & Tag Storage
 
-Thumbnails and tags are stored in an `imlage/` folder next to each image:
+Thumbnails and tags are stored in an `visual-buffet/` folder next to each image:
 
 ```
 /photos/vacation/
 ├── beach.jpg
-└── imlage/
+└── visual-buffet/
     ├── beach_480.webp       # Grid thumbnail (quick quality)
     ├── beach_1080.webp      # Preview (standard quality)
     ├── beach_2048.webp      # Zoom (high quality)
@@ -109,7 +109,7 @@ batch_size = 4
 Every plugin must implement:
 
 ```python
-from imlage.plugins import PluginBase, TagResult, PluginInfo
+from visual-buffet.plugins import PluginBase, TagResult, PluginInfo
 
 class MyPlugin(PluginBase):
     def get_info(self) -> PluginInfo:
@@ -171,7 +171,7 @@ Results inform plugin batch sizes and model variant selection.
 When GUI mode is requested:
 
 1. FastAPI server starts on `localhost:8420`
-2. Serves static frontend from `src/imlage/gui/static/`
+2. Serves static frontend from `src/visual-buffet/gui/static/`
 3. CLI becomes the backend via API endpoints
 4. Browser opens automatically (or user navigates manually)
 
@@ -179,13 +179,13 @@ When GUI mode is requested:
 
 ```bash
 # Default (opens browser automatically)
-imlage gui
+visual-buffet gui
 
 # Custom port
-imlage gui --port 9000
+visual-buffet gui --port 9000
 
 # Without auto-opening browser
-imlage gui --no-browser
+visual-buffet gui --no-browser
 ```
 
 ### API Endpoints
@@ -251,7 +251,7 @@ const state = {
 uv run pytest
 
 # Run with coverage
-uv run pytest --cov=imlage
+uv run pytest --cov=visual-buffet
 
 # Run specific test file
 uv run pytest tests/test_cli.py
@@ -288,7 +288,7 @@ uv build
 
 | Issue | Cause | Solution |
 |-------|-------|----------|
-| `ModuleNotFoundError: imlage` | Not installed | Run `uv sync` or `pip install -e .` |
+| `ModuleNotFoundError: visual-buffet` | Not installed | Run `uv sync` or `pip install -e .` |
 | Plugin not loading | Missing dependencies | Check plugin's requirements in SME file |
 | GPU not detected | Driver issues | Check CUDA/Metal installation |
 | Out of memory | Batch too large | Reduce batch_size in plugin config |
@@ -297,16 +297,16 @@ uv build
 
 ```bash
 # Run with debug logging
-IMLAGE_DEBUG=1 uv run imlage tag image.jpg
+IMLAGE_DEBUG=1 uv run visual-buffet tag image.jpg
 
 # Or via CLI flag
-uv run imlage --debug tag image.jpg
+uv run visual-buffet --debug tag image.jpg
 ```
 
 ### Log Location
 
 Logs written to:
-- `~/.imlage/logs/imlage.log`
+- `~/.visual-buffet/logs/visual-buffet.log`
 
 ## Performance Tuning
 
@@ -324,7 +324,7 @@ batch_size = 8  # Higher if you have more VRAM
 Run multiple plugins simultaneously:
 
 ```bash
-uv run imlage tag folder/ --parallel
+uv run visual-buffet tag folder/ --parallel
 ```
 
 Requires sufficient RAM for all active models.

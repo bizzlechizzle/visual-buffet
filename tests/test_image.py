@@ -6,8 +6,8 @@ from pathlib import Path
 import pytest
 from PIL import Image
 
-from imlage.exceptions import ImageError
-from imlage.utils.image import (
+from visual_buffet.exceptions import ImageError
+from visual_buffet.utils.image import (
     SUPPORTED_EXTENSIONS,
     expand_paths,
     is_supported_image,

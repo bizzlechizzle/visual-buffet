@@ -13,9 +13,9 @@ src_path = Path(__file__).parent.parent.parent / "src"
 if str(src_path) not in sys.path:
     sys.path.insert(0, str(src_path))
 
-from imlage.exceptions import ModelNotFoundError, PluginError
-from imlage.plugins.base import PluginBase
-from imlage.plugins.schemas import PluginInfo, Tag, TagResult
+from visual_buffet.exceptions import ModelNotFoundError, PluginError
+from visual_buffet.plugins.base import PluginBase
+from visual_buffet.plugins.schemas import PluginInfo, Tag, TagResult
 
 # Version of this plugin
 PLUGIN_VERSION = "1.0.0"

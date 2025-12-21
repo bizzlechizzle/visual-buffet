@@ -1,4 +1,4 @@
-"""Custom exceptions for IMLAGE.
+"""Custom exceptions for Visual Buffet.
 
 Each exception type represents a category of error.
 Catch specific exceptions to handle errors appropriately.
@@ -6,7 +6,7 @@ Catch specific exceptions to handle errors appropriately.
 
 
 class ImlageError(Exception):
-    """Base exception for all IMLAGE errors."""
+    """Base exception for all Visual Buffet errors."""
 
     pass
 
