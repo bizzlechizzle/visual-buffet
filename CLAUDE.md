@@ -88,6 +88,19 @@ Use hooks (settings.json) for formatting/linting—not CLAUDE.md.
 - Never force push to main/master
 - Never commit secrets or .env files
 
+## Versioning
+
+### repo-depot version
+- Format: `0.MINOR.COMMIT_COUNT` (e.g., `0.1.34`)
+- Calculated automatically from `VERSION` file + git commit count
+- Bump `VERSION` to `0.2` for breaking changes to sync behavior
+- Bump to `1.0` when declared stable
+
+### App versions
+- Each app tracks its own version separately in its own `VERSION` file
+- Only bump app version when app code changes (not from repo-depot syncs)
+- Apps receive `.depot-version` file indicating synced repo-depot version
+
 ## Path-Scoped Rules
 
 Rules in `.claude/rules/` can target specific paths:
