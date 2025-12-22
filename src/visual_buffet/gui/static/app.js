@@ -9,7 +9,8 @@
 
 const state = {
     images: new Map(), // id -> { id, filename, thumbnail, width, height, format, results }
-    selectedImage: null,
+    selectedImageId: null, // Currently selected card (for panel)
+    panelOpen: false,      // Is detail panel visible
     settings: {
         plugins: [], // List of available plugins with their settings
         // Per-plugin settings: { name: { enabled, threshold, limit, discoveryMode, useRamPlus, useFlorence2 } }
@@ -37,6 +38,18 @@ const elements = {
     cancelBtn: document.getElementById('cancelBtn'),
     clearAllBtn: document.getElementById('clearAllBtn'),
 
+    // Detail Panel
+    detailPanel: document.getElementById('detailPanel'),
+    panelBack: document.getElementById('panelBack'),
+    panelClose: document.getElementById('panelClose'),
+    panelTitle: document.getElementById('panelTitle'),
+    panelPreview: document.getElementById('panelPreview'),
+    panelPreviewImg: document.getElementById('panelPreviewImg'),
+    panelMetadata: document.getElementById('panelMetadata'),
+    panelTags: document.getElementById('panelTags'),
+    panelViewBtn: document.getElementById('panelViewBtn'),
+    panelTagBtn: document.getElementById('panelTagBtn'),
+
     // Lightbox
     lightbox: document.getElementById('lightbox'),
     lightboxImage: document.getElementById('lightboxImage'),
@@ -58,6 +71,9 @@ const elements = {
     customQualityBtn: document.getElementById('customQualityBtn'),
     qualityHint: document.getElementById('qualityHint'),
 
+    // Header
+    appVersion: document.getElementById('appVersion'),
+
     // Toast
     toastContainer: document.getElementById('toastContainer'),
 };
@@ -71,6 +87,11 @@ async function fetchStatus() {
     try {
         const response = await fetch('/api/status');
         const data = await response.json();
+
+        // Update version in header
+        if (data.version && elements.appVersion) {
+            elements.appVersion.textContent = `v${data.version}`;
+        }
 
         state.hardware = data.hardware;
         state.settings.plugins = data.plugins || [];
@@ -260,30 +281,87 @@ function createImageCard(image) {
     const card = document.createElement('div');
     card.className = 'image-card';
     card.dataset.id = image.id;
+    card.tabIndex = 0; // Make focusable for keyboard nav
 
     const hasResults = image.results && !image.results.error;
     const isProcessing = image.processing;
+    const isSelected = state.selectedImageIdId === image.id;
 
-    card.innerHTML = `
-        <img class="image-card-thumb" src="${image.thumbnail}" alt="${image.filename}">
-        <div class="image-card-info">
-            <div class="image-card-name">${image.filename}</div>
-            <div class="image-card-meta">${image.width} x ${image.height}</div>
-        </div>
-        <div class="image-card-status ${hasResults ? 'tagged' : ''} ${isProcessing ? 'processing' : ''}">
-            ${isProcessing ? `
-                <svg class="spinner" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="10" stroke-dasharray="32" stroke-dashoffset="32"/>
-                </svg>
-            ` : hasResults ? `
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <polyline points="20 6 9 17 4 12"/>
-                </svg>
-            ` : ''}
-        </div>
-    `;
+    // Add selected class if this card is selected
+    if (isSelected) {
+        card.classList.add('selected');
+    }
 
-    card.addEventListener('click', () => openLightbox(image.id));
+    // Count tags for display
+    let tagCount = 0;
+    if (hasResults && image.results.results) {
+        for (const pluginResult of Object.values(image.results.results)) {
+            if (pluginResult.tags) {
+                tagCount += pluginResult.tags.length;
+            }
+        }
+    }
+
+    // Thumbnail image
+    const thumb = document.createElement('img');
+    thumb.className = 'image-card-thumb';
+    thumb.src = image.thumbnail;
+    thumb.alt = image.filename;
+    card.appendChild(thumb);
+
+    // Info section
+    const info = document.createElement('div');
+    info.className = 'image-card-info';
+
+    const name = document.createElement('div');
+    name.className = 'image-card-name';
+    name.textContent = image.filename;
+    info.appendChild(name);
+
+    const meta = document.createElement('div');
+    meta.className = 'image-card-meta';
+    meta.textContent = hasResults ? `✓ ${tagCount} tags` : `${image.width} × ${image.height}`;
+    info.appendChild(meta);
+
+    card.appendChild(info);
+
+    // Status indicator
+    const status = document.createElement('div');
+    status.className = 'image-card-status';
+    if (hasResults) status.classList.add('tagged');
+    if (isProcessing) status.classList.add('processing');
+
+    if (isProcessing) {
+        const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        svg.setAttribute('class', 'spinner');
+        svg.setAttribute('viewBox', '0 0 24 24');
+        svg.setAttribute('fill', 'none');
+        svg.setAttribute('stroke', 'currentColor');
+        svg.setAttribute('stroke-width', '2');
+        const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        circle.setAttribute('cx', '12');
+        circle.setAttribute('cy', '12');
+        circle.setAttribute('r', '10');
+        circle.setAttribute('stroke-dasharray', '32');
+        circle.setAttribute('stroke-dashoffset', '32');
+        svg.appendChild(circle);
+        status.appendChild(svg);
+    } else if (hasResults) {
+        const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        svg.setAttribute('viewBox', '0 0 24 24');
+        svg.setAttribute('fill', 'none');
+        svg.setAttribute('stroke', 'currentColor');
+        svg.setAttribute('stroke-width', '2');
+        const polyline = document.createElementNS('http://www.w3.org/2000/svg', 'polyline');
+        polyline.setAttribute('points', '20 6 9 17 4 12');
+        svg.appendChild(polyline);
+        status.appendChild(svg);
+    }
+
+    card.appendChild(status);
+
+    // Click opens panel (not lightbox)
+    card.addEventListener('click', () => openPanel(image.id));
 
     return card;
 }
@@ -631,11 +709,230 @@ function renderHardwareInfo() {
 
 
 // ============================================================================
+// Detail Panel
+// ============================================================================
+
+/**
+ * Open the detail panel for an image
+ */
+async function openPanel(imageId) {
+    const image = state.images.get(imageId);
+    if (!image) return;
+
+    // Update state
+    state.selectedImageIdId = imageId;
+    state.panelOpen = true;
+
+    // Update UI
+    elements.detailPanel.classList.add('open');
+    elements.detailPanel.setAttribute('aria-hidden', 'false');
+    elements.imageGrid.classList.add('panel-open');
+
+    // Update panel content
+    elements.panelTitle.textContent = image.filename;
+    elements.panelPreviewImg.src = image.thumbnail;
+    elements.panelPreviewImg.alt = image.filename;
+
+    // Update metadata
+    elements.panelMetadata.textContent = '';
+    const sizeSpan = document.createElement('span');
+    sizeSpan.textContent = `${image.width} × ${image.height}`;
+    elements.panelMetadata.appendChild(sizeSpan);
+
+    const sep = document.createElement('span');
+    sep.textContent = '•';
+    elements.panelMetadata.appendChild(sep);
+
+    const formatSpan = document.createElement('span');
+    formatSpan.textContent = image.format;
+    elements.panelMetadata.appendChild(formatSpan);
+
+    // Render grid to update selected state
+    renderImageGrid();
+
+    // Render tags in panel
+    renderPanelTags(image);
+
+    // Try to load full preview and any server-side results
+    try {
+        elements.panelPreviewImg.src = `/api/image/${imageId}`;
+
+        const meta = await fetch(`/api/image/${imageId}/meta`).then(r => r.json());
+        if (meta.results) {
+            image.results = meta.results;
+            state.images.set(imageId, image);
+            renderPanelTags(image);
+        }
+    } catch (error) {
+        console.error('Failed to load image details:', error);
+    }
+
+    // Move focus to close button for accessibility
+    requestAnimationFrame(() => {
+        elements.panelClose.focus();
+    });
+}
+
+/**
+ * Close the detail panel
+ */
+function closePanel() {
+    const previouslySelected = state.selectedImageIdId;
+
+    state.panelOpen = false;
+    state.selectedImageIdId = null;
+
+    elements.detailPanel.classList.remove('open');
+    elements.detailPanel.setAttribute('aria-hidden', 'true');
+    elements.imageGrid.classList.remove('panel-open');
+
+    // Re-render grid to remove selected state
+    renderImageGrid();
+
+    // Return focus to the card that was selected
+    if (previouslySelected) {
+        requestAnimationFrame(() => {
+            const card = document.querySelector(`[data-id="${previouslySelected}"]`);
+            if (card) card.focus();
+        });
+    }
+}
+
+/**
+ * Render tag results in the panel with the new row format
+ */
+function renderPanelTags(image) {
+    // Clear existing content
+    elements.panelTags.textContent = '';
+
+    if (!image.results || !image.results.results) {
+        const emptyState = document.createElement('p');
+        emptyState.className = 'panel-empty-state';
+        emptyState.textContent = 'Click "Tag Image" to analyze';
+        elements.panelTags.appendChild(emptyState);
+        elements.panelTagBtn.textContent = 'Tag Image';
+        elements.panelTagBtn.disabled = false;
+        return;
+    }
+
+    const results = image.results.results;
+    let hasAnyTags = false;
+
+    for (const [pluginName, pluginResult] of Object.entries(results)) {
+        const displayName = getPluginDisplayName(pluginName);
+        const section = document.createElement('div');
+        section.className = 'panel-plugin-section';
+
+        // Plugin header
+        const header = document.createElement('div');
+        header.className = 'panel-plugin-header';
+
+        const nameSpan = document.createElement('span');
+        nameSpan.className = 'panel-plugin-name';
+        nameSpan.textContent = displayName;
+        header.appendChild(nameSpan);
+
+        if (pluginResult.error) {
+            const errorSpan = document.createElement('span');
+            errorSpan.className = 'panel-plugin-error';
+            errorSpan.textContent = 'Error';
+            header.appendChild(errorSpan);
+            section.appendChild(header);
+
+            const errorMsg = document.createElement('p');
+            errorMsg.className = 'panel-empty-state';
+            errorMsg.textContent = pluginResult.error;
+            section.appendChild(errorMsg);
+        } else {
+            const tags = pluginResult.tags || [];
+            hasAnyTags = hasAnyTags || tags.length > 0;
+
+            const countSpan = document.createElement('span');
+            countSpan.className = 'panel-plugin-count';
+            countSpan.textContent = `${tags.length} tags`;
+            header.appendChild(countSpan);
+
+            if (pluginResult.inference_time_ms) {
+                const timeSpan = document.createElement('span');
+                timeSpan.className = 'panel-plugin-time';
+                timeSpan.textContent = `${pluginResult.inference_time_ms.toFixed(0)}ms`;
+                header.appendChild(timeSpan);
+            }
+
+            section.appendChild(header);
+
+            // Tag rows
+            const tagList = document.createElement('div');
+            tagList.className = 'panel-tag-list';
+
+            for (const tag of tags) {
+                const row = document.createElement('div');
+                row.className = 'panel-tag-row';
+
+                // Label
+                const label = document.createElement('span');
+                label.className = 'panel-tag-label';
+                label.textContent = tag.label;
+                row.appendChild(label);
+
+                // Confidence
+                if (tag.confidence !== undefined && tag.confidence !== null) {
+                    const conf = tag.confidence;
+                    const confSpan = document.createElement('span');
+                    confSpan.className = 'panel-tag-confidence';
+                    if (conf >= 0.8) confSpan.classList.add('high');
+                    else if (conf >= 0.6) confSpan.classList.add('medium');
+                    else confSpan.classList.add('low');
+                    confSpan.textContent = `${Math.round(conf * 100)}%`;
+                    row.appendChild(confSpan);
+                }
+
+                // Source dots (for multi-resolution results)
+                if (tag.sources !== undefined && tag.max_sources !== undefined) {
+                    const dotsDiv = document.createElement('div');
+                    dotsDiv.className = 'panel-tag-dots';
+
+                    for (let i = 0; i < tag.max_sources; i++) {
+                        const dot = document.createElement('span');
+                        dot.className = 'panel-tag-dot';
+                        if (i < tag.sources) dot.classList.add('filled');
+                        dotsDiv.appendChild(dot);
+                    }
+                    row.appendChild(dotsDiv);
+
+                    const sourcesSpan = document.createElement('span');
+                    sourcesSpan.className = 'panel-tag-sources';
+                    sourcesSpan.textContent = `${tag.sources}/${tag.max_sources}`;
+                    row.appendChild(sourcesSpan);
+                }
+
+                tagList.appendChild(row);
+            }
+
+            section.appendChild(tagList);
+        }
+
+        elements.panelTags.appendChild(section);
+    }
+
+    if (!hasAnyTags) {
+        const emptyState = document.createElement('p');
+        emptyState.className = 'panel-empty-state';
+        emptyState.textContent = 'No tags found';
+        elements.panelTags.appendChild(emptyState);
+    }
+
+    elements.panelTagBtn.textContent = 'Re-tag';
+    elements.panelTagBtn.disabled = false;
+}
+
+
+// ============================================================================
 // Lightbox
 // ============================================================================
 
 async function openLightbox(imageId) {
-    state.selectedImage = imageId;
+    state.selectedImageIdId = imageId;
     const image = state.images.get(imageId);
 
     if (!image) return;
@@ -670,7 +967,7 @@ async function openLightbox(imageId) {
 
 function closeLightbox() {
     elements.lightbox.hidden = true;
-    state.selectedImage = null;
+    state.selectedImageId = null;
 }
 
 /**
@@ -1089,7 +1386,14 @@ async function tagSingleImage(imageId) {
     image.processing = true;
     state.images.set(imageId, image);
 
-    if (state.selectedImage === imageId) {
+    // Update panel button if open for this image
+    if (state.selectedImageId === imageId && state.panelOpen) {
+        elements.panelTagBtn.disabled = true;
+        elements.panelTagBtn.textContent = 'Processing...';
+    }
+
+    // Update lightbox button if open for this image
+    if (state.selectedImageId === imageId && !elements.lightbox.hidden) {
         elements.lightboxTagBtn.disabled = true;
         elements.lightboxTagBtn.textContent = 'Processing...';
     }
@@ -1103,8 +1407,15 @@ async function tagSingleImage(imageId) {
         image.processing = false;
         state.images.set(imageId, image);
 
-        if (state.selectedImage === imageId) {
-            renderLightboxTags(image);
+        if (state.selectedImageId === imageId) {
+            // Update panel if open
+            if (state.panelOpen) {
+                renderPanelTags(image);
+            }
+            // Update lightbox if open
+            if (!elements.lightbox.hidden) {
+                renderLightboxTags(image);
+            }
         }
 
         renderImageGrid();
@@ -1113,9 +1424,17 @@ async function tagSingleImage(imageId) {
         state.images.set(imageId, image);
         showToast(`Tagging failed: ${error.message}`, 'error');
 
-        if (state.selectedImage === imageId) {
-            elements.lightboxTagBtn.disabled = false;
-            elements.lightboxTagBtn.textContent = 'Tag Image';
+        if (state.selectedImageId === imageId) {
+            // Reset panel button
+            if (state.panelOpen) {
+                elements.panelTagBtn.disabled = false;
+                elements.panelTagBtn.textContent = 'Tag Image';
+            }
+            // Reset lightbox button
+            if (!elements.lightbox.hidden) {
+                elements.lightboxTagBtn.disabled = false;
+                elements.lightboxTagBtn.textContent = 'Tag Image';
+            }
         }
 
         renderImageGrid();
@@ -1305,21 +1624,43 @@ document.addEventListener('drop', async (e) => {
 elements.cancelBtn.addEventListener('click', cancelProcessing);
 elements.clearAllBtn.addEventListener('click', clearAll);
 
+// Detail Panel
+elements.panelBack.addEventListener('click', closePanel);
+elements.panelClose.addEventListener('click', closePanel);
+elements.panelPreview.addEventListener('click', () => {
+    if (state.selectedImageId) {
+        openLightbox(state.selectedImageId);
+    }
+});
+elements.panelViewBtn.addEventListener('click', () => {
+    if (state.selectedImageId) {
+        openLightbox(state.selectedImageId);
+    }
+});
+elements.panelTagBtn.addEventListener('click', () => {
+    if (state.selectedImageId) {
+        tagSingleImage(state.selectedImageId);
+    }
+});
+
 // Lightbox
 elements.lightboxBack.addEventListener('click', closeLightbox);
 elements.lightboxClose.addEventListener('click', closeLightbox);
 elements.lightbox.querySelector('.lightbox-overlay').addEventListener('click', closeLightbox);
 elements.lightboxTagBtn.addEventListener('click', () => {
-    if (state.selectedImage) {
-        tagSingleImage(state.selectedImage);
+    if (state.selectedImageId) {
+        tagSingleImage(state.selectedImageId);
     }
 });
 
 // Keyboard shortcuts
 document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
+        // Close modals/panels in order of priority
         if (!elements.lightbox.hidden) {
             closeLightbox();
+        } else if (state.panelOpen) {
+            closePanel();
         } else if (!elements.settingsModal.hidden) {
             closeSettings();
         }

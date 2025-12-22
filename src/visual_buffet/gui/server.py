@@ -130,6 +130,7 @@ async def status():
 
         return {
             "status": "ok",
+            "version": __version__,
             "hardware": {
                 "cpu": profile.cpu_model,
                 "cpu_cores": profile.cpu_cores,
