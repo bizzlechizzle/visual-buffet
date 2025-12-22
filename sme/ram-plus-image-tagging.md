@@ -3,7 +3,7 @@
 > **Generated**: 2025-12-21
 > **Sources current as of**: December 2025
 > **Scope**: Standard
-> **Version**: 1.0
+> **Version**: 1.1
 > **Audit-Ready**: Yes
 
 ---
@@ -305,7 +305,7 @@ Image → RAM++ (Recognition) → Grounded-SAM (Localization) → Segmented Obje
 
 ### Visual Buffet Integration
 
-In the visual-buffet project, RAM++ is implemented as a plugin:
+In the visual-buffet project, RAM++ is implemented as a plugin with full confidence score support:
 
 ```python
 from visual_buffet.plugins import RamPlusPlugin
@@ -314,10 +314,111 @@ plugin = RamPlusPlugin(plugin_dir)
 result = plugin.tag(image_path)
 
 for tag in result.tags:
-    print(f"- {tag.label}")  # No confidence scores
+    print(f"- {tag.label}: {tag.confidence:.2%}")
 ```
 
-**Note**: RAM++ returns tags without confidence scores, unlike SigLIP which provides per-tag probabilities.
+**Note**: Visual Buffet extracts confidence scores from RAM++'s internal sigmoid(logits), providing real probabilities (0.0-1.0) for each tag.
+
+---
+
+## Multi-Resolution Scoring
+
+### Scan Types
+
+Visual Buffet supports three quality levels for RAM++ inference:
+
+| Scan Type | Resolutions | Coverage | Use Case |
+|-----------|-------------|----------|----------|
+| **QUICK** | 1080px | ~87% | Fast preview, bulk processing |
+| **STANDARD** | 480px + 2048px | ~92% | Balanced quality/speed |
+| **MAX** | 480 + 1080 + 2048 + 4096 + original | ~100% | Maximum accuracy |
+
+### Why Multiple Resolutions?
+
+Different resolutions capture different information:
+- **Low resolution (480px)**: Global context, scene-level features, dominant objects
+- **Medium resolution (1080px)**: Balanced detail, most common objects
+- **High resolution (2048px+)**: Fine details, small objects, text, textures
+
+A tag detected at multiple resolutions indicates **scale-invariant recognition** — the model sees it regardless of image scale, suggesting higher reliability.
+
+### Scoring Philosophy: Separation Over Combination
+
+**Design decision**: Keep confidence and source count as **separate signals** rather than combining into a boosted score.
+
+**Rationale**:
+1. The sigmoid confidence IS the model's confidence at that resolution — it has intrinsic meaning
+2. Multi-resolution agreement is orthogonal information — it indicates robustness, not higher probability
+3. A 0.60 confidence seen at 5 resolutions vs 0.95 seen at 1 resolution are different situations, not directly comparable
+4. Combining them (e.g., "+2% per source") loses information and introduces arbitrary magic numbers
+
+### MergedTag Structure
+
+When using multi-resolution modes, tags are returned as `MergedTag` objects:
+
+```python
+@dataclass
+class MergedTag:
+    label: str                      # Tag text
+    confidence: float | None        # Highest confidence across resolutions
+    sources: int                    # Number of resolutions that detected this tag
+    min_resolution: int | None      # Smallest resolution where tag was found
+```
+
+### Sorting Algorithm
+
+Tags are sorted by **sources first, then confidence**:
+
+```python
+sorted_tags = sorted(tags, key=lambda t: (-t.sources, -(t.confidence or 0), t.label))
+```
+
+This prioritizes multi-resolution agreement while preserving original confidence semantics.
+
+### Example Output (MAX Mode)
+
+```
+Tag              Confidence   Sources   Interpretation
+─────────────────────────────────────────────────────────
+dog              0.92         5/5       High confidence, scale-invariant
+person           0.88         5/5       High confidence, scale-invariant
+outdoor          0.85         4/5       High confidence, mostly scale-invariant
+sunset           0.71         3/5       Moderate confidence, partial agreement
+cat              0.95         1/5       High confidence, single-scale only
+motion blur      0.52         1/5       Borderline, single-scale only
+```
+
+### Interpretation Guidelines
+
+| Sources | Confidence | Interpretation |
+|---------|------------|----------------|
+| 4-5/5 | > 0.7 | High confidence, robust detection |
+| 4-5/5 | 0.5-0.7 | Moderate confidence, but consistent across scales |
+| 1-2/5 | > 0.9 | Strong single-scale detection, may be scale-dependent |
+| 1-2/5 | 0.5-0.7 | Weak detection, consider filtering |
+
+### Alternative: Log-Odds Boosting (Not Implemented)
+
+For applications requiring a single combined score, log-odds boosting is the mathematically correct approach:
+
+```python
+import math
+
+def boost_confidence(score: float, sources: int, boost_per_source: float = 0.15) -> float:
+    """Boost confidence in log-odds space for multi-resolution agreement."""
+    if sources <= 1 or score <= 0 or score >= 1:
+        return score
+    log_odds = math.log(score / (1 - score))
+    boosted_log_odds = log_odds + (sources - 1) * boost_per_source
+    return 1 / (1 + math.exp(-boosted_log_odds))
+```
+
+This approach:
+- Stays bounded 0-1 (no "108%" values)
+- Has diminishing returns at extremes (0.99 can't boost much)
+- Is equivalent to treating each resolution as additional Bayesian evidence
+
+**Current implementation does NOT use boosting** — it preserves raw confidence and uses source count for ranking only.
 
 ---
 
@@ -338,13 +439,13 @@ for tag in result.tags:
 **Choose RAM++ when:**
 - You need broad vocabulary coverage (4,585 categories)
 - Open-set recognition of uncommon categories is important
-- You don't need per-tag confidence scores
+- Multi-resolution robustness checking is valuable
 - Cost-efficient batch processing is priority
 
 **Choose alternatives when:**
-- You need confidence scores (use SigLIP or CLIP)
 - Custom vocabulary is required (use CLIP/SigLIP zero-shot)
 - Minimal latency is critical (use CLIP)
+- You need zero-shot classification on arbitrary labels
 
 ---
 
@@ -408,4 +509,5 @@ None identified - sources are consistent.
 
 | Version | Date | Changes |
 |---------|------|---------|
+| 1.1 | 2025-12-22 | Added Multi-Resolution Scoring section; updated Visual Buffet integration with confidence scores; revised recommendations |
 | 1.0 | 2025-12-21 | Initial version |
