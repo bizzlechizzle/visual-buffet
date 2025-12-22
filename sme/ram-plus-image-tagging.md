@@ -3,7 +3,7 @@
 > **Generated**: 2025-12-21
 > **Sources current as of**: December 2025
 > **Scope**: Standard
-> **Version**: 1.1
+> **Version**: 1.2
 > **Audit-Ready**: Yes
 
 ---
@@ -342,15 +342,34 @@ Different resolutions capture different information:
 
 A tag detected at multiple resolutions indicates **scale-invariant recognition** — the model sees it regardless of image scale, suggesting higher reliability.
 
-### Scoring Philosophy: Separation Over Combination
+### Scoring Philosophy: Log-Odds Boosted Confidence
 
-**Design decision**: Keep confidence and source count as **separate signals** rather than combining into a boosted score.
+**Design decision**: Boost confidence scores when tags are found at multiple resolutions using log-odds space calculation.
 
 **Rationale**:
-1. The sigmoid confidence IS the model's confidence at that resolution — it has intrinsic meaning
-2. Multi-resolution agreement is orthogonal information — it indicates robustness, not higher probability
-3. A 0.60 confidence seen at 5 resolutions vs 0.95 seen at 1 resolution are different situations, not directly comparable
-4. Combining them (e.g., "+2% per source") loses information and introduces arbitrary magic numbers
+1. Multi-resolution agreement provides additional evidence of correct detection
+2. Log-odds boosting is mathematically equivalent to Bayesian evidence combination
+3. Scores remain bounded 0-1 (no "108%" values)
+4. Diminishing returns at extremes (0.95 can't boost as much as 0.70)
+
+**Implementation** (`schemas.py`):
+```python
+def boost_confidence(raw_confidence: float, sources: int, boost_per_source: float = 0.15) -> float:
+    if sources <= 1 or raw_confidence <= 0 or raw_confidence >= 1:
+        return raw_confidence
+    log_odds = math.log(raw_confidence / (1 - raw_confidence))
+    boosted_log_odds = log_odds + (sources - 1) * boost_per_source
+    return 1 / (1 + math.exp(-boosted_log_odds))
+```
+
+**Expected boost values** (boost_per_source=0.15):
+
+| Raw | Sources | Boosted | Change |
+|-----|---------|---------|--------|
+| 0.50 | 5/5 | 0.65 | +15% |
+| 0.70 | 5/5 | 0.82 | +12% |
+| 0.85 | 5/5 | 0.92 | +7% |
+| 0.95 | 5/5 | 0.97 | +2% |
 
 ### MergedTag Structure
 
@@ -359,66 +378,54 @@ When using multi-resolution modes, tags are returned as `MergedTag` objects:
 ```python
 @dataclass
 class MergedTag:
-    label: str                      # Tag text
-    confidence: float | None        # Highest confidence across resolutions
-    sources: int                    # Number of resolutions that detected this tag
-    min_resolution: int | None      # Smallest resolution where tag was found
+    label: str                          # Tag text
+    raw_confidence: float | None        # Highest raw confidence across resolutions
+    boosted_confidence: float | None    # After multi-resolution log-odds boost
+    sources: int                        # Number of resolutions that detected this tag
+    max_sources: int                    # Total resolutions used (e.g., 5 for MAX)
+    min_resolution: int | None          # Smallest resolution where tag was found
+
+    @property
+    def confidence(self) -> float | None:
+        """Return boosted confidence if available, else raw."""
+        return self.boosted_confidence or self.raw_confidence
 ```
 
 ### Sorting Algorithm
 
-Tags are sorted by **sources first, then confidence**:
+Tags are sorted by **boosted confidence** (which inherently rewards multi-resolution agreement):
 
 ```python
-sorted_tags = sorted(tags, key=lambda t: (-t.sources, -(t.confidence or 0), t.label))
+sorted_tags = sorted(
+    tags,
+    key=lambda t: (-(t.boosted_confidence or t.raw_confidence or 0), -t.sources, t.label)
+)
 ```
 
-This prioritizes multi-resolution agreement while preserving original confidence semantics.
+Since boosted confidence already incorporates source count, tags found at multiple resolutions naturally rank higher.
 
 ### Example Output (MAX Mode)
 
 ```
-Tag              Confidence   Sources   Interpretation
-─────────────────────────────────────────────────────────
-dog              0.92         5/5       High confidence, scale-invariant
-person           0.88         5/5       High confidence, scale-invariant
-outdoor          0.85         4/5       High confidence, mostly scale-invariant
-sunset           0.71         3/5       Moderate confidence, partial agreement
-cat              0.95         1/5       High confidence, single-scale only
-motion blur      0.52         1/5       Borderline, single-scale only
+Tag              Raw    Boosted   Sources   Interpretation
+───────────────────────────────────────────────────────────────
+dog              0.87   0.92      5/5       High confidence, boosted by multi-res
+person           0.83   0.88      5/5       High confidence, boosted by multi-res
+outdoor          0.80   0.85      4/5       High confidence, partial boost
+sunset           0.65   0.71      3/5       Moderate confidence, partial boost
+cat              0.95   0.95      1/5       High raw confidence, no boost (single-scale)
+motion blur      0.52   0.52      1/5       Borderline, no boost (single-scale)
 ```
 
 ### Interpretation Guidelines
 
-| Sources | Confidence | Interpretation |
-|---------|------------|----------------|
-| 4-5/5 | > 0.7 | High confidence, robust detection |
-| 4-5/5 | 0.5-0.7 | Moderate confidence, but consistent across scales |
-| 1-2/5 | > 0.9 | Strong single-scale detection, may be scale-dependent |
-| 1-2/5 | 0.5-0.7 | Weak detection, consider filtering |
-
-### Alternative: Log-Odds Boosting (Not Implemented)
-
-For applications requiring a single combined score, log-odds boosting is the mathematically correct approach:
-
-```python
-import math
-
-def boost_confidence(score: float, sources: int, boost_per_source: float = 0.15) -> float:
-    """Boost confidence in log-odds space for multi-resolution agreement."""
-    if sources <= 1 or score <= 0 or score >= 1:
-        return score
-    log_odds = math.log(score / (1 - score))
-    boosted_log_odds = log_odds + (sources - 1) * boost_per_source
-    return 1 / (1 + math.exp(-boosted_log_odds))
-```
-
-This approach:
-- Stays bounded 0-1 (no "108%" values)
-- Has diminishing returns at extremes (0.99 can't boost much)
-- Is equivalent to treating each resolution as additional Bayesian evidence
-
-**Current implementation does NOT use boosting** — it preserves raw confidence and uses source count for ranking only.
+| Sources | Boosted Conf | Interpretation |
+|---------|--------------|----------------|
+| 5/5 | > 0.85 | Very high confidence, fully scale-invariant |
+| 4-5/5 | 0.7-0.85 | High confidence, robust detection |
+| 2-3/5 | 0.6-0.7 | Moderate confidence, partial agreement |
+| 1/5 | > 0.9 | Strong single-scale, may be scale-dependent |
+| 1/5 | 0.5-0.7 | Weak detection, consider filtering |
 
 ---
 
@@ -509,5 +516,6 @@ None identified - sources are consistent.
 
 | Version | Date | Changes |
 |---------|------|---------|
+| 1.2 | 2025-12-22 | Implemented log-odds boosted confidence; updated MergedTag structure with raw/boosted fields |
 | 1.1 | 2025-12-22 | Added Multi-Resolution Scoring section; updated Visual Buffet integration with confidence scores; revised recommendations |
 | 1.0 | 2025-12-21 | Initial version |
