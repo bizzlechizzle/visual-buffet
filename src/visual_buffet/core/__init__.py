@@ -1,4 +1,4 @@
-"""Core IMLAGE logic.
+"""Core Visual Buffet logic.
 
 This module contains:
 - TaggingEngine: Main processing engine

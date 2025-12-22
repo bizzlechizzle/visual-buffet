@@ -312,15 +312,15 @@ class TestCLIEdgeCases:
             result = runner.invoke(main, ["tag", str(test_image)])
             assert "Interrupted" in result.output
 
-    def test_imlage_error_handling(self, runner, test_image):
-        """Test ImlageError handling."""
-        from visual_buffet.exceptions import ImlageError
+    def test_visual_buffet_error_handling(self, runner, test_image):
+        """Test VisualBuffetError handling."""
+        from visual_buffet.exceptions import VisualBuffetError
 
         with patch("visual_buffet.cli.TaggingEngine") as mock_engine_class:
             mock_engine = MagicMock()
             mock_engine.plugins = {"mock": MagicMock()}
             mock_engine.plugins["mock"].is_available.return_value = True
-            mock_engine.tag_batch.side_effect = ImlageError("Test error")
+            mock_engine.tag_batch.side_effect = VisualBuffetError("Test error")
 
             mock_engine_class.return_value = mock_engine
 

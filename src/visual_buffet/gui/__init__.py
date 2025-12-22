@@ -1,4 +1,4 @@
-"""Web GUI for IMLAGE.
+"""Web GUI for Visual Buffet.
 
 Provides a FastAPI-based web interface for image tagging.
 """

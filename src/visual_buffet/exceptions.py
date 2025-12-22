@@ -5,13 +5,13 @@ Catch specific exceptions to handle errors appropriately.
 """
 
 
-class ImlageError(Exception):
+class VisualBuffetError(Exception):
     """Base exception for all Visual Buffet errors."""
 
     pass
 
 
-class PluginError(ImlageError):
+class PluginError(VisualBuffetError):
     """Raised when a plugin fails to load or execute."""
 
     pass
@@ -29,19 +29,19 @@ class ModelNotFoundError(PluginError):
     pass
 
 
-class ConfigError(ImlageError):
+class ConfigError(VisualBuffetError):
     """Raised when configuration is invalid or missing."""
 
     pass
 
 
-class HardwareDetectionError(ImlageError):
+class HardwareDetectionError(VisualBuffetError):
     """Raised when hardware detection fails."""
 
     pass
 
 
-class ImageError(ImlageError):
+class ImageError(VisualBuffetError):
     """Raised when an image cannot be loaded or is invalid."""
 
     pass

@@ -24,8 +24,8 @@ def get_plugins_dir() -> Path:
         Path to the plugins/ directory at project root
     """
     # plugins/ is at project root
-    # This file is at src/imlage/plugins/loader.py
-    # Go up: loader.py -> plugins/ -> imlage/ -> src/ -> project_root
+    # This file is at src/visual_buffet/plugins/loader.py
+    # Go up: loader.py -> plugins/ -> visual_buffet/ -> src/ -> project_root
     src_dir = Path(__file__).parent.parent.parent
     project_root = src_dir.parent
     return project_root / "plugins"
@@ -106,7 +106,7 @@ def load_plugin(plugin_dir: Path) -> PluginBase:
 
     try:
         # Dynamic import
-        module_name = f"imlage_plugin_{plugin_dir.name}"
+        module_name = f"visual_buffet_plugin_{plugin_dir.name}"
         spec = importlib.util.spec_from_file_location(module_name, init_path)
         if spec is None or spec.loader is None:
             raise PluginError(f"Cannot load module from {init_path}")

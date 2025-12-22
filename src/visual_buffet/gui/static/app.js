@@ -1,5 +1,5 @@
 /**
- * IMLAGE GUI Application
+ * Visual Buffet GUI Application
  * Frontend JavaScript for image tagging interface
  */
 

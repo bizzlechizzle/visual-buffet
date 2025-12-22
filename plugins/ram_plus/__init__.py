@@ -18,7 +18,7 @@ from visual_buffet.plugins.base import PluginBase
 from visual_buffet.plugins.schemas import PluginInfo, Tag, TagResult
 
 # Version of this plugin
-PLUGIN_VERSION = "1.0.0"
+PLUGIN_VERSION = "1.1.0"
 
 # Model configuration
 MODEL_NAME = "ram_plus_swin_large_14m.pth"
@@ -46,8 +46,8 @@ class RamPlusPlugin(PluginBase):
                 "gpu": False,  # Works on CPU, but GPU recommended
                 "min_ram_gb": 4,
             },
-            provides_confidence=False,  # RAM++ returns tags without confidence scores
-            recommended_threshold=0.0,  # No threshold needed since no confidence
+            provides_confidence=True,  # Now returns real sigmoid probabilities!
+            recommended_threshold=0.5,  # Scores are already above model's per-class threshold
         )
 
     def is_available(self) -> bool:
@@ -151,25 +151,22 @@ class RamPlusPlugin(PluginBase):
         try:
             import torch
             from PIL import Image
-            from ram import inference_ram
+            from .inference_with_scores import inference_ram_with_scores
 
             # Load and transform image
             image = Image.open(image_path).convert("RGB")
             image_tensor = self._transform(image).unsqueeze(0).to(self._device)
 
-            # Run inference
+            # Run inference with confidence scores
             with torch.no_grad():
-                tags_str, _ = inference_ram(image_tensor, self._model)
+                tags, scores, _, _ = inference_ram_with_scores(image_tensor, self._model)
 
-            # Parse results - RAM++ returns pipe-separated tags string
-            # Tags are ordered by relevance (first = most relevant)
-            # RAM++ does NOT provide confidence scores - only tag names
-            detected_tags = [t.strip() for t in tags_str.split("|") if t.strip()]
-
-            # Create Tag objects without confidence (None indicates no score available)
+            # Create Tag objects WITH real confidence scores
+            # Scores are sigmoid probabilities [0,1] from the model
+            # Tags are already sorted by confidence (descending)
             results = []
-            for tag_label in detected_tags:
-                results.append(Tag(label=tag_label, confidence=None))
+            for tag_label, score in zip(tags, scores):
+                results.append(Tag(label=tag_label, confidence=round(score, 4)))
 
             return results
 

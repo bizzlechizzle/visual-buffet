@@ -33,7 +33,7 @@ RAM++ (Recognize Anything Plus Plus) is an advanced image tagging model develope
 ## Limitations
 
 ### Known Weaknesses
-1. **No Confidence Scores**: Model outputs binary tag presence, not probabilities
+1. **~~No Confidence Scores~~**: RESOLVED - Visual Buffet now extracts sigmoid probabilities from model internals
 2. **Western Bias**: Better at recognizing Western objects/concepts
 3. **Artistic Images**: May struggle with abstract or stylized art
 4. **Text in Images**: Does not OCR or read text
@@ -75,7 +75,7 @@ pip install git+https://github.com/xinyu1205/recognize-anything.git
 Models are downloaded automatically on first use, or manually via:
 
 ```bash
-imlage plugins setup ram_plus
+visual-buffet plugins setup ram_plus
 ```
 
 Files are stored in `plugins/ram_plus/models/`:
@@ -91,9 +91,11 @@ Files are stored in `plugins/ram_plus/models/`:
 4. Use threshold of 0.5-0.7 for balanced precision/recall
 
 ### Confidence Interpretation
-Since RAM++ doesn't provide true confidence scores, the plugin assigns synthetic scores based on tag order:
-- First tags: ~0.99 (most confident)
-- Later tags: Decreasing to ~0.50
+Visual Buffet extracts **real sigmoid probabilities** from RAM++'s internal logits:
+- Scores represent `sigmoid(logits)` - actual model confidence
+- Tags only appear if they exceed their per-class calibrated threshold
+- Typical range: 0.68-0.99 (since they already passed thresholding)
+- Higher scores = stronger model confidence for that tag
 
 ## Troubleshooting
 
@@ -101,7 +103,7 @@ Since RAM++ doesn't provide true confidence scores, the plugin assigns synthetic
 
 | Problem | Solution |
 |---------|----------|
-| "Model not found" | Run `imlage plugins setup ram_plus` |
+| "Model not found" | Run `visual-buffet plugins setup ram_plus` |
 | "CUDA out of memory" | Use CPU or reduce batch size |
 | "Missing ram package" | Install recognize-anything package |
 | Slow inference | Install CUDA-enabled PyTorch |
@@ -116,7 +118,7 @@ ls -la plugins/ram_plus/models/
 python -c "import torch; print(torch.cuda.is_available())"
 
 # Test inference
-imlage tag test.jpg --debug
+visual-buffet tag test.jpg --debug
 ```
 
 ## References

@@ -1,4 +1,4 @@
-"""Plugin system for IMLAGE.
+"""Plugin system for Visual Buffet.
 
 This module provides the plugin infrastructure:
 - PluginBase: Abstract base class all plugins must inherit

@@ -38,10 +38,12 @@ dev = [
     "pytest>=8.0",
     "pytest-cov>=4.0",
     "ruff>=0.4",
+    "httpx>=0.27",
 ]
 gui = [
     "fastapi>=0.110",
     "uvicorn>=0.29",
+    "python-multipart>=0.0.9",
 ]
 ml = [
     "torch>=2.0",
@@ -52,7 +54,10 @@ ram_plus = [
     "torch>=2.0",
     "torchvision>=0.15",
     "timm>=0.9",
-    "recognize-anything @ git+https://github.com/xinyu1205/recognize-anything.git",
+    "einops>=0.7.0",
+    "scipy>=1.10.0",
+    "fairscale>=0.4.0",
+    "ram @ git+https://github.com/xinyu1205/recognize-anything.git",
 ]
 florence_2 = [
     "torch>=2.0",
@@ -74,6 +79,19 @@ siglip_quantized = [
     "transformers>=4.47.0",
     "accelerate>=0.25.0",
     "bitsandbytes>=0.41.0",
+]
+all_models = [
+    "torch>=2.0",
+    "torchvision>=0.15",
+    "timm>=0.9",
+    "einops>=0.7.0",
+    "scipy>=1.10.0",
+    "fairscale>=0.4.0",
+    "transformers>=4.47.0,<4.50.0",
+    "accelerate>=0.25.0",
+    "sentencepiece>=0.1.99",
+    "protobuf>=3.20.0",
+    "ram @ git+https://github.com/xinyu1205/recognize-anything.git",
 ]
 
 [project.scripts]

@@ -1,4 +1,4 @@
-# Universal Development Standards
+# Universal Development Standards v0.1.0
 
 Consistent, maintainable code across all projects.
 

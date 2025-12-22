@@ -22,7 +22,7 @@ SigLIP has **both defaults and configurable settings**. The model ships with sen
 
 ---
 
-## 2. Configurable Settings for IMLAGE Plugin
+## 2. Configurable Settings for Visual Buffet Plugin
 
 ### A. Model Selection (Practical: YES)
 
@@ -234,7 +234,7 @@ With 4-bit quantization, reduce requirements by ~75%.
 
 ## 7. Output Contract
 
-Per IMLAGE specification, this plugin returns:
+Per Visual Buffet specification, this plugin returns:
 
 ```json
 {

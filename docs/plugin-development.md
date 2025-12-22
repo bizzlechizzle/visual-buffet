@@ -1,10 +1,10 @@
 # Plugin Development Guide
 
-This guide explains how to create plugins for IMLAGE and how the quality-based tagging system works.
+This guide explains how to create plugins for Visual Buffet and how the quality-based tagging system works.
 
 ## Overview
 
-IMLAGE uses a plugin architecture where each ML tagger is an independent plugin. Plugins:
+Visual Buffet uses a plugin architecture where each ML tagger is an independent plugin. Plugins:
 
 - Live in the `plugins/` directory
 - Implement a standard interface (`PluginBase`)
@@ -15,7 +15,7 @@ IMLAGE uses a plugin architecture where each ML tagger is an independent plugin.
 
 ### How It Works
 
-Instead of always tagging the original image, IMLAGE uses pre-generated thumbnails at different resolutions. This provides:
+Instead of always tagging the original image, Visual Buffet uses pre-generated thumbnails at different resolutions. This provides:
 
 1. **Faster tagging** - Smaller images process faster
 2. **Consistent results** - Same resolution = reproducible tags
@@ -56,7 +56,7 @@ When using `standard` or `high` quality, tags from multiple resolutions are merg
 
 ### Standard Sizes
 
-IMLAGE generates these thumbnails for every imported image:
+Visual Buffet generates these thumbnails for every imported image:
 
 | Name | Size | Purpose |
 |------|------|---------|
@@ -66,13 +66,13 @@ IMLAGE generates these thumbnails for every imported image:
 
 ### Storage Location
 
-Thumbnails and tags are stored in an `imlage/` folder **next to each image**:
+Thumbnails and tags are stored in a `visual-buffet/` folder **next to each image**:
 
 ```
 /photos/vacation/
 ├── beach.jpg
 ├── sunset.jpg
-└── imlage/
+└── visual-buffet/
     ├── beach_480.webp       # Grid thumbnail
     ├── beach_1080.webp      # Preview
     ├── beach_2048.webp      # Zoom
@@ -169,8 +169,8 @@ limit = 50                      # Default max tags
 # plugins/my_plugin/__init__.py
 
 from pathlib import Path
-from imlage.plugins.base import PluginBase
-from imlage.plugins.schemas import PluginInfo, TagResult, Tag
+from visual_buffet.plugins.base import PluginBase
+from visual_buffet.plugins.schemas import PluginInfo, TagResult, Tag
 
 
 class MyPlugin(PluginBase):
@@ -250,7 +250,7 @@ class MyPlugin(PluginBase):
 Users can configure each plugin independently:
 
 ```toml
-# ~/.config/imlage/config.toml
+# ~/.config/visual-buffet/config.toml
 
 [plugins.ram_plus]
 enabled = true
@@ -268,8 +268,8 @@ limit = 100
 ### Programmatic Configuration
 
 ```python
-from imlage.core.engine import TaggingEngine
-from imlage.plugins.schemas import TagQuality
+from visual_buffet.core.engine import TaggingEngine
+from visual_buffet.plugins.schemas import TagQuality
 
 engine = TaggingEngine()
 
@@ -444,7 +444,7 @@ Brief description of what this plugin does.
 - VRAM: 6GB for GPU mode
 
 ## Setup
-1. Run `imlage plugins setup my_plugin`
+1. Run `visual-buffet plugins setup my_plugin`
 2. Model downloads automatically (~2GB)
 
 ## Configuration

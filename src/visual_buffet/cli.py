@@ -18,7 +18,7 @@ from rich.table import Table
 from visual_buffet import __version__
 from visual_buffet.core.engine import TaggingEngine
 from visual_buffet.core.hardware import detect_hardware, get_recommended_batch_size
-from visual_buffet.exceptions import ImlageError
+from visual_buffet.exceptions import VisualBuffetError
 from visual_buffet.plugins.loader import discover_plugins, get_plugins_dir, load_plugin
 from visual_buffet.utils.config import get_value, load_config, save_config, set_value
 from visual_buffet.utils.image import expand_paths
@@ -127,7 +127,7 @@ def tag(
             for result in results:
                 _print_result(result)
 
-    except ImlageError as e:
+    except VisualBuffetError as e:
         console.print(f"[red]Error: {e}[/red]")
         sys.exit(1)
     except KeyboardInterrupt:

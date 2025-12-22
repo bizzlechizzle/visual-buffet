@@ -1,19 +1,70 @@
 [plugin]
 name = "ram_plus"
 display_name = "RAM++"
-version = "1.0.0"
-description = "Recognize Anything Plus Plus - General purpose image tagging with ~6500 tags"
+version = "1.1.0"
+description = "Recognize Anything Plus Plus - General purpose image tagging with ~4585 tags"
 entry_point = "RamPlusPlugin"
 python_requires = ">=3.11"
-# RAM++ outputs tags in order of relevance but does NOT provide confidence scores
-provides_confidence = false
+provides_confidence = true  # Extracts sigmoid probabilities from model internals
 
 [plugin.dependencies]
 torch = ">=2.0"
 torchvision = ">=0.15"
 timm = ">=0.9"
+scipy = ">=1.10.0"
+fairscale = ">=0.4.0"
+einops = ">=0.7.0"
 
 [plugin.hardware]
 gpu_recommended = true
+gpu_required = false
 min_ram_gb = 4
 min_vram_gb = 4
+
+# =============================================================================
+# USER-CONFIGURABLE SETTINGS
+# These can be overridden in ~/.config/visual-buffet/config.toml
+# =============================================================================
+
+[plugin.defaults]
+# Quality level: quick | standard | high | max
+# Controls how many resolution passes are used for tagging
+quality = "standard"
+
+# Minimum confidence threshold (0.0-1.0)
+# Tags below this score are filtered out
+# Note: RAM++ already applies per-class thresholds internally (~0.68 default)
+# This is an additional filter on top of that
+threshold = 0.0
+
+# Maximum number of tags to return per image
+# Set to 0 for unlimited
+limit = 50
+
+# Batch size for processing multiple images
+# Higher = faster but more VRAM
+# Auto-adjusted based on hardware detection
+batch_size = 4
+
+[plugin.model]
+# Model variant (only swin_l currently supported)
+variant = "swin_l"
+
+# Input image size (must match model training)
+# DO NOT CHANGE - model was trained at 384x384
+image_size = 384
+
+# Base threshold used by model internally
+# Per-class thresholds are calibrated around this value
+# Exposed for reference only - changing requires model retrain
+base_threshold = 0.68
+
+[plugin.output]
+# Include Chinese translations in output
+include_chinese = false
+
+# Sort order: confidence | alphabetical | model_order
+sort_by = "confidence"
+
+# Include per-class threshold in output (for debugging)
+include_thresholds = false

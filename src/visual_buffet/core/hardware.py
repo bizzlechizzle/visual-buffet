@@ -70,9 +70,20 @@ def _save_cache(profile: HardwareProfile) -> None:
 
 
 def _get_cpu_model() -> str:
-    """Get CPU model name, with macOS-specific handling."""
+    """Get CPU model name, with platform-specific handling."""
     # Try platform.processor() first
     cpu_model = platform.processor()
+
+    # On Linux, platform.processor() often returns empty or unhelpful values
+    # Read from /proc/cpuinfo instead
+    if platform.system() == "Linux" and (not cpu_model or cpu_model in ("x86_64", "aarch64")):
+        try:
+            with open("/proc/cpuinfo") as f:
+                for line in f:
+                    if line.startswith("model name"):
+                        return line.split(":", 1)[1].strip()
+        except Exception:
+            pass
 
     # On macOS with Apple Silicon, platform.processor() returns just "arm"
     # Use sysctl to get the actual chip name

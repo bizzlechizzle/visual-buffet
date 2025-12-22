@@ -475,12 +475,18 @@ class SigLIPPlugin(PluginBase):
                 return_tensors="pt",
             )
 
-            # Move to device
+            # Move to device and convert pixel_values to model dtype
             if hasattr(inputs, "to"):
                 inputs = inputs.to(self._device)
+                # Convert pixel_values to model dtype (bfloat16/float16/float32)
+                if hasattr(inputs, "pixel_values") and self._torch_dtype is not None:
+                    inputs.pixel_values = inputs.pixel_values.to(self._torch_dtype)
             else:
                 inputs = {k: v.to(self._device) if hasattr(v, "to") else v
                           for k, v in inputs.items()}
+                # Convert pixel_values to model dtype
+                if "pixel_values" in inputs and self._torch_dtype is not None:
+                    inputs["pixel_values"] = inputs["pixel_values"].to(self._torch_dtype)
 
             # Run inference
             with torch.no_grad():
@@ -497,8 +503,8 @@ class SigLIPPlugin(PluginBase):
             # SigLIP's sigmoid outputs independent probabilities per label
             probs = torch.sigmoid(logits).squeeze(0)
 
-            # Convert to list for processing
-            probs_list = probs.cpu().numpy().tolist()
+            # Convert to list for processing (float32 required for numpy)
+            probs_list = probs.cpu().float().numpy().tolist()
 
             # Create Tag objects with confidence scores
             tags = []

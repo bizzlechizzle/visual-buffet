@@ -5,27 +5,89 @@ version = "1.0.0"
 description = "Microsoft Florence-2 vision foundation model for image tagging and captioning"
 entry_point = "Florence2Plugin"
 python_requires = ">=3.11"
-# Florence-2 does NOT provide confidence scores - it outputs text only
-provides_confidence = false
+# Florence-2 provides synthetic confidence scores derived from generation/position
+provides_confidence = true
 
 [plugin.dependencies]
 torch = ">=2.0"
 torchvision = ">=0.15"
-transformers = ">=4.40.0,<4.50.0"
+transformers = ">=4.40.0,<4.50.0"  # 4.50+ has compatibility issues
 einops = ">=0.7.0"
 
 [plugin.hardware]
 gpu_recommended = true
+gpu_required = false
 min_ram_gb = 4
 min_vram_gb = 2
 
-[plugin.config]
-# Model variant: base, large, base-ft, large-ft
-model_variant = "florence-2-large-ft"
-# Task prompt for tagging:
-#   <MORE_DETAILED_CAPTION> - Rich descriptions, 20-50 tags (RECOMMENDED)
-#   <DETAILED_CAPTION> - Moderate descriptions, 10-20 tags
-#   <DENSE_REGION_CAPTION> - Region-specific phrases, 15-30 tags
-#   <OD> - Object detection only, 2-5 tags (limited vocabulary)
-#   <CAPTION> - Brief description, 5-10 tags
+# =============================================================================
+# USER-CONFIGURABLE SETTINGS
+# These can be overridden in ~/.config/visual-buffet/config.toml
+# =============================================================================
+
+[plugin.defaults]
+# Quality level: quick | standard | high | max
+quality = "standard"
+
+# Minimum confidence threshold (0.0-1.0)
+# Florence-2 uses synthetic confidence from text parsing
+threshold = 0.0
+
+# Maximum number of tags to return per image
+limit = 50
+
+# Batch size for processing multiple images
+batch_size = 4
+
+[plugin.model]
+# Model variant selection
+# Options:
+#   "base"       - 0.23B params, fastest, lower quality
+#   "large"      - 0.77B params, slower, better quality
+#   "base-ft"    - 0.23B params, fine-tuned for downstream tasks
+#   "large-ft"   - 0.77B params, fine-tuned, RECOMMENDED
+#   "large-no-flash" - 0.77B params, Mac/MPS compatible (no flash_attn)
+variant = "large-ft"
+
+# Task prompt for tag extraction
+# Options:
+#   "<MORE_DETAILED_CAPTION>"    - Rich descriptions, 25-50 tags (DEFAULT)
+#   "<DETAILED_CAPTION>"         - Moderate descriptions, 15-25 tags
+#   "<DENSE_REGION_CAPTION>"     - Region-specific phrases, 15-30 tags
+#   "<OD>"                       - Object detection only, 2-5 tags (LIMITED!)
+#   "<CAPTION>"                  - Brief description, 5-10 tags
+#   "<OCR>"                      - Text content extraction
 task_prompt = "<MORE_DETAILED_CAPTION>"
+
+# Maximum tokens to generate
+# Higher = more detailed output but slower
+# Range: 256-4096
+max_new_tokens = 1024
+
+# Beam search width (quality vs speed)
+# 1 = greedy (fastest), 3 = balanced, 5 = highest quality
+num_beams = 3
+
+[plugin.generation]
+# Enable sampling for non-deterministic output
+do_sample = false
+
+# Temperature for sampling (only if do_sample=true)
+# Higher = more random/creative
+temperature = 1.0
+
+# Nucleus sampling threshold (only if do_sample=true)
+top_p = 1.0
+
+# Penalize repeated tokens
+repetition_penalty = 1.0
+
+[plugin.output]
+# Sort order: confidence | alphabetical | position
+sort_by = "confidence"
+
+# Include bounding boxes for OD/DENSE_REGION tasks
+include_bboxes = false
+
+# Include raw caption text alongside parsed tags
+include_raw_caption = false

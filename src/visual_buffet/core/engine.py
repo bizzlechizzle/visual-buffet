@@ -108,8 +108,8 @@ class TaggingEngine:
         Returns:
             Path where thumbnail should be stored
         """
-        imlage_dir = self._get_data_dir(image_path)
-        return imlage_dir / f"{image_path.stem}_{resolution}.{THUMBNAIL_FORMAT}"
+        data_dir = self._get_data_dir(image_path)
+        return data_dir / f"{image_path.stem}_{resolution}.{THUMBNAIL_FORMAT}"
 
     def _get_tags_path(self, image_path: Path) -> Path:
         """Get the path for tags JSON file.
@@ -120,8 +120,8 @@ class TaggingEngine:
         Returns:
             Path where tags should be stored
         """
-        imlage_dir = self._get_data_dir(image_path)
-        return imlage_dir / f"{image_path.stem}_tags.json"
+        data_dir = self._get_data_dir(image_path)
+        return data_dir / f"{image_path.stem}_tags.json"
 
     def _get_or_create_thumbnail(
         self,

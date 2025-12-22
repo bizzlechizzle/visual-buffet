@@ -156,13 +156,13 @@ pip install einops
 Models are downloaded automatically from HuggingFace on first use:
 
 ```bash
-imlage plugins setup florence_2
+visual-buffet plugins setup florence_2
 ```
 
 Or specify variant:
 
 ```bash
-imlage plugins setup florence_2 --variant large-ft
+visual-buffet plugins setup florence_2 --variant large-ft
 ```
 
 Models are cached in HuggingFace's default cache (`~/.cache/huggingface/`).
@@ -184,7 +184,7 @@ processor = AutoProcessor.from_pretrained(
 
 ## Output Normalization
 
-Florence-2 outputs vary by task and require normalization to IMLAGE format.
+Florence-2 outputs vary by task and require normalization to Visual Buffet format.
 
 ### Object Detection (`<OD>`)
 
@@ -197,7 +197,7 @@ Florence-2 outputs vary by task and require normalization to IMLAGE format.
     }
 }
 
-# Normalized to IMLAGE format
+# Normalized to Visual Buffet format
 {
     "tags": [
         {"label": "cat", "confidence": 0.95},
@@ -215,7 +215,7 @@ Note: Confidence scores derived from generation beam scores or assigned position
 # Florence-2 raw output
 "A black cat sitting on a wooden table next to a window"
 
-# Normalized to IMLAGE format (extract nouns/phrases)
+# Normalized to Visual Buffet format (extract nouns/phrases)
 {
     "tags": [
         {"label": "cat", "confidence": 0.90},
@@ -286,8 +286,8 @@ model = AutoModelForCausalLM.from_pretrained('microsoft/Florence-2-large-ft', tr
 print('Model loaded successfully')
 "
 
-# Test with IMLAGE
-imlage tag test.jpg --plugin florence_2 --debug
+# Test with Visual Buffet
+visual-buffet tag test.jpg --plugin florence_2 --debug
 ```
 
 ## References

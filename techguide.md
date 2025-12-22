@@ -44,7 +44,7 @@ visual-buffet/
 ├── lilbits.md          # Script registry
 ├── pyproject.toml      # Project config and dependencies
 ├── src/
-│   └── visual-buffet/
+│   └── visual_buffet/
 │       ├── __init__.py
 │       ├── cli.py      # CLI entry point
 │       ├── core/       # Core logic
@@ -98,9 +98,16 @@ Each plugin has its own config section in the main config:
 ```toml
 [plugins.ram_plus]
 enabled = true
-model_path = "/path/to/model"
+quality = "standard"
+threshold = 0.0
+limit = 50
 batch_size = 4
 ```
+
+See plugin-specific settings references:
+- [RAM++ Settings Reference](docs/reference/ram_plus_settings.md)
+- [Florence-2 Settings Reference](docs/reference/florence_2_settings.md)
+- [SigLIP Settings Reference](docs/reference/siglip_settings.md)
 
 ## Plugin Development
 
@@ -157,7 +164,7 @@ torch = ">=2.0"
 
 ## Hardware Detection
 
-On first run, IMLAGE detects:
+On first run, Visual Buffet detects:
 
 - GPU: CUDA version, VRAM, device name
 - Metal: Apple Silicon GPU capabilities
@@ -297,7 +304,7 @@ uv build
 
 ```bash
 # Run with debug logging
-IMLAGE_DEBUG=1 uv run visual-buffet tag image.jpg
+VISUAL_BUFFET_DEBUG=1 uv run visual-buffet tag image.jpg
 
 # Or via CLI flag
 uv run visual-buffet --debug tag image.jpg
@@ -312,7 +319,7 @@ Logs written to:
 
 ### Batch Processing
 
-For large folders, IMLAGE batches images. Adjust per-plugin:
+For large folders, Visual Buffet batches images. Adjust per-plugin:
 
 ```toml
 [plugins.ram_plus]

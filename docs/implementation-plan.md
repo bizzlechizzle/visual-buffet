@@ -1,8 +1,8 @@
-# IMLAGE Implementation Plan (Phases 2-4)
+# Visual Buffet Implementation Plan (Phases 2-4)
 
 ## Overview
 
-This plan covers the complete implementation of IMLAGE core functionality:
+This plan covers the complete implementation of Visual Buffet core functionality:
 - **Phase 2:** Core Engine (plugin system, hardware detection, config)
 - **Phase 3:** RAM++ Plugin (working ML tagging)
 - **Phase 4:** CLI Completion (all commands working)
@@ -13,31 +13,31 @@ Files are created in dependency order (dependencies first):
 
 ### 1. Core Infrastructure (no dependencies)
 ```
-src/imlage/exceptions.py         # Custom exceptions (ImlageError, PluginError, etc.)
-src/imlage/plugins/schemas.py    # TagResult, PluginInfo, HardwareReqs dataclasses
+src/visual_buffet/exceptions.py         # Custom exceptions (VisualBuffetError, PluginError, etc.)
+src/visual_buffet/plugins/schemas.py    # TagResult, PluginInfo, HardwareReqs dataclasses
 ```
 
 ### 2. Plugin Base (depends on schemas)
 ```
-src/imlage/plugins/base.py       # PluginBase ABC
+src/visual_buffet/plugins/base.py       # PluginBase ABC
 ```
 
 ### 3. Utilities (no dependencies)
 ```
-src/imlage/utils/config.py       # Config file loading/saving
-src/imlage/utils/image.py        # Image validation and loading
-src/imlage/core/hardware.py      # Hardware detection
+src/visual_buffet/utils/config.py       # Config file loading/saving
+src/visual_buffet/utils/image.py        # Image validation and loading
+src/visual_buffet/core/hardware.py      # Hardware detection
 ```
 
 ### 4. Plugin Infrastructure (depends on base, schemas)
 ```
-src/imlage/plugins/loader.py     # Plugin discovery and loading
-src/imlage/plugins/registry.py   # Plugin registration
+src/visual_buffet/plugins/loader.py     # Plugin discovery and loading
+src/visual_buffet/plugins/registry.py   # Plugin registration
 ```
 
 ### 5. Core Engine (depends on plugins, utils)
 ```
-src/imlage/core/engine.py        # Main processing engine
+src/visual_buffet/core/engine.py        # Main processing engine
 ```
 
 ### 6. RAM++ Plugin (depends on plugin base)
@@ -50,7 +50,7 @@ docs/sme/ram_plus.sme.md         # SME documentation
 
 ### 7. CLI Commands (depends on everything)
 ```
-src/imlage/cli.py                # Updated with all commands
+src/visual_buffet/cli.py         # Updated with all commands
 ```
 
 ### 8. Tests
@@ -64,7 +64,7 @@ tests/test_cli.py
 
 ## Detailed Implementation
 
-### Phase 2A: Schemas (src/imlage/plugins/schemas.py)
+### Phase 2A: Schemas (src/visual_buffet/plugins/schemas.py)
 
 ```python
 # Data classes for plugin system
@@ -98,7 +98,7 @@ class HardwareProfile:
     gpu_vram_gb: float | None
 ```
 
-### Phase 2B: Plugin Base (src/imlage/plugins/base.py)
+### Phase 2B: Plugin Base (src/visual_buffet/plugins/base.py)
 
 ```python
 from abc import ABC, abstractmethod
@@ -119,24 +119,24 @@ class PluginBase(ABC):
     def get_model_path(self) -> Path: ...  # Returns plugin's model directory
 ```
 
-### Phase 2C: Hardware Detection (src/imlage/core/hardware.py)
+### Phase 2C: Hardware Detection (src/visual_buffet/core/hardware.py)
 
 ```python
 # Uses psutil for CPU/RAM
 # Uses torch for GPU detection (cuda/mps)
-# Caches to ~/.imlage/hardware.json
+# Caches to ~/.visual-buffet/hardware.json
 # Returns HardwareProfile dataclass
 ```
 
-### Phase 2D: Config Management (src/imlage/utils/config.py)
+### Phase 2D: Config Management (src/visual_buffet/utils/config.py)
 
 ```python
-# Loads from ~/.config/imlage/config.toml
+# Loads from ~/.config/visual-buffet/config.toml
 # Creates default config if missing
 # Provides get/set methods for plugin configs
 ```
 
-### Phase 2E: Image Utilities (src/imlage/utils/image.py)
+### Phase 2E: Image Utilities (src/visual_buffet/utils/image.py)
 
 ```python
 # Validates image formats (jpg, png, webp, heic)
@@ -144,7 +144,7 @@ class PluginBase(ABC):
 # Expands globs and folders to file lists
 ```
 
-### Phase 2F: Plugin Loader (src/imlage/plugins/loader.py)
+### Phase 2F: Plugin Loader (src/visual_buffet/plugins/loader.py)
 
 ```python
 # Discovers plugins in plugins/ directory
@@ -153,7 +153,7 @@ class PluginBase(ABC):
 # Returns list of available plugins
 ```
 
-### Phase 2G: Core Engine (src/imlage/core/engine.py)
+### Phase 2G: Core Engine (src/visual_buffet/core/engine.py)
 
 ```python
 class TaggingEngine:
@@ -187,12 +187,12 @@ class RamPlusPlugin(PluginBase):
 ### Phase 4: CLI Commands
 
 **Commands to implement:**
-- `imlage tag PATH` - Tag images
-- `imlage plugins list` - List available plugins
-- `imlage plugins setup NAME` - Download plugin models
-- `imlage hardware` - Show detected hardware
-- `imlage config show` - Show current config
-- `imlage config set KEY VALUE` - Set config value
+- `visual-buffet tag PATH` - Tag images
+- `visual-buffet plugins list` - List available plugins
+- `visual-buffet plugins setup NAME` - Download plugin models
+- `visual-buffet hardware` - Show detected hardware
+- `visual-buffet config show` - Show current config
+- `visual-buffet config set KEY VALUE` - Set config value
 
 ## Dependencies to Add
 
@@ -235,17 +235,17 @@ dev = [
 - `test_cli.py` - CLI commands work
 
 ### Manual Tests
-- Run `imlage tag images/testimage01.jpg` with RAM++ installed
+- Run `visual-buffet tag images/testimage01.jpg` with RAM++ installed
 - Verify JSON output matches contract
 - Test on CPU and GPU (if available)
 
 ## Success Criteria
 
 1. ✅ `pip install -e .` works
-2. ✅ `imlage --version` shows version
-3. ✅ `imlage hardware` shows detected hardware
-4. ✅ `imlage plugins list` shows RAM++
-5. ✅ `imlage plugins setup ram_plus` downloads model
-6. ✅ `imlage tag images/testimage01.jpg` outputs tags
+2. ✅ `visual-buffet --version` shows version
+3. ✅ `visual-buffet hardware` shows detected hardware
+4. ✅ `visual-buffet plugins list` shows RAM++
+5. ✅ `visual-buffet plugins setup ram_plus` downloads model
+6. ✅ `visual-buffet tag images/testimage01.jpg` outputs tags
 7. ✅ `pytest` passes all tests
 8. ✅ `ruff check .` has no errors

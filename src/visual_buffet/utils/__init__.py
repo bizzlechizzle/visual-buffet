@@ -1,4 +1,4 @@
-"""Utility functions for IMLAGE.
+"""Utility functions for Visual Buffet.
 
 This module contains:
 - Config file management

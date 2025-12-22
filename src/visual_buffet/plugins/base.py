@@ -1,4 +1,4 @@
-"""Abstract base class for all IMLAGE plugins.
+"""Abstract base class for all Visual Buffet plugins.
 
 Every plugin MUST inherit from PluginBase and implement all abstract methods.
 This ensures consistent behavior across all plugins.

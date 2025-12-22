@@ -2,15 +2,13 @@
 name = "siglip"
 display_name = "SigLIP"
 version = "1.0.0"
-description = "Google SigLIP vision-language model for zero-shot image tagging with confidence scores"
+description = "Google SigLIP vision-language model for zero-shot image tagging with real confidence scores"
 entry_point = "SigLIPPlugin"
 python_requires = ">=3.11"
-# SigLIP provides actual confidence scores via sigmoid activation
-# NOTE: SigLIP outputs independent probabilities per label (not softmax)
-# Typical confidence range: 0.01-0.10 for matches, use lower thresholds
+# SigLIP provides REAL confidence scores via sigmoid activation
+# NOTE: Sigmoid outputs independent probabilities per label (not softmax)
+# Typical confidence range: 0.01-0.10 for good matches
 provides_confidence = true
-# Recommended threshold for SigLIP (lower than other models due to sigmoid output)
-recommended_threshold = 0.01
 
 [plugin.dependencies]
 torch = ">=2.0"
@@ -18,29 +16,63 @@ transformers = ">=4.47.0"
 pillow = ">=10.0.0"
 accelerate = ">=0.25.0"
 
+[plugin.optional_dependencies]
+flash-attn = ">=2.0.0"      # For flash_attention_2
+bitsandbytes = ">=0.41.0"   # For quantization
+
 [plugin.hardware]
 gpu_recommended = true
+gpu_required = false
 min_ram_gb = 4
 min_vram_gb = 2
 
-# Model configuration - these are the user-configurable settings
-[plugin.config]
-# Model variant to use (affects accuracy vs speed/memory)
-# Options:
-#   "base" - 86M params, 224x224, fast/low VRAM
-#   "large" - 303M params, 512x512, higher accuracy
-#   "so400m" - 400M params, 384x384, best balance (RECOMMENDED)
-#   "giant" - 1B params, 384x384, maximum accuracy
-model_variant = "so400m"
+# =============================================================================
+# USER-CONFIGURABLE SETTINGS
+# These can be overridden in ~/.config/visual-buffet/config.toml
+# =============================================================================
 
-# Attention implementation (affects speed/memory)
+[plugin.defaults]
+# Quality level: quick | standard | high | max
+quality = "standard"
+
+# Minimum confidence threshold (0.0-1.0)
+# IMPORTANT: SigLIP uses much LOWER thresholds than other models!
+# Good matches typically score 0.01-0.10
+# Recommended: 0.005-0.05
+threshold = 0.01
+
+# Maximum number of tags to return per image
+limit = 50
+
+# Batch size for processing multiple images
+batch_size = 4
+
+[plugin.model]
+# Model variant selection
+# Options:
+#   "base"     - 86M params, 224x224, fast/low VRAM
+#   "large"    - 303M params, 512x512, high resolution
+#   "so400m"   - 400M params, 384x384, best balance (RECOMMENDED)
+#   "giant"    - 1B params, 384x384, maximum accuracy
+#
+# SigLIP 2 variants (experimental, multilingual):
+#   "v2-base"   - 86M params, improved semantic understanding
+#   "v2-so400m" - 400M params, SigLIP 2 version
+#   "v2-naflex" - 86M params, variable aspect ratio support
+#   "v2-giant"  - 1B params, maximum accuracy
+variant = "so400m"
+
+# Use SigLIP 2 (experimental, multilingual support)
+use_v2 = false
+
+# Attention implementation
 # Options: "auto", "sdpa", "flash_attention_2", "eager"
-# "auto" detects best available
+# "auto" detects best available for your hardware
 attention = "auto"
 
 # Data type for inference
 # Options: "auto", "float16", "bfloat16", "float32"
-# "auto" picks best for your hardware
+# "auto" picks optimal for your hardware
 dtype = "auto"
 
 # Quantization mode for low VRAM systems
@@ -48,7 +80,25 @@ dtype = "auto"
 # Reduces VRAM by ~50% (8bit) or ~75% (4bit)
 quantization = "none"
 
-# NaFlex-specific: max patches for variable resolution
-# Range: 64-512, higher = more detail for non-square images
-# Only applies when using naflex model variants
+[plugin.naflex]
+# NaFlex-specific settings (only for v2-naflex variant)
+# Maximum patches for variable resolution processing
+# Range: 64-512
+# Higher = more detail for non-square images
 max_num_patches = 256
+
+[plugin.labels]
+# Path to custom tag vocabulary file (one tag per line)
+# If not set, uses built-in vocabulary
+custom_vocabulary = ""
+
+# Number of candidate labels to evaluate per image
+# Higher = more comprehensive but slower
+max_candidates = 1000
+
+[plugin.output]
+# Sort order: confidence | alphabetical
+sort_by = "confidence"
+
+# Include similarity scores (raw logits before sigmoid)
+include_raw_scores = false

@@ -1,6 +1,6 @@
-# IMLAGE Developer Implementation Guide
+# Visual Buffet Developer Implementation Guide
 
-A step-by-step guide for implementing IMLAGE, written for developers who may be less experienced with Python plugin architectures or ML integrations.
+A step-by-step guide for implementing Visual Buffet, written for developers who may be less experienced with Python plugin architectures or ML integrations.
 
 ---
 
@@ -28,7 +28,7 @@ Before starting, ensure you have:
 
 ```bash
 # 1. Navigate to project
-cd /Users/bryant/Documents/projects/imlage
+cd /Users/bryant/Documents/projects/visual-buffet
 
 # 2. Create a virtual environment
 python3 -m venv .venv
@@ -42,15 +42,15 @@ pip install -e ".[dev]"
 ```
 
 **Why virtual environments?**
-They isolate project dependencies. If IMLAGE needs `torch==2.0` but another project needs `torch==1.0`, virtual environments prevent conflicts.
+They isolate project dependencies. If Visual Buffet needs `torch==2.0` but another project needs `torch==1.0`, virtual environments prevent conflicts.
 
 ---
 
 ## Project Structure Overview
 
 ```
-imlage/
-├── src/imlage/           # Main source code
+visual-buffet/
+├── src/visual_buffet/    # Main source code
 │   ├── __init__.py       # Package marker + version
 │   ├── cli.py            # Command-line interface (what users run)
 │   ├── exceptions.py     # Custom error types
@@ -175,25 +175,25 @@ plugins/ram_plus/
 
 ### Step 1: Create Custom Exceptions
 
-**File: `src/imlage/exceptions.py`**
+**File: `src/visual_buffet/exceptions.py`**
 
 **Why?**
 Custom exceptions make error handling clearer. Instead of `raise Exception("Plugin failed")`, you write `raise PluginError("RAM++ failed to load model")`.
 
 ```python
-"""Custom exceptions for IMLAGE.
+"""Custom exceptions for Visual Buffet.
 
 Each exception type represents a category of error.
 Catch specific exceptions to handle errors appropriately.
 """
 
 
-class ImlageError(Exception):
-    """Base exception for all IMLAGE errors."""
+class VisualBuffetError(Exception):
+    """Base exception for all Visual Buffet errors."""
     pass
 
 
-class PluginError(ImlageError):
+class PluginError(VisualBuffetError):
     """Raised when a plugin fails to load or execute."""
     pass
 
@@ -208,17 +208,17 @@ class ModelNotFoundError(PluginError):
     pass
 
 
-class ConfigError(ImlageError):
+class ConfigError(VisualBuffetError):
     """Raised when configuration is invalid or missing."""
     pass
 
 
-class HardwareDetectionError(ImlageError):
+class HardwareDetectionError(VisualBuffetError):
     """Raised when hardware detection fails."""
     pass
 
 
-class ImageError(ImlageError):
+class ImageError(VisualBuffetError):
     """Raised when an image cannot be loaded or is invalid."""
     pass
 ```
@@ -227,7 +227,7 @@ class ImageError(ImlageError):
 
 ### Step 2: Create Data Schemas
 
-**File: `src/imlage/plugins/schemas.py`**
+**File: `src/visual_buffet/plugins/schemas.py`**
 
 **What goes here?**
 All the data structures that get passed around. Think of these as the "shape" of your data.
@@ -325,7 +325,7 @@ class PluginInfo:
 class HardwareProfile:
     """Detected hardware capabilities.
 
-    Cached to ~/.imlage/hardware.json after first detection.
+    Cached to ~/.visual-buffet/hardware.json after first detection.
 
     Attributes:
         cpu_model: CPU name (e.g., "Apple M2 Pro")
@@ -360,13 +360,13 @@ class HardwareProfile:
 
 ### Step 3: Create Plugin Base Class
 
-**File: `src/imlage/plugins/base.py`**
+**File: `src/visual_buffet/plugins/base.py`**
 
 **Why an abstract class?**
 It forces all plugins to implement the same interface. The engine can call `plugin.tag()` on ANY plugin without knowing which one it is.
 
 ```python
-"""Abstract base class for all IMLAGE plugins.
+"""Abstract base class for all Visual Buffet plugins.
 
 Every plugin MUST inherit from PluginBase and implement all abstract methods.
 This ensures consistent behavior across all plugins.
@@ -483,7 +483,7 @@ class PluginBase(ABC):
 
 ### Step 4: Create Hardware Detection
 
-**File: `src/imlage/core/hardware.py`**
+**File: `src/visual_buffet/core/hardware.py`**
 
 **What it does:**
 1. Detects CPU, RAM, and GPU
@@ -494,7 +494,7 @@ class PluginBase(ABC):
 """Hardware detection for performance scaling.
 
 Detects CPU, RAM, and GPU capabilities. Results are cached to
-~/.imlage/hardware.json to avoid re-detection on every run.
+~/.visual-buffet/hardware.json to avoid re-detection on every run.
 
 Usage:
     profile = detect_hardware()
@@ -514,7 +514,7 @@ from ..plugins.schemas import HardwareProfile
 
 
 # Cache location
-CACHE_DIR = Path.home() / ".imlage"
+CACHE_DIR = Path.home() / ".visual-buffet"
 CACHE_FILE = CACHE_DIR / "hardware.json"
 
 
@@ -656,10 +656,10 @@ def get_recommended_batch_size(profile: HardwareProfile) -> int:
 
 ### Step 5: Create Config Management
 
-**File: `src/imlage/utils/config.py`**
+**File: `src/visual_buffet/utils/config.py`**
 
 **What it does:**
-- Loads config from `~/.config/imlage/config.toml`
+- Loads config from `~/.config/visual-buffet/config.toml`
 - Creates default config if missing
 - Provides get/set methods
 
@@ -667,8 +667,8 @@ def get_recommended_batch_size(profile: HardwareProfile) -> int:
 """Configuration file management.
 
 Config is stored in TOML format at:
-- macOS/Linux: ~/.config/imlage/config.toml
-- Windows: %APPDATA%\\imlage\\config.toml
+- macOS/Linux: ~/.config/visual-buffet/config.toml
+- Windows: %APPDATA%\\visual-buffet\\config.toml
 
 Usage:
     config = load_config()
@@ -695,7 +695,7 @@ def get_config_dir() -> Path:
         base = Path.home() / "AppData" / "Roaming"
     else:
         base = Path.home() / ".config"
-    return base / "imlage"
+    return base / "visual-buffet"
 
 
 def get_config_path() -> Path:
@@ -810,7 +810,7 @@ def set_value(config: dict, key: str, value: Any) -> None:
 
 ### Step 6: Create Image Utilities
 
-**File: `src/imlage/utils/image.py`**
+**File: `src/visual_buffet/utils/image.py`**
 
 ```python
 """Image loading and validation utilities.
@@ -941,7 +941,7 @@ def expand_paths(paths: list[str], recursive: bool = False) -> list[Path]:
 
 ### Step 7: Create Plugin Loader
 
-**File: `src/imlage/plugins/loader.py`**
+**File: `src/visual_buffet/plugins/loader.py`**
 
 ```python
 """Plugin discovery and loading.
@@ -968,7 +968,7 @@ from .schemas import PluginInfo
 def get_plugins_dir() -> Path:
     """Get the plugins directory path."""
     # plugins/ is at project root, not in src/
-    # Go up from src/imlage/plugins/loader.py to project root
+    # Go up from src/visual_buffet/plugins/loader.py to project root
     return Path(__file__).parent.parent.parent.parent.parent / "plugins"
 
 
@@ -1043,7 +1043,7 @@ def load_plugin(plugin_dir: Path) -> PluginBase:
 
     try:
         # Dynamic import
-        module_name = f"imlage_plugin_{plugin_dir.name}"
+        module_name = f"visual_buffet_plugin_{plugin_dir.name}"
         spec = importlib.util.spec_from_file_location(module_name, init_path)
         module = importlib.util.module_from_spec(spec)
         sys.modules[module_name] = module
@@ -1087,7 +1087,7 @@ def load_all_plugins() -> list[PluginBase]:
 
 ### Step 8: Create Core Engine
 
-**File: `src/imlage/core/engine.py`**
+**File: `src/visual_buffet/core/engine.py`**
 
 ```python
 """Core tagging engine.
@@ -1250,9 +1250,9 @@ for general-purpose image tagging with ~6500 possible tags.
 import time
 from pathlib import Path
 
-from imlage.plugins.base import PluginBase
-from imlage.plugins.schemas import PluginInfo, TagResult, Tag
-from imlage.exceptions import ModelNotFoundError, PluginError
+from visual_buffet.plugins.base import PluginBase
+from visual_buffet.plugins.schemas import PluginInfo, TagResult, Tag
+from visual_buffet.exceptions import ModelNotFoundError, PluginError
 
 # Version of this plugin
 PLUGIN_VERSION = "1.0.0"
@@ -1308,7 +1308,7 @@ class RamPlusPlugin(PluginBase):
         """Tag an image using RAM++."""
         if not self.is_available():
             raise ModelNotFoundError(
-                "RAM++ model not found. Run 'imlage plugins setup ram_plus'"
+                "RAM++ model not found. Run 'visual-buffet plugins setup ram_plus'"
             )
 
         # Lazy load model
@@ -1565,10 +1565,10 @@ min_vram_gb = 4
 
 ### Step 10: Update CLI
 
-**File: `src/imlage/cli.py`**
+**File: `src/visual_buffet/cli.py`**
 
 ```python
-"""IMLAGE CLI entry point.
+"""Visual Buffet CLI entry point.
 
 Commands:
     tag       Tag image(s) using configured plugins
@@ -1586,23 +1586,23 @@ from rich.console import Console
 from rich.table import Table
 from rich.panel import Panel
 
-from imlage import __version__
-from imlage.core.engine import TaggingEngine
-from imlage.core.hardware import detect_hardware, get_recommended_batch_size
-from imlage.plugins.loader import discover_plugins, load_plugin, get_plugins_dir
-from imlage.utils.config import load_config, save_config, get_value, set_value
-from imlage.utils.image import expand_paths
-from imlage.exceptions import ImlageError
+from visual_buffet import __version__
+from visual_buffet.core.engine import TaggingEngine
+from visual_buffet.core.hardware import detect_hardware, get_recommended_batch_size
+from visual_buffet.plugins.loader import discover_plugins, load_plugin, get_plugins_dir
+from visual_buffet.utils.config import load_config, save_config, get_value, set_value
+from visual_buffet.utils.image import expand_paths
+from visual_buffet.exceptions import VisualBuffetError
 
 console = Console()
 
 
 @click.group()
-@click.version_option(version=__version__, prog_name="imlage")
+@click.version_option(version=__version__, prog_name="visual-buffet")
 @click.option("--debug", is_flag=True, help="Enable debug logging")
 @click.pass_context
 def main(ctx: click.Context, debug: bool) -> None:
-    """IMLAGE - Compare visual tagging results from local ML tools."""
+    """Visual Buffet - Compare visual tagging results from local ML tools."""
     ctx.ensure_object(dict)
     ctx.obj["debug"] = debug
 
@@ -1637,7 +1637,7 @@ def tag(ctx, path, plugins, output, fmt, threshold, limit, recursive):
 
         if not engine.plugins:
             console.print("[red]No plugins available[/red]")
-            console.print("Run 'imlage plugins list' to see available plugins")
+            console.print("Run 'visual-buffet plugins list' to see available plugins")
             sys.exit(1)
 
         # Filter to requested plugins
@@ -1662,7 +1662,7 @@ def tag(ctx, path, plugins, output, fmt, threshold, limit, recursive):
             for result in results:
                 _print_result(result)
 
-    except ImlageError as e:
+    except VisualBuffetError as e:
         console.print(f"[red]Error: {e}[/red]")
         sys.exit(1)
 
@@ -1863,7 +1863,7 @@ pytest -v
 pytest tests/test_cli.py
 
 # Run with coverage
-pytest --cov=imlage
+pytest --cov=visual_buffet
 ```
 
 ### What Each Test File Checks
@@ -1882,7 +1882,7 @@ pytest --cov=imlage
 
 ### 1. Import Errors
 
-**Problem:** `ModuleNotFoundError: No module named 'imlage'`
+**Problem:** `ModuleNotFoundError: No module named 'visual_buffet'`
 
 **Solution:** Install the package in development mode:
 ```bash
@@ -1891,7 +1891,7 @@ pip install -e .
 
 ### 2. Plugin Not Found
 
-**Problem:** Plugin exists but `imlage plugins list` shows nothing
+**Problem:** Plugin exists but `visual-buffet plugins list` shows nothing
 
 **Solution:** Check that:
 - Plugin has `__init__.py`
