@@ -72,6 +72,19 @@ const elements = {
 
 
 // ============================================================================
+// Helper Functions
+// ============================================================================
+
+/**
+ * Format tag label for display by replacing underscores with spaces
+ * e.g., "white_house" -> "white house"
+ */
+function formatTagLabel(label) {
+    return label.replace(/_/g, ' ');
+}
+
+
+// ============================================================================
 // API Functions
 // ============================================================================
 
@@ -81,8 +94,8 @@ async function fetchStatus() {
         const data = await response.json();
 
         // Update version in header
-        if (data.version && elements.appVersion) {
-            elements.appVersion.textContent = `v${data.version}`;
+        if (elements.appVersion) {
+            elements.appVersion.textContent = data.version ? `v${data.version}` : 'v?';
         }
 
         state.hardware = data.hardware;
@@ -141,6 +154,10 @@ async function fetchStatus() {
     } catch (error) {
         console.error('Failed to fetch status:', error);
         showToast('Failed to connect to server', 'error');
+        // Show error indicator in version
+        if (elements.appVersion) {
+            elements.appVersion.textContent = 'v?';
+        }
     }
 }
 
@@ -852,10 +869,10 @@ function renderTagResults(image) {
                 const row = document.createElement('div');
                 row.className = 'tag-row';
 
-                // Label
+                // Label (replace underscores with spaces for display)
                 const label = document.createElement('span');
                 label.className = 'tag-label';
-                label.textContent = tag.label;
+                label.textContent = formatTagLabel(tag.label);
                 row.appendChild(label);
 
                 // Confidence
@@ -863,8 +880,8 @@ function renderTagResults(image) {
                     const conf = tag.confidence;
                     const confSpan = document.createElement('span');
                     confSpan.className = 'tag-confidence';
-                    if (conf >= 0.8) confSpan.classList.add('high');
-                    else if (conf >= 0.6) confSpan.classList.add('medium');
+                    if (conf >= 0.75) confSpan.classList.add('high');
+                    else if (conf >= 0.55) confSpan.classList.add('medium');
                     else confSpan.classList.add('low');
                     confSpan.textContent = `${Math.round(conf * 100)}%`;
                     row.appendChild(confSpan);

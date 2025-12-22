@@ -34,7 +34,7 @@
     /* Confidence Colors */
     --confidence-high: #4A8C5E;
     --confidence-medium: #5A7A94;
-    --confidence-low: #8A8A86;
+    --confidence-low: #C9A227;  /* Yellow/amber for LOW */
 
     /* Spacing (8pt grid) */
     --space-1: 4px;
@@ -587,7 +587,7 @@ body {
 
 .tag-confidence.high { color: var(--confidence-high); }
 .tag-confidence.medium { color: var(--confidence-medium); }
-.tag-confidence.low { color: var(--text-tertiary); }
+.tag-confidence.low { color: var(--confidence-low); }
 
 .tag-sources {
     display: flex;
@@ -857,6 +857,11 @@ body {
 .tag.medium-confidence {
     background: #E3F2FD;
     color: var(--confidence-medium);
+}
+
+.tag.low-confidence {
+    background: #FFF8E1;
+    color: var(--confidence-low);
 }
 
 
