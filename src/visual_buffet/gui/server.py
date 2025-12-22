@@ -19,6 +19,7 @@ from fastapi.staticfiles import StaticFiles
 from PIL import Image
 from pydantic import BaseModel
 
+from .. import __version__
 from ..core.engine import TaggingEngine
 from ..core.hardware import detect_hardware, get_recommended_batch_size
 from ..plugins.loader import discover_plugins, load_plugin
@@ -29,7 +30,7 @@ from ..utils.image import RAW_EXTENSIONS, SUPPORTED_EXTENSIONS
 app = FastAPI(
     title="Visual Buffet",
     description="Compare visual tagging results from local ML tools",
-    version="0.1.0",
+    version=__version__,
 )
 
 # CORS for local development

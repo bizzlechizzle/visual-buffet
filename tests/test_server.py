@@ -118,8 +118,10 @@ class TestAppCreation:
         assert app.title == "Visual Buffet"
 
     def test_app_version(self):
-        """Test app has version set."""
-        assert app.version == "0.1.0"
+        """Test app has version set from VERSION file."""
+        from visual_buffet import __version__
+
+        assert app.version == __version__
 
 
 class TestAPIRoutes:
