@@ -429,9 +429,8 @@ body {
 
 .tag-modal-content {
     position: absolute;
-    inset: var(--space-5);
+    inset: 0;
     background: var(--surface);
-    border-radius: var(--radius-md);
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -682,11 +681,6 @@ body {
    ============================================================================ */
 
 @media (max-width: 768px) {
-    .tag-modal-content {
-        inset: 0;
-        border-radius: 0;
-    }
-
     .tag-modal-header {
         flex-wrap: wrap;
         gap: var(--space-2);
