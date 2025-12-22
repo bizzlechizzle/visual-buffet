@@ -71,10 +71,13 @@ class SigLIPPlugin(PluginBase):
             "dtype": "auto",
             "quantization": "none",
             "max_num_patches": 256,
-            # Discovery mode: use RAM++ and/or Florence-2 for vocabulary
+            # Discovery mode: use other plugins to discover vocabulary
             "discovery_mode": False,
-            "use_ram_plus": True,
-            "use_florence_2": True,
+            "use_ram_plus": True,      # General tagging (4500+ categories)
+            "use_florence_2": True,    # Detailed captioning
+            "use_yolo": False,         # Object detection (80 COCO classes)
+            "use_paddle_ocr": False,   # Text detection (OCR)
+            "use_easyocr": False,      # Scene text recognition (photos/signs)
         }
 
     def get_info(self) -> PluginInfo:
@@ -200,6 +203,12 @@ class SigLIPPlugin(PluginBase):
             self._config["use_ram_plus"] = bool(kwargs["use_ram_plus"])
         if "use_florence_2" in kwargs:
             self._config["use_florence_2"] = bool(kwargs["use_florence_2"])
+        if "use_yolo" in kwargs:
+            self._config["use_yolo"] = bool(kwargs["use_yolo"])
+        if "use_paddle_ocr" in kwargs:
+            self._config["use_paddle_ocr"] = bool(kwargs["use_paddle_ocr"])
+        if "use_easyocr" in kwargs:
+            self._config["use_easyocr"] = bool(kwargs["use_easyocr"])
 
     def tag(self, image_path: Path) -> TagResult:
         """Tag an image using SigLIP zero-shot classification.
@@ -256,14 +265,17 @@ class SigLIPPlugin(PluginBase):
         """
         # Determine which discovery sources are available and enabled
         available_sources = []
-        if self._config["use_ram_plus"] and "ram_plus" in self._discovery_plugins:
-            plugin = self._discovery_plugins["ram_plus"]
-            if plugin.is_available():
-                available_sources.append("ram_plus")
-        if self._config["use_florence_2"] and "florence_2" in self._discovery_plugins:
-            plugin = self._discovery_plugins["florence_2"]
-            if plugin.is_available():
-                available_sources.append("florence_2")
+        for source_name, config_key in [
+            ("ram_plus", "use_ram_plus"),
+            ("florence_2", "use_florence_2"),
+            ("yolo", "use_yolo"),
+            ("paddle_ocr", "use_paddle_ocr"),
+            ("easyocr", "use_easyocr"),
+        ]:
+            if self._config.get(config_key) and source_name in self._discovery_plugins:
+                plugin = self._discovery_plugins[source_name]
+                if plugin.is_available():
+                    available_sources.append(source_name)
 
         if not available_sources:
             raise PluginError(

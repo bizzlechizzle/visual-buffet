@@ -49,13 +49,8 @@ TASK_PROMPTS = {
     "<OCR_WITH_REGION>",
 }
 
-# Categorical confidence levels (mapped to numeric for compatibility)
-# Florence-2 doesn't provide native confidence, so we derive it from:
-# - Position in output (earlier = higher confidence)
-# - Tag type (compounds = HIGH, early singles = MEDIUM, late singles = LOW)
-CONFIDENCE_HIGH = 0.85
-CONFIDENCE_MEDIUM = 0.65
-CONFIDENCE_LOW = 0.45
+# Florence-2 does not provide native confidence scores.
+# Tags are returned without confidence values.
 
 # Default configuration
 # NOTE: <MORE_DETAILED_CAPTION> returns rich descriptions (20-50 tags)
@@ -89,8 +84,8 @@ class Florence2Plugin(PluginBase):
                 "gpu": False,
                 "min_ram_gb": 4,
             },
-            provides_confidence=True,  # Derived categorical confidence (HIGH/MEDIUM/LOW)
-            recommended_threshold=0.4,  # Filter out lowest confidence tags if desired
+            provides_confidence=False,
+            recommended_threshold=0.0,
         )
 
     def is_available(self) -> bool:
@@ -284,7 +279,6 @@ class Florence2Plugin(PluginBase):
         if task_prompt == "<OD>":
             # Object detection returns {'<OD>': {'bboxes': [...], 'labels': [...]}}
             # Labels are single words like "furniture", "person"
-            # OD labels get HIGH confidence (direct detection)
             key = task_prompt
             if key in parsed and "labels" in parsed[key]:
                 labels = parsed[key]["labels"]
@@ -293,7 +287,7 @@ class Florence2Plugin(PluginBase):
                     label_lower = label.lower().strip()
                     if label_lower and label_lower not in seen:
                         seen.add(label_lower)
-                        tags.append(Tag(label=label_lower, confidence=CONFIDENCE_HIGH))
+                        tags.append(Tag(label=label_lower))
 
         elif task_prompt == "<DENSE_REGION_CAPTION>":
             # Dense region returns phrases like "abandoned bar counter with stools"
@@ -310,15 +304,15 @@ class Florence2Plugin(PluginBase):
                 tags = self._extract_tags_from_caption(caption)
 
         elif task_prompt == "<OCR>" or task_prompt == "<OCR_WITH_REGION>":
-            # OCR returns text content - HIGH confidence for detected text
+            # OCR returns text content
             key = task_prompt
             if key in parsed:
                 ocr_text = parsed[key]
                 if isinstance(ocr_text, str) and ocr_text.strip():
-                    tags.append(Tag(label=f"text:{ocr_text.strip()}", confidence=CONFIDENCE_HIGH))
+                    tags.append(Tag(label=f"text:{ocr_text.strip()}"))
                 elif isinstance(ocr_text, dict) and "labels" in ocr_text:
                     for label in ocr_text["labels"]:
-                        tags.append(Tag(label=f"text:{label}", confidence=CONFIDENCE_HIGH))
+                        tags.append(Tag(label=f"text:{label}"))
 
         elif task_prompt == "<REGION_PROPOSAL>":
             # Region proposal doesn't have labels, not useful for tagging
@@ -336,12 +330,8 @@ class Florence2Plugin(PluginBase):
         Uses a minimal stop word list to preserve descriptive adjectives
         like 'red', 'wooden', 'empty', 'large', 'abandoned', etc.
 
-        Confidence scoring:
-        - Compound tags (bigrams) get HIGH confidence (more specific/reliable)
-        - Single word tags get positional confidence:
-          - First 30% of caption: HIGH
-          - Middle 40%: MEDIUM
-          - Last 30%: LOW
+        Note: Florence-2 does not provide confidence scores. Tags are returned
+        without confidence values.
         """
         import re
 
@@ -371,8 +361,8 @@ class Florence2Plugin(PluginBase):
         phrases = re.split(r"[,.;:!?\-\(\)\[\]\"']", caption.lower())
 
         seen = set()
-        compound_tags = []  # Compounds get HIGH confidence
-        single_tags = []    # Singles get positional confidence
+        compound_tags = []
+        single_tags = []
 
         for phrase in phrases:
             # Extract words from this phrase
@@ -395,27 +385,12 @@ class Florence2Plugin(PluginBase):
                     seen.add(word)
                     single_tags.append(word)
 
-        # Build final tag list with confidence scores
+        # Build final tag list (compound phrases first, then singles)
         tags = []
-
-        # Compounds get HIGH confidence (more specific = more reliable)
         for label in compound_tags:
-            tags.append(Tag(label=label, confidence=CONFIDENCE_HIGH))
-
-        # Singles get positional confidence based on order in caption
-        n_singles = len(single_tags)
-        if n_singles > 0:
-            high_cutoff = int(n_singles * 0.3)
-            medium_cutoff = int(n_singles * 0.7)
-
-            for i, label in enumerate(single_tags):
-                if i < high_cutoff:
-                    conf = CONFIDENCE_HIGH
-                elif i < medium_cutoff:
-                    conf = CONFIDENCE_MEDIUM
-                else:
-                    conf = CONFIDENCE_LOW
-                tags.append(Tag(label=label, confidence=conf))
+            tags.append(Tag(label=label))
+        for label in single_tags:
+            tags.append(Tag(label=label))
 
         # Limit to 100 tags
         return tags[:100]

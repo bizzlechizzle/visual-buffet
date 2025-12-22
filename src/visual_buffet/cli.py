@@ -49,7 +49,6 @@ def main(ctx: click.Context, debug: bool) -> None:
     "-f", "--format", "fmt", default="json", type=click.Choice(["json"]), help="Output format"
 )
 @click.option("--threshold", default=0.5, type=float, help="Minimum confidence (0.0-1.0)")
-@click.option("--limit", default=50, type=int, help="Max tags per plugin")
 @click.option("--recursive", is_flag=True, help="Search folders recursively")
 @click.option(
     "--discover",
@@ -64,7 +63,6 @@ def tag(
     output: str | None,
     fmt: str,
     threshold: float,
-    limit: int,
     recursive: bool,
     discover: bool,
 ) -> None:
@@ -118,7 +116,7 @@ def tag(
         # Handle discovery mode
         if discover:
             console.print("[bold]Discovery mode:[/bold] SigLIP with RAM++/Florence-2 vocabulary")
-            console.print(f"[dim]Threshold: {threshold}, Limit: {limit}[/dim]")
+            console.print(f"[dim]Threshold: {threshold}[/dim]")
             console.print()
 
             # Ensure siglip is included
@@ -135,7 +133,7 @@ def tag(
             }
         else:
             console.print(f"[dim]Using plugins: {', '.join(available)}[/dim]")
-            console.print(f"[dim]Threshold: {threshold}, Limit: {limit}[/dim]")
+            console.print(f"[dim]Threshold: {threshold}[/dim]")
             console.print()
 
         # Process images
@@ -143,7 +141,6 @@ def tag(
             image_paths,
             plugin_names=plugin_names,
             threshold=threshold,
-            limit=limit,
             plugin_configs=plugin_configs if plugin_configs else None,
         )
 

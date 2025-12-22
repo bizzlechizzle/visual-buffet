@@ -1,6 +1,6 @@
 [project]
 name = "visual-buffet"
-version = "0.1.1"
+version = "0.1.9"
 description = "Visual Buffet - Compare visual tagging results from local ML tools"
 readme = "README.md"
 license = { text = "MIT" }
@@ -26,6 +26,7 @@ dependencies = [
     "click>=8.0",
     "rich>=13.0",
     "pillow>=10.0",
+    "pillow-heif>=0.16",
     "psutil>=5.9",
     "tomli-w>=1.0",
     "tomli>=2.0;python_version<'3.11'",
@@ -87,6 +88,27 @@ yolo = [
     "torchvision>=0.15",
     "ultralytics>=8.0",
 ]
+easyocr = [
+    "torch>=2.0",
+    "torchvision>=0.15",
+    "easyocr>=1.7.0",
+]
+# surya_ocr requires transformers>=4.56 which conflicts with RAM++ and other models
+# Install surya-ocr manually if needed: uv pip install surya-ocr
+# surya_ocr = [
+#     "torch>=2.0",
+#     "torchvision>=0.15",
+#     "surya-ocr>=0.17.0",
+# ]
+doctr = [
+    "torch>=2.0",
+    "torchvision>=0.15",
+    "python-doctr>=0.11.0",
+]
+qwen3_vl = [
+    "ollama>=0.4.0",
+    "httpx>=0.25.0",
+]
 all_models = [
     "torch>=2.0",
     "torchvision>=0.15",
@@ -99,6 +121,8 @@ all_models = [
     "sentencepiece>=0.1.99",
     "protobuf>=3.20.0",
     "ultralytics>=8.0",
+    "easyocr>=1.7.0",
+    "python-doctr>=0.11.0",
     "ram @ git+https://github.com/xinyu1205/recognize-anything.git",
 ]
 
@@ -108,6 +132,10 @@ visual-buffet = "visual_buffet.cli:main"
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
+
+[tool.uv]
+# Only resolve for the current platform (avoids cross-platform conflicts)
+environments = ["sys_platform == 'linux'"]
 
 [tool.hatch.metadata]
 allow-direct-references = true

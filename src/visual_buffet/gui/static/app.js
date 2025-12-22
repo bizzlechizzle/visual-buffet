@@ -12,7 +12,7 @@ const state = {
     selectedImageId: null, // Currently selected image (for tag modal)
     settings: {
         plugins: [], // List of available plugins with their settings
-        // Per-plugin settings: { name: { enabled, threshold, limit, discoveryMode, useRamPlus, useFlorence2 } }
+        // Per-plugin settings: { name: { enabled, threshold, discoveryMode, useRamPlus, useFlorence2, quality } }
         pluginSettings: {},
     },
     hardware: null,
@@ -120,13 +120,14 @@ async function fetchStatus() {
                     state.settings.pluginSettings[plugin.name] = {
                         enabled: saved.enabled ?? plugin.available,
                         threshold: saved.threshold ?? plugin.recommended_threshold ?? 0.0,
-                        limit: saved.limit ?? 50,
                         quality: saved.quality ?? 'standard',
                         providesConfidence: plugin.provides_confidence !== false,
                         // SigLIP discovery settings
                         discoveryMode: saved.discoveryMode ?? false,
                         useRamPlus: saved.useRamPlus ?? true,
                         useFlorence2: saved.useFlorence2 ?? true,
+                        // Qwen3-VL settings
+                        vlmMode: saved.vlmMode ?? 'tagging',
                     };
                 } else {
                     // Use plugin's recommended_threshold (critical for SigLIP which needs 0.01)
@@ -134,13 +135,14 @@ async function fetchStatus() {
                     state.settings.pluginSettings[plugin.name] = {
                         enabled: plugin.available,
                         threshold: threshold,
-                        limit: 50,
                         quality: 'standard',
                         providesConfidence: plugin.provides_confidence !== false,
                         // SigLIP discovery settings (defaults)
                         discoveryMode: false,
                         useRamPlus: true,
                         useFlorence2: true,
+                        // Qwen3-VL settings (defaults)
+                        vlmMode: 'tagging',
                     };
                 }
             }
@@ -189,7 +191,6 @@ async function tagImage(imageId) {
             enabledPlugins.push(plugin.name);
             const config = {
                 threshold: settings.threshold,
-                limit: settings.limit,
                 quality: settings.quality || 'standard',
             };
             // Add discovery settings for SigLIP
@@ -197,6 +198,10 @@ async function tagImage(imageId) {
                 config.discovery_mode = settings.discoveryMode || false;
                 config.use_ram_plus = settings.useRamPlus !== false;
                 config.use_florence_2 = settings.useFlorence2 !== false;
+            }
+            // Add VLM settings for Qwen3-VL
+            if (plugin.name === 'qwen3_vl') {
+                config.mode = settings.vlmMode || 'tagging';
             }
             pluginConfigs[plugin.name] = config;
         }
@@ -411,7 +416,7 @@ function renderPluginsList() {
 
 function createPluginCard(plugin) {
     const defaultThreshold = plugin.recommended_threshold ?? 0.0;
-    const settings = state.settings.pluginSettings[plugin.name] || { enabled: false, threshold: defaultThreshold, limit: 50 };
+    const settings = state.settings.pluginSettings[plugin.name] || { enabled: false, threshold: defaultThreshold };
     const displayName = plugin.display_name || plugin.name;
     const isAvailable = plugin.available;
     const isEnabled = settings.enabled && isAvailable;
@@ -527,6 +532,42 @@ function createPluginCard(plugin) {
         settingsDiv.appendChild(sourcesDiv);
     }
 
+    // Qwen3-VL specific settings
+    const isQwen3VL = plugin.name === 'qwen3_vl';
+    if (isQwen3VL) {
+        // VLM Mode selector
+        const modeSetting = document.createElement('div');
+        modeSetting.className = 'plugin-setting';
+
+        const modeLabel = document.createElement('label');
+        modeLabel.textContent = 'Mode';
+        modeSetting.appendChild(modeLabel);
+
+        const modeControl = document.createElement('div');
+        modeControl.className = 'setting-control';
+
+        const modeSelect = document.createElement('select');
+        modeSelect.className = 'quality-select';
+        modeSelect.disabled = !isEnabled;
+        const modes = [
+            { value: 'tagging', label: 'Tagging' },
+            { value: 'describe', label: 'Describe' },
+            { value: 'both', label: 'Both (tags + description)' },
+            { value: 'custom', label: 'Custom Prompt' },
+        ];
+        modes.forEach(m => {
+            const opt = document.createElement('option');
+            opt.value = m.value;
+            opt.textContent = m.label;
+            opt.selected = (settings.vlmMode || 'tagging') === m.value;
+            modeSelect.appendChild(opt);
+        });
+        modeSelect.addEventListener('change', () => updateVLMSetting(plugin.name, 'vlmMode', modeSelect.value));
+        modeControl.appendChild(modeSelect);
+        modeSetting.appendChild(modeControl);
+        settingsDiv.appendChild(modeSetting);
+    }
+
     // Threshold setting (only for plugins with confidence)
     if (plugin.provides_confidence) {
         const thresholdSetting = document.createElement('div');
@@ -586,36 +627,6 @@ function createPluginCard(plugin) {
     qualitySetting.appendChild(qualityControl);
     settingsDiv.appendChild(qualitySetting);
 
-    // Limit setting
-    const limitSetting = document.createElement('div');
-    limitSetting.className = 'plugin-setting';
-
-    const limitLabel = document.createElement('label');
-    limitLabel.textContent = 'Tag Limit';
-    limitSetting.appendChild(limitLabel);
-
-    const limitControl = document.createElement('div');
-    limitControl.className = 'setting-control';
-
-    const limitRange = document.createElement('input');
-    limitRange.type = 'range';
-    limitRange.min = '5';
-    limitRange.max = '100';
-    limitRange.value = settings.limit;
-    limitRange.disabled = !isEnabled;
-    const limitValue = document.createElement('span');
-    limitValue.className = 'setting-value';
-    limitValue.textContent = settings.limit;
-    limitRange.addEventListener('input', () => {
-        updatePluginLimit(plugin.name, limitRange.value);
-        limitValue.textContent = limitRange.value;
-    });
-    limitControl.appendChild(limitRange);
-    limitControl.appendChild(limitValue);
-
-    limitSetting.appendChild(limitControl);
-    settingsDiv.appendChild(limitSetting);
-
     card.appendChild(settingsDiv);
     return card;
 }
@@ -645,23 +656,6 @@ function updatePluginThreshold(pluginName, value) {
     }
 }
 
-function updatePluginLimit(pluginName, value) {
-    if (state.settings.pluginSettings[pluginName]) {
-        state.settings.pluginSettings[pluginName].limit = parseInt(value);
-        // Update display value - find the limit setting specifically
-        const card = document.querySelector(`[data-plugin="${pluginName}"]`);
-        if (card) {
-            const limitSetting = Array.from(card.querySelectorAll('.plugin-setting'))
-                .find(el => el.querySelector('label')?.textContent === 'Tag Limit');
-            if (limitSetting) {
-                const valueSpan = limitSetting.querySelector('.setting-value');
-                if (valueSpan) valueSpan.textContent = value;
-            }
-        }
-        saveSettings(); // Persist to disk
-    }
-}
-
 function updatePluginQuality(pluginName, value) {
     if (state.settings.pluginSettings[pluginName]) {
         state.settings.pluginSettings[pluginName].quality = value;
@@ -681,6 +675,13 @@ function toggleDiscoveryMode(pluginName, enabled) {
 function updateDiscoverySource(pluginName, source, enabled) {
     if (state.settings.pluginSettings[pluginName]) {
         state.settings.pluginSettings[pluginName][source] = enabled;
+        saveSettings();
+    }
+}
+
+function updateVLMSetting(pluginName, setting, value) {
+    if (state.settings.pluginSettings[pluginName]) {
+        state.settings.pluginSettings[pluginName][setting] = value;
         saveSettings();
     }
 }
@@ -861,19 +862,19 @@ function renderTagResults(image) {
             header.appendChild(statsDiv);
             section.appendChild(header);
 
-            // Tag list
+            // Tag list - pill layout
             const tagList = document.createElement('div');
-            tagList.className = 'tag-list';
+            tagList.className = 'tag-list-pills';
 
             for (const tag of tags) {
-                const row = document.createElement('div');
-                row.className = 'tag-row';
+                const pill = document.createElement('div');
+                pill.className = 'tag-pill';
 
-                // Label (replace underscores with spaces for display)
+                // Label
                 const label = document.createElement('span');
                 label.className = 'tag-label';
                 label.textContent = formatTagLabel(tag.label);
-                row.appendChild(label);
+                pill.appendChild(label);
 
                 // Confidence
                 if (tag.confidence !== undefined && tag.confidence !== null) {
@@ -884,22 +885,11 @@ function renderTagResults(image) {
                     else if (conf >= 0.55) confSpan.classList.add('medium');
                     else confSpan.classList.add('low');
                     confSpan.textContent = `${Math.round(conf * 100)}%`;
-                    row.appendChild(confSpan);
-
-                    // Show raw confidence if boosted
-                    if (tag.raw_confidence !== undefined && tag.raw_confidence !== tag.confidence) {
-                        const rawSpan = document.createElement('span');
-                        rawSpan.className = 'tag-raw';
-                        rawSpan.textContent = `(${Math.round(tag.raw_confidence * 100)}% raw)`;
-                        row.appendChild(rawSpan);
-                    }
+                    pill.appendChild(confSpan);
                 }
 
                 // Source dots (for multi-resolution results)
                 if (tag.sources !== undefined && tag.max_sources !== undefined) {
-                    const sourcesDiv = document.createElement('div');
-                    sourcesDiv.className = 'tag-sources';
-
                     const dotsDiv = document.createElement('div');
                     dotsDiv.className = 'tag-dots';
 
@@ -909,17 +899,10 @@ function renderTagResults(image) {
                         if (i < tag.sources) dot.classList.add('filled');
                         dotsDiv.appendChild(dot);
                     }
-                    sourcesDiv.appendChild(dotsDiv);
-
-                    const countSpan = document.createElement('span');
-                    countSpan.className = 'tag-source-count';
-                    countSpan.textContent = `${tag.sources}/${tag.max_sources}`;
-                    sourcesDiv.appendChild(countSpan);
-
-                    row.appendChild(sourcesDiv);
+                    pill.appendChild(dotsDiv);
                 }
 
-                tagList.appendChild(row);
+                tagList.appendChild(pill);
             }
 
             section.appendChild(tagList);

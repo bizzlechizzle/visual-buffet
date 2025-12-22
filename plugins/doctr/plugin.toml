@@ -1,0 +1,68 @@
+[plugin]
+name = "doctr"
+display_name = "docTR"
+version = "1.0.0"
+description = "Mindee docTR - Deep learning OCR with flexible model selection"
+entry_point = "DocTRPlugin"
+python_requires = ">=3.10"
+provides_confidence = true
+
+[plugin.dependencies]
+python-doctr = ">=0.11.0"
+torch = ">=2.0"
+
+[plugin.hardware]
+gpu_recommended = true
+gpu_required = false
+min_ram_gb = 4
+min_vram_gb = 2
+
+# =============================================================================
+# USER-CONFIGURABLE SETTINGS
+# These can be overridden in ~/.config/visual-buffet/config.toml
+# =============================================================================
+
+[plugin.defaults]
+# Quality preset (affects processing)
+quality = "standard"
+
+# Minimum recognition confidence threshold (0.0-1.0)
+# Lines below this confidence will be filtered out
+threshold = 0.5
+
+# Maximum number of text lines to return per image
+# Set to 0 for unlimited
+limit = 100
+
+# Batch size for processing multiple images
+batch_size = 1
+
+[plugin.model]
+# Detection architecture
+# Options: db_resnet50, db_mobilenet_v3_large, linknet_resnet18,
+#          linknet_resnet34, linknet_resnet50, fast_tiny, fast_small, fast_base
+# Speed: fast_tiny > db_mobilenet_v3_large > db_resnet50 > fast_base
+# Accuracy: fast_base > db_resnet50 > linknet_resnet50
+det_arch = "db_resnet50"
+
+# Recognition architecture
+# Options: crnn_vgg16_bn, crnn_mobilenet_v3_small, crnn_mobilenet_v3_large,
+#          sar_resnet31, master, vitstr_small, vitstr_base, parseq, viptr_tiny
+# Speed: viptr_tiny > crnn_mobilenet_v3_small > crnn_vgg16_bn > master
+# Accuracy: master > parseq > vitstr_base > crnn_vgg16_bn
+reco_arch = "crnn_vgg16_bn"
+
+# Assume pages are not rotated (faster processing)
+# Set to false if you have rotated documents
+assume_straight_pages = true
+
+# Preserve aspect ratio during image resize
+preserve_aspect_ratio = true
+
+[plugin.output]
+# Sort order: confidence | position | alphabetical
+# position = reading order (top-to-bottom, left-to-right)
+sort_by = "confidence"
+
+# Include bounding box coordinates in metadata
+include_boxes = true

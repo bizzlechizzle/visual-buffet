@@ -463,7 +463,6 @@ class PluginConfig(BaseModel):
     # None means use plugin's recommended threshold
     # SigLIP needs 0.01, others use 0.0 (no filtering)
     threshold: float | None = None
-    limit: int = 50
     quality: Literal["quick", "standard", "max"] = "standard"
 
     # SigLIP discovery mode settings

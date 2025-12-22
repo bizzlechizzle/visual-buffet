@@ -623,6 +623,150 @@ body {
     margin-left: var(--space-2);
 }
 
+/* ============================================================================
+   Tag Pills (Compact Badge Layout)
+   ============================================================================ */
+
+/* Tag List - Pill/badge layout */
+.tag-list-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-4);
+}
+
+/* Tag Pill */
+.tag-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    height: 26px;
+    padding: 0 var(--space-3);
+    background: var(--surface-hover);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-sm);
+    color: var(--text-primary);
+    transition: background 0.15s ease;
+}
+
+.tag-pill:hover {
+    background: var(--border);
+}
+
+.tag-pill .tag-label {
+    font-weight: var(--font-weight-normal);
+}
+
+.tag-pill .tag-confidence {
+    font-size: var(--font-size-xs);
+    color: var(--text-tertiary);
+    margin-left: var(--space-1);
+    width: auto;
+    text-align: left;
+    margin-right: 0;
+}
+
+.tag-pill .tag-confidence.high { color: var(--confidence-high); }
+.tag-pill .tag-confidence.medium { color: var(--confidence-medium); }
+.tag-pill .tag-confidence.low { color: var(--confidence-low); }
+
+/* Multi-hit indicator dots in pills */
+.tag-pill .tag-dots {
+    display: flex;
+    gap: 2px;
+    margin-left: var(--space-1);
+}
+
+.tag-pill .tag-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--border);
+}
+
+.tag-pill .tag-dot.filled {
+    background: currentColor;
+}
+
+/* Accordion Toggle for Plugin Sections */
+.tag-plugin-header {
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.15s ease;
+}
+
+.tag-plugin-header:hover {
+    background: var(--border);
+}
+
+.tag-plugin-header-left {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+}
+
+.tag-plugin-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    color: var(--text-tertiary);
+    transition: transform 0.2s ease;
+}
+
+.tag-plugin-section.expanded .tag-plugin-toggle {
+    transform: rotate(90deg);
+}
+
+/* Tag Content - Collapsible */
+.tag-plugin-content {
+    padding: var(--space-3) var(--space-4);
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease, padding 0.3s ease;
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+.tag-plugin-section.expanded .tag-plugin-content {
+    max-height: 2000px;
+    padding: var(--space-3) var(--space-4);
+}
+
+/* Tag Preview (shown when collapsed) */
+.tag-preview {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1);
+    padding: var(--space-2) var(--space-4);
+    border-top: 1px solid var(--border);
+    background: var(--surface);
+    max-height: 60px;
+    overflow: hidden;
+}
+
+.tag-plugin-section.expanded .tag-preview {
+    display: none;
+}
+
+.tag-preview .tag-pill {
+    height: 22px;
+    font-size: var(--font-size-xs);
+    padding: 0 var(--space-2);
+    opacity: 0.8;
+}
+
+.tag-preview-more {
+    display: inline-flex;
+    align-items: center;
+    height: 22px;
+    padding: 0 var(--space-2);
+    font-size: var(--font-size-xs);
+    color: var(--text-tertiary);
+    font-style: italic;
+}
+
 
 /* ============================================================================
    Image Viewer (Simple Full-Size View)

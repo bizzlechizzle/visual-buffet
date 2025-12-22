@@ -4,6 +4,7 @@ Handles:
 - Validating image formats
 - Loading images with Pillow
 - Loading RAW images with rawpy
+- Loading HEIC/HEIF images with pillow-heif
 - Expanding globs/folders to file lists
 - Generating thumbnails at standard sizes
 """
@@ -12,6 +13,13 @@ from pathlib import Path
 
 import rawpy
 from PIL import Image
+
+# Register HEIC/HEIF support with Pillow
+try:
+    import pillow_heif
+    pillow_heif.register_heif_opener()
+except ImportError:
+    pass  # pillow-heif not installed, HEIC files won't be readable
 
 from ..exceptions import ImageError
 from ..plugins.schemas import THUMBNAIL_SIZES

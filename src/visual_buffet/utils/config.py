@@ -41,7 +41,6 @@ DEFAULT_CONFIG = {
     "general": {
         "default_format": "json",
         "default_threshold": 0.5,
-        "default_limit": 50,
     },
     "plugins": {
         "enabled": ["ram_plus"],

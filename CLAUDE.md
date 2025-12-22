@@ -100,29 +100,16 @@ Use hooks (settings.json) for formatting/linting—not CLAUDE.md.
 
 ### App versions
 - Format: `MAJOR.MINOR.PATCH` (e.g., `1.0.12`)
-- Each commit that modifies app code **must** increment PATCH by exactly 1
+- Increment PATCH for fixes and small changes
 - Increment MINOR (reset PATCH to 0) for new features
 - Increment MAJOR (reset MINOR and PATCH to 0) for breaking changes
-- **Do not** use git commit counts—version is manually incremented per commit
+- **VERSION is only bumped when pushing to GitHub**—not per individual change
 - Do not bump version for repo-depot syncs that don't change app logic
-- Apps receive `.depot-version` file indicating synced repo-depot version
-
-**Initialization:**
-- New apps start at `0.1.0` (pre-release) or `1.0.0` (stable launch)
-- Create `VERSION` file in app's root directory containing version as plain text
-- Example: `echo "0.1.0" > VERSION`
 
 **Tracking:**
-- `VERSION` file lives in app's root directory (e.g., `apps/myapp/VERSION`)
+- `VERSION` file lives in app's root directory
 - File contains only the version string, no other content (e.g., `1.0.12`)
 - Read version: `cat VERSION`
-- **Include VERSION bump in the same commit** as your code changes
-
-**What triggers a version bump:**
-- Source code changes → Yes, always
-- Config changes that affect behavior → Yes
-- Test-only or docs-only changes → No
-- Merge commits → Count as 1 commit (bump once, not per merged commit)
 
 ## Path-Scoped Rules
 

@@ -1,0 +1,94 @@
+[plugin]
+name = "qwen3_vl"
+display_name = "Qwen3-VL"
+version = "1.0.0"
+description = "Qwen3 Vision-Language model for prompted image analysis via Ollama"
+entry_point = "Qwen3VLPlugin"
+python_requires = ">=3.11"
+# VLMs generate text, not confidence scores
+provides_confidence = false
+
+[plugin.dependencies]
+ollama = ">=0.4.0"
+pillow = ">=10.0.0"
+httpx = ">=0.25.0"
+
+[plugin.hardware]
+# Plugin is lightweight - model runs on remote/local Ollama server
+gpu_recommended = false
+gpu_required = false
+min_ram_gb = 2
+min_vram_gb = 0
+
+# =============================================================================
+# USER-CONFIGURABLE SETTINGS
+# Override in ~/.config/visual-buffet/config.toml or GUI
+# =============================================================================
+
+[plugin.defaults]
+# Quality level: quick | standard | max
+quality = "standard"
+
+# No threshold for VLMs (no confidence scores)
+threshold = 0.0
+
+# Maximum tags to return per image
+limit = 100
+
+# Batch size (VLMs typically process one at a time)
+batch_size = 1
+
+[plugin.connection]
+# Ollama server URL
+# Examples:
+#   "http://localhost:11434" (local Ollama)
+#   "http://192.168.1.100:11434" (remote server)
+server_url = "http://localhost:11434"
+
+# Model name as shown in `ollama list`
+# Available vision models: qwen3-vl, qwen2.5vl, llama3.2-vision
+model_name = "qwen3-vl:latest"
+
+# Request timeout in seconds (VLMs can be slow)
+timeout_seconds = 120
+
+# Keep model loaded in memory (faster subsequent requests)
+keep_alive = "5m"
+
+[plugin.generation]
+# Max tokens to generate
+max_tokens = 1024
+
+# Temperature: 0.0 = deterministic, 1.0 = creative
+# Lower is better for consistent tagging
+temperature = 0.1
+
+# Top-p sampling (nucleus sampling)
+top_p = 0.9
+
+# Output mode: tagging | describe | custom
+# - tagging: Returns structured tags (parsed from JSON response)
+# - describe: Returns detailed description
+# - custom: Uses custom_prompt field
+mode = "tagging"
+
+# Custom prompt (used when mode = "custom")
+custom_prompt = ""
+
+[plugin.image]
+# Maximum image dimension before resizing
+# Larger = more detail but slower/more memory
+max_size = 1280
+
+# JPEG quality for encoding (if conversion needed)
+jpeg_quality = 90
+
+[plugin.output]
+# Include full description alongside tags (in metadata)
+include_description = true
+
+# Parse compound tags (e.g., "red car" -> ["red", "car", "red_car"])
+expand_compounds = true
+
+# Minimum tag length to include
+min_tag_length = 2

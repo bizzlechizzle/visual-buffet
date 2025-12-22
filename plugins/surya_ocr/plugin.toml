@@ -1,0 +1,68 @@
+[plugin]
+name = "surya_ocr"
+display_name = "Surya OCR"
+version = "1.0.0"
+description = "Vision transformer OCR with layout analysis - 90+ languages"
+entry_point = "SuryaOCRPlugin"
+python_requires = ">=3.10"
+provides_confidence = true
+
+[plugin.dependencies]
+surya-ocr = ">=0.17.0"
+torch = ">=2.0"
+
+[plugin.hardware]
+gpu_recommended = true
+gpu_required = false
+min_ram_gb = 8
+min_vram_gb = 6
+
+# =============================================================================
+# USER-CONFIGURABLE SETTINGS
+# These can be overridden in ~/.config/visual-buffet/config.toml
+# =============================================================================
+
+[plugin.defaults]
+# Quality preset (affects processing)
+quality = "standard"
+
+# Minimum recognition confidence threshold (0.0-1.0)
+# Lines below this confidence will be filtered out
+threshold = 0.5
+
+# Maximum number of text lines to return per image
+# Set to 0 for unlimited
+limit = 100
+
+# Batch size for processing multiple images
+batch_size = 1
+
+[plugin.model]
+# Include layout analysis (tables, headers, etc.)
+# Adds latency but provides document structure information
+include_layout = false
+
+# Detection batch size (auto = based on VRAM)
+# Lower values use less VRAM: 4 for 6GB, 8 for 8GB, 16 for 12GB
+det_batch_size = "auto"
+
+# Recognition batch size (auto = based on VRAM)
+# Lower values use less VRAM: 32 for 6GB, 64 for 8GB, 128 for 12GB
+rec_batch_size = "auto"
+
+[plugin.detection]
+# Blank threshold for line spacing detection (0.0-1.0)
+# Default uses model's built-in value
+blank_threshold = "default"
+
+# Text threshold for text joining (0.0-1.0)
+# Must be greater than blank_threshold
+text_threshold = "default"
+
+[plugin.output]
+# Sort order: confidence | position | alphabetical
+# position = reading order (top-to-bottom, left-to-right)
+sort_by = "confidence"
+
+# Include bounding box coordinates in metadata
+include_boxes = true

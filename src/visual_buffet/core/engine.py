@@ -20,6 +20,8 @@ from ..plugins.schemas import Tag, TagQuality, merge_tags
 from ..utils.image import (
     THUMBNAIL_FORMAT,
     generate_thumbnail,
+    is_raw_image,
+    load_image,
     validate_image,
 )
 
@@ -37,15 +39,16 @@ class TaggingEngine:
     - STANDARD: 480px + 2048px merged (balanced, ~92% tag coverage)
     - MAX: All resolutions merged (480 + 1080 + 2048 + 4096 + original, 100% coverage)
 
-    Thumbnails and tags are saved in a 'visual-buffet/' folder next to each image:
+    Thumbnails are saved in a 'visual-buffet/' folder next to each image.
+    Tags are saved as JSON files directly next to each image:
 
         /photos/vacation/
         ├── beach.jpg
+        ├── beach_tags.json
         └── visual-buffet/
             ├── beach_480.webp
             ├── beach_1080.webp
-            ├── beach_2048.webp
-            └── beach_tags.json
+            └── beach_2048.webp
 
     Example:
         >>> engine = TaggingEngine()
@@ -76,10 +79,17 @@ class TaggingEngine:
         self._setup_siglip_discovery()
 
     def _setup_siglip_discovery(self) -> None:
-        """Give SigLIP references to discovery plugins (RAM++, Florence-2).
+        """Give SigLIP references to discovery plugins.
 
         This enables SigLIP's discovery mode, where it first runs discovery
         plugins to find candidate tags, then scores them with real confidence.
+
+        Available discovery sources:
+        - RAM++: General image tagging (4500+ categories)
+        - Florence-2: Detailed captioning converted to tags
+        - YOLO: Object detection (80 COCO classes)
+        - PaddleOCR: Text detection (words found in image)
+        - EasyOCR: Scene text detection (80+ languages)
         """
         siglip = self._plugins.get("siglip")
         if siglip and hasattr(siglip, "set_discovery_plugins"):
@@ -88,6 +98,12 @@ class TaggingEngine:
                 discovery_plugins["ram_plus"] = ram
             if florence := self._plugins.get("florence_2"):
                 discovery_plugins["florence_2"] = florence
+            if yolo := self._plugins.get("yolo"):
+                discovery_plugins["yolo"] = yolo
+            if paddle_ocr := self._plugins.get("paddle_ocr"):
+                discovery_plugins["paddle_ocr"] = paddle_ocr
+            if easyocr := self._plugins.get("easyocr"):
+                discovery_plugins["easyocr"] = easyocr
             siglip.set_discovery_plugins(discovery_plugins)
 
     @property
@@ -100,17 +116,33 @@ class TaggingEngine:
         return self._plugins.get(name)
 
     def _get_data_dir(self, image_path: Path) -> Path:
-        """Get the visual-buffet folder for an image (next to the image).
+        """Get the visual-buffet folder for an image.
+
+        Tries to create folder next to image (preferred for caching).
+        Falls back to temp directory if source location is read-only.
 
         Args:
             image_path: Path to the source image
 
         Returns:
-            Path to visual-buffet folder (e.g., /photos/visual-buffet/)
+            Path to visual-buffet folder
         """
+        # Try to create next to source image (preferred - enables caching)
         data_dir = image_path.parent / VISUAL_BUFFET_FOLDER
-        data_dir.mkdir(parents=True, exist_ok=True)
-        return data_dir
+        try:
+            data_dir.mkdir(parents=True, exist_ok=True)
+            return data_dir
+        except PermissionError:
+            # Source directory is read-only, use temp directory instead
+            import tempfile
+            import hashlib
+
+            # Create a stable temp path based on source directory
+            # This ensures same source dir always uses same temp cache
+            source_hash = hashlib.md5(str(image_path.parent).encode()).hexdigest()[:8]
+            temp_data_dir = Path(tempfile.gettempdir()) / f"visual-buffet-{source_hash}"
+            temp_data_dir.mkdir(parents=True, exist_ok=True)
+            return temp_data_dir
 
     def _get_thumbnail_path(
         self,
@@ -130,16 +162,15 @@ class TaggingEngine:
         return data_dir / f"{image_path.stem}_{resolution}.{THUMBNAIL_FORMAT}"
 
     def _get_tags_path(self, image_path: Path) -> Path:
-        """Get the path for tags JSON file.
+        """Get the path for tags JSON file (stored next to the image).
 
         Args:
             image_path: Original image path
 
         Returns:
-            Path where tags should be stored
+            Path where tags should be stored (e.g., /photos/beach_tags.json)
         """
-        data_dir = self._get_data_dir(image_path)
-        return data_dir / f"{image_path.stem}_tags.json"
+        return image_path.parent / f"{image_path.stem}_tags.json"
 
     def _get_or_create_thumbnail(
         self,
@@ -164,12 +195,44 @@ class TaggingEngine:
 
         return thumb_path
 
+    def _create_temp_from_raw(self, image_path: Path) -> Path:
+        """Convert a RAW image to a temporary JPEG file.
+
+        This is needed for resolution=0 (original) when plugins don't
+        support RAW formats directly. Without this:
+        - YOLO/Ultralytics fails with "unsupported format" error
+        - PIL-based plugins silently read tiny embedded thumbnail
+
+        Args:
+            image_path: Path to RAW image file
+
+        Returns:
+            Path to temporary JPEG file (caller must delete)
+        """
+        import tempfile
+
+        # Load RAW properly with rawpy (via load_image)
+        img = load_image(image_path)
+
+        # Create temp file with .jpg extension
+        fd, temp_path_str = tempfile.mkstemp(suffix=".jpg")
+
+        try:
+            temp_path = Path(temp_path_str)
+            # Save at high quality to preserve detail
+            img.save(temp_path, "JPEG", quality=95)
+            return temp_path
+        finally:
+            # Close file descriptor (file handle opened by mkstemp)
+            import os
+            os.close(fd)
+
     def _save_tags(
         self,
         image_path: Path,
         results: dict[str, Any],
     ) -> Path:
-        """Save tagging results to JSON file next to the image.
+        """Save tagging results to JSON file directly next to the image.
 
         Args:
             image_path: Original image path
@@ -228,7 +291,17 @@ class TaggingEngine:
         """
         if resolution == 0:
             # Use original image directly
-            result = plugin.tag(image_path)
+            # For RAW files, convert to temp JPEG first because:
+            # - YOLO/Ultralytics doesn't support RAW formats
+            # - PIL reads tiny embedded thumbnail instead of actual RAW data
+            if is_raw_image(image_path):
+                temp_path = self._create_temp_from_raw(image_path)
+                try:
+                    result = plugin.tag(temp_path)
+                finally:
+                    temp_path.unlink(missing_ok=True)
+            else:
+                result = plugin.tag(image_path)
         else:
             thumb_path = self._get_or_create_thumbnail(image_path, resolution)
             result = plugin.tag(thumb_path)
@@ -270,7 +343,6 @@ class TaggingEngine:
         image_path: Path,
         plugin_names: list[str] | None = None,
         threshold: float = 0.0,
-        limit: int | None = None,
         plugin_configs: dict[str, Any] | None = None,
         default_quality: TagQuality | str = TagQuality.STANDARD,
         use_thumbnails: bool = True,
@@ -282,12 +354,10 @@ class TaggingEngine:
             image_path: Path to image file
             plugin_names: Plugins to use (None = all)
             threshold: Default minimum confidence to include
-            limit: Default maximum tags per plugin
             plugin_configs: Per-plugin settings dict:
                 {
                     "plugin_name": {
                         "threshold": 0.5,
-                        "limit": 50,
                         "quality": "max"  # quick | standard | max
                     }
                 }
@@ -313,7 +383,7 @@ class TaggingEngine:
 
         Side effects:
             - Creates thumbnails in {image_dir}/visual-buffet/
-            - Saves tags to {image_dir}/visual-buffet/{image_stem}_tags.json
+            - Saves tags to {image_dir}/{image_stem}_tags.json
         """
         # Validate image
         validate_image(image_path)
@@ -354,7 +424,6 @@ class TaggingEngine:
                     else:
                         # Use plugin's recommended threshold
                         plugin_threshold = recommended
-                    plugin_limit = config.limit
                     quality_str = getattr(config, 'quality', None)
                 else:
                     # Dict config - use plugin's recommended threshold if no explicit threshold
@@ -368,7 +437,6 @@ class TaggingEngine:
                         plugin_threshold = recommended
                     else:
                         plugin_threshold = threshold if threshold > 0 else recommended
-                    plugin_limit = config.get("limit", limit)
                     quality_str = config.get("quality")
 
                 # Parse quality setting
@@ -422,10 +490,6 @@ class TaggingEngine:
                 if filtered_tags and filtered_tags[0].confidence is not None:
                     filtered_tags.sort(key=lambda t: t.confidence or 0, reverse=True)
 
-                # Apply limit
-                if plugin_limit:
-                    filtered_tags = filtered_tags[:plugin_limit]
-
                 # Build result dict (plugin_info already fetched at loop start)
                 result_dict = {
                     "tags": [t.to_dict() for t in filtered_tags],
@@ -456,7 +520,6 @@ class TaggingEngine:
         image_paths: list[Path],
         plugin_names: list[str] | None = None,
         threshold: float = 0.0,
-        limit: int | None = None,
         plugin_configs: dict[str, Any] | None = None,
         default_quality: TagQuality | str = TagQuality.STANDARD,
         use_thumbnails: bool = True,
@@ -468,8 +531,7 @@ class TaggingEngine:
             image_paths: List of image paths
             plugin_names: Plugins to use
             threshold: Minimum confidence
-            limit: Maximum tags per plugin
-            plugin_configs: Per-plugin settings (threshold, limit, quality)
+            plugin_configs: Per-plugin settings (threshold, quality)
             default_quality: Default quality for plugins without config
             use_thumbnails: If True, use quality-based thumbnails
             save_tags: If True, save tags to JSON files next to images
@@ -485,7 +547,6 @@ class TaggingEngine:
                     path,
                     plugin_names,
                     threshold,
-                    limit,
                     plugin_configs,
                     default_quality,
                     use_thumbnails,

@@ -1,0 +1,78 @@
+[plugin]
+name = "easyocr"
+display_name = "EasyOCR"
+version = "1.0.0"
+description = "CRAFT+CRNN scene text recognition - 80+ languages, excellent for photos"
+entry_point = "EasyOCRPlugin"
+python_requires = ">=3.10"
+provides_confidence = true
+
+[plugin.dependencies]
+easyocr = ">=1.7.0"
+torch = ">=2.0"
+
+[plugin.hardware]
+gpu_recommended = true
+gpu_required = false
+min_ram_gb = 4
+min_vram_gb = 2
+
+# =============================================================================
+# USER-CONFIGURABLE SETTINGS
+# These can be overridden in ~/.config/visual-buffet/config.toml
+# =============================================================================
+
+[plugin.defaults]
+# Quality preset (affects processing)
+quality = "standard"
+
+# Minimum recognition confidence threshold (0.0-1.0)
+# Lower than document OCR because scene text is harder
+threshold = 0.3
+
+# Maximum number of text lines to return per image
+# Set to 0 for unlimited
+limit = 100
+
+# Batch size for processing multiple images
+batch_size = 1
+
+[plugin.model]
+# Languages to recognize
+# Common codes: en, es, fr, de, it, pt, zh, ja, ko, ar, hi, ru
+# Full list: https://www.jaided.ai/easyocr/
+languages = ["en"]
+
+# Decoder type: "greedy" (fast) or "beamsearch" (more accurate)
+decoder = "greedy"
+
+# Beam width for beamsearch decoder (ignored if using greedy)
+beam_width = 5
+
+# Group text into paragraphs (true/false)
+# Useful for documents, less so for scene text
+paragraph = false
+
+[plugin.detection]
+# Contrast threshold for low contrast text detection
+contrast_ths = 0.1
+
+# Contrast adjustment factor
+adjust_contrast = 0.5
+
+# Text confidence threshold (CRAFT detector)
+text_threshold = 0.7
+
+# Low text bound
+low_text = 0.4
+
+# Link threshold for connecting text regions
+link_threshold = 0.4
+
+[plugin.output]
+# Sort order: confidence | position | alphabetical
+# position = reading order (top-to-bottom, left-to-right)
+sort_by = "confidence"
+
+# Include bounding box coordinates in metadata
+include_boxes = true
