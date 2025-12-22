@@ -80,6 +80,23 @@ dtype = "auto"
 # Reduces VRAM by ~50% (8bit) or ~75% (4bit)
 quantization = "none"
 
+[plugin.discovery]
+# Discovery mode uses RAM++ and/or Florence-2 to discover candidate tags,
+# then SigLIP scores each candidate with real sigmoid confidence values.
+# This solves SigLIP's fixed vocabulary limitation.
+
+# Enable discovery mode (default: false)
+# When enabled, SigLIP will first run discovery plugins to get candidate tags
+enabled = false
+
+# Use RAM++ for vocabulary discovery
+# RAM++ has ~6,500 fixed categories with confidence scores
+use_ram_plus = true
+
+# Use Florence-2 for vocabulary discovery
+# Florence-2 extracts tags from generated captions
+use_florence_2 = true
+
 [plugin.naflex]
 # NaFlex-specific settings (only for v2-naflex variant)
 # Maximum patches for variable resolution processing

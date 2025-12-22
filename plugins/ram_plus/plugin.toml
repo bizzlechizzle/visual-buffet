@@ -1,11 +1,11 @@
 [plugin]
 name = "ram_plus"
 display_name = "RAM++"
-version = "1.1.0"
+version = "1.3.0"
 description = "Recognize Anything Plus Plus - General purpose image tagging with ~4585 tags"
 entry_point = "RamPlusPlugin"
 python_requires = ">=3.11"
-provides_confidence = true  # Extracts sigmoid probabilities from model internals
+provides_confidence = true  # Returns real sigmoid probabilities from model
 
 [plugin.dependencies]
 torch = ">=2.0"
@@ -31,12 +31,6 @@ min_vram_gb = 4
 # Controls how many resolution passes are used for tagging
 quality = "standard"
 
-# Minimum confidence threshold (0.0-1.0)
-# Tags below this score are filtered out
-# Note: RAM++ already applies per-class thresholds internally (~0.68 default)
-# This is an additional filter on top of that
-threshold = 0.0
-
 # Maximum number of tags to return per image
 # Set to 0 for unlimited
 limit = 50
@@ -54,17 +48,10 @@ variant = "swin_l"
 # DO NOT CHANGE - model was trained at 384x384
 image_size = 384
 
-# Base threshold used by model internally
-# Per-class thresholds are calibrated around this value
-# Exposed for reference only - changing requires model retrain
-base_threshold = 0.68
-
 [plugin.output]
 # Include Chinese translations in output
 include_chinese = false
 
-# Sort order: confidence | alphabetical | model_order
-sort_by = "confidence"
-
-# Include per-class threshold in output (for debugging)
-include_thresholds = false
+# Sort order: alphabetical | model_order
+# Note: model_order is the order the model outputs them (by relevance)
+sort_by = "model_order"

@@ -29,7 +29,6 @@ Each plugin can have its own quality setting:
 |---------|---------------|-------|--------------|----------|
 | `quick` | 1080px | Fastest | ~87% | Bulk imports, rough sorting |
 | `standard` | 480 + 2048px | Fast | ~92% | Daily use (default) |
-| `high` | 480 + 1080 + 2048px | Slow | ~96% | Important images |
 | `max` | 480 + 1080 + 2048 + 4096 + original | Slowest | 100% | Final archive, maximum coverage |
 
 ### Resolution Selection
@@ -39,13 +38,12 @@ Quality Level    Resolutions Used                    Processing
 ─────────────    ──────────────────────────────────  ──────────────────
 quick            [1080]                              Single pass
 standard         [480, 2048]                         Two passes, merged
-high             [480, 1080, 2048]                   Three passes, merged
 max              [480, 1080, 2048, 4096, original]   Five passes, merged
 ```
 
-### Tag Merging (STANDARD and HIGH Modes)
+### Tag Merging (STANDARD and MAX Modes)
 
-When using `standard` or `high` quality, tags from multiple resolutions are merged:
+When using `standard` or `max` quality, tags from multiple resolutions are merged:
 
 - Duplicate tags are deduplicated (case-insensitive)
 - Highest confidence score is kept
@@ -260,7 +258,7 @@ limit = 50
 
 [plugins.florence_2]
 enabled = true
-quality = "high"       # Maximum tags
+quality = "max"        # Maximum tags
 threshold = 0.3
 limit = 100
 ```
@@ -283,7 +281,7 @@ result = engine.tag_image(
             "limit": 50,
         },
         "florence_2": {
-            "quality": "high",
+            "quality": "max",
             "threshold": 0.3,
             "limit": 100,
         },
@@ -293,7 +291,7 @@ result = engine.tag_image(
 # Or set default for all plugins
 result = engine.tag_image(
     Path("photo.jpg"),
-    default_quality=TagQuality.HIGH,
+    default_quality=TagQuality.MAX,
 )
 ```
 
@@ -320,19 +318,19 @@ result = engine.tag_image(
 }
 ```
 
-### HIGH Quality Result (Merged)
+### MAX Quality Result (Merged)
 
-When using HIGH quality, the `sources` field indicates how many resolutions found the tag:
+When using MAX quality, the `sources` field indicates how many resolutions found the tag:
 
 ```json
 {
   "tags": [
-    {"label": "dog", "confidence": 0.95, "sources": 3},
-    {"label": "outdoor", "confidence": 0.87, "sources": 2},
+    {"label": "dog", "confidence": 0.95, "sources": 5},
+    {"label": "outdoor", "confidence": 0.87, "sources": 3},
     {"label": "grass", "confidence": 0.72, "sources": 1}
   ],
-  "quality": "high",
-  "resolutions": [480, 1080, 2048]
+  "quality": "max",
+  "resolutions": [480, 1080, 2048, 4096, 0]
 }
 ```
 

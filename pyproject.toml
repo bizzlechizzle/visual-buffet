@@ -1,6 +1,6 @@
 [project]
 name = "visual-buffet"
-version = "0.1.0"
+version = "0.2.0"
 description = "Visual Buffet - Compare visual tagging results from local ML tools"
 readme = "README.md"
 license = { text = "MIT" }
@@ -31,6 +31,8 @@ dependencies = [
     "tomli>=2.0;python_version<'3.11'",
     "rawpy>=0.19",
     "packaging>=21.0",
+    "paddlepaddle>=3.2.2",
+    "paddleocr>=3.3.2",
 ]
 
 [project.optional-dependencies]
@@ -80,6 +82,11 @@ siglip_quantized = [
     "accelerate>=0.25.0",
     "bitsandbytes>=0.41.0",
 ]
+yolo = [
+    "torch>=2.0",
+    "torchvision>=0.15",
+    "ultralytics>=8.0",
+]
 all_models = [
     "torch>=2.0",
     "torchvision>=0.15",
@@ -91,6 +98,7 @@ all_models = [
     "accelerate>=0.25.0",
     "sentencepiece>=0.1.99",
     "protobuf>=3.20.0",
+    "ultralytics>=8.0",
     "ram @ git+https://github.com/xinyu1205/recognize-anything.git",
 ]
 

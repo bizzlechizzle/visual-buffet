@@ -51,7 +51,7 @@ pip install bitsandbytes>=0.41.0 # 4-bit/8-bit quantization
 
 | Setting | CLI Flag | Config Key | Default | Range/Options |
 |---------|----------|------------|---------|---------------|
-| Quality | `--quality` | `plugins.siglip.quality` | `standard` | quick/standard/high/max |
+| Quality | `--quality` | `plugins.siglip.quality` | `standard` | quick/standard/max |
 | Threshold | `--threshold` | `plugins.siglip.threshold` | `0.01` | 0.001-0.10 |
 | Limit | `--limit` | `plugins.siglip.max_tags` | `50` | 0-unlimited |
 | Variant | `--variant` | `plugins.siglip.variant` | `so400m` | base/large/so400m/giant |

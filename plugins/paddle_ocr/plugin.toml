@@ -1,0 +1,75 @@
+[plugin]
+name = "paddle_ocr"
+display_name = "PaddleOCR"
+version = "1.0.0"
+description = "High-speed text detection and OCR - 100+ languages with bounding boxes"
+entry_point = "PaddleOCRPlugin"
+python_requires = ">=3.11"
+provides_confidence = true  # PaddleOCR outputs recognition confidence per line
+
+[plugin.dependencies]
+paddlepaddle = ">=2.5.0"
+paddleocr = ">=2.7.0"
+
+[plugin.hardware]
+gpu_recommended = true
+gpu_required = false
+min_ram_gb = 4
+min_vram_gb = 2
+
+# =============================================================================
+# USER-CONFIGURABLE SETTINGS
+# These can be overridden in ~/.config/visual-buffet/config.toml
+# =============================================================================
+
+[plugin.defaults]
+# Quality preset (affects processing but OCR is single-pass)
+quality = "standard"
+
+# Minimum recognition confidence threshold (0.0-1.0)
+# Lines below this confidence will be filtered out
+threshold = 0.5
+
+# Maximum number of text lines to return per image
+# Set to 0 for unlimited
+limit = 100
+
+# Batch size for processing multiple images
+batch_size = 1
+
+[plugin.model]
+# Language for OCR: en, ch, fr, german, korean, japan, etc.
+# See: https://github.com/PaddlePaddle/PaddleOCR/blob/main/doc/doc_en/multi_languages_en.md
+language = "en"
+
+# Enable text line orientation detection (for rotated text)
+# PaddleOCR v3 parameter name
+use_textline_orientation = true
+
+[plugin.detection]
+# Text detection threshold - probability threshold for text regions
+# Lower = more sensitive (may detect noise), Higher = stricter
+# PaddleOCR v3 parameter name: text_det_thresh
+text_det_thresh = 0.3
+
+# Box confidence threshold - minimum score for detected boxes
+# PaddleOCR v3 parameter name: text_det_box_thresh
+text_det_box_thresh = 0.5
+
+# Text region expansion ratio - how much to expand detected regions
+# Higher values help with touching characters
+# PaddleOCR v3 parameter name: text_det_unclip_ratio
+text_det_unclip_ratio = 1.5
+
+[plugin.recognition]
+# Recognition confidence threshold - filter low-confidence results
+# PaddleOCR v3 parameter name: text_rec_score_thresh
+text_rec_score_thresh = 0.5
+
+[plugin.output]
+# Sort order: confidence | position | alphabetical
+# position = reading order (top-to-bottom, left-to-right)
+sort_by = "confidence"
+
+# Include bounding box coordinates in metadata
+include_boxes = true

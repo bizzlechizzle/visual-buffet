@@ -19,13 +19,11 @@ class TagQuality(str, Enum):
     Attributes:
         QUICK: 1080px preview only. Fast, ~87% tag coverage.
         STANDARD: 480px + 2048px merged. Balanced, ~92% coverage.
-        HIGH: All standard thumbnails (480 + 1080 + 2048) merged. ~96% coverage.
         MAX: All resolutions (480 + 1080 + 2048 + 4096 + original). 100% coverage.
 
     Resolution mapping (0 = original image):
         QUICK    -> [1080]
         STANDARD -> [480, 2048]
-        HIGH     -> [480, 1080, 2048]
         MAX      -> [480, 1080, 2048, 4096, 0]
 
     Example:
@@ -36,7 +34,6 @@ class TagQuality(str, Enum):
 
     QUICK = "quick"
     STANDARD = "standard"
-    HIGH = "high"
     MAX = "max"
 
     @property
@@ -53,7 +50,6 @@ class TagQuality(str, Enum):
 QUALITY_RESOLUTIONS: dict[TagQuality, list[int]] = {
     TagQuality.QUICK: [1080],
     TagQuality.STANDARD: [480, 2048],
-    TagQuality.HIGH: [480, 1080, 2048],
     TagQuality.MAX: [480, 1080, 2048, 4096, 0],
 }
 
@@ -101,6 +97,7 @@ class TagResult:
         model: Model name/identifier used
         version: Plugin version
         inference_time_ms: How long inference took in milliseconds
+        metadata: Optional plugin-specific metadata (e.g., discovery mode info)
 
     Example:
         >>> result = TagResult(
@@ -115,15 +112,19 @@ class TagResult:
     model: str
     version: str
     inference_time_ms: float
+    metadata: dict[str, Any] | None = None
 
     def to_dict(self) -> dict:
         """Convert to dictionary matching output contract."""
-        return {
+        result = {
             "tags": [t.to_dict() for t in self.tags],
             "model": self.model,
             "version": self.version,
             "inference_time_ms": self.inference_time_ms,
         }
+        if self.metadata:
+            result["metadata"] = self.metadata
+        return result
 
     def to_json(self) -> str:
         """Convert to JSON string."""
@@ -134,7 +135,7 @@ class TagResult:
 class MergedTag:
     """A tag with metadata from multi-resolution merging.
 
-    Used when HIGH quality mode merges tags from multiple resolutions.
+    Used when multi-resolution quality modes merge tags from different resolutions.
 
     Attributes:
         label: The tag text

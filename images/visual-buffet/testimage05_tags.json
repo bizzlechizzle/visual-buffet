@@ -1,0 +1,39 @@
+{
+  "file": "images/testimage05.jpg",
+  "filename": "testimage05.jpg",
+  "tagged_at": "2025-12-22T08:26:36.101933",
+  "results": {
+    "yolo": {
+      "tags": [
+        {
+          "label": "chair",
+          "confidence": 0.8959
+        },
+        {
+          "label": "laptop",
+          "confidence": 0.5503
+        },
+        {
+          "label": "refrigerator",
+          "confidence": 0.4834
+        },
+        {
+          "label": "oven",
+          "confidence": 0.4577
+        },
+        {
+          "label": "tv",
+          "confidence": 0.4054
+        }
+      ],
+      "model": "yolo",
+      "version": "1.0.0",
+      "quality": "standard",
+      "resolutions": [
+        480,
+        2048
+      ],
+      "inference_time_ms": 522.37
+    }
+  }
+}

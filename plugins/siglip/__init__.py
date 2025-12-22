@@ -60,6 +60,8 @@ class SigLIPPlugin(PluginBase):
         self._torch_dtype = None
         self._labels = None
         self._config = self._load_default_config()
+        # Discovery plugins injected by engine
+        self._discovery_plugins: dict[str, PluginBase] = {}
 
     def _load_default_config(self) -> dict:
         """Load default configuration."""
@@ -69,6 +71,10 @@ class SigLIPPlugin(PluginBase):
             "dtype": "auto",
             "quantization": "none",
             "max_num_patches": 256,
+            # Discovery mode: use RAM++ and/or Florence-2 for vocabulary
+            "discovery_mode": False,
+            "use_ram_plus": True,
+            "use_florence_2": True,
         }
 
     def get_info(self) -> PluginInfo:
@@ -187,14 +193,37 @@ class SigLIPPlugin(PluginBase):
                 raise PluginError("max_num_patches must be between 64 and 512")
             self._config["max_num_patches"] = patches
 
+        # Discovery mode settings
+        if "discovery_mode" in kwargs:
+            self._config["discovery_mode"] = bool(kwargs["discovery_mode"])
+        if "use_ram_plus" in kwargs:
+            self._config["use_ram_plus"] = bool(kwargs["use_ram_plus"])
+        if "use_florence_2" in kwargs:
+            self._config["use_florence_2"] = bool(kwargs["use_florence_2"])
+
     def tag(self, image_path: Path) -> TagResult:
-        """Tag an image using SigLIP zero-shot classification."""
+        """Tag an image using SigLIP zero-shot classification.
+
+        If discovery_mode is enabled, first runs RAM++ and/or Florence-2 to
+        discover candidate tags, then scores them with SigLIP. Returns all
+        model results in the metadata.
+
+        If discovery_mode is disabled, uses the builtin vocabulary.
+        """
         if not self.is_available():
             raise ModelNotFoundError(
                 "SigLIP dependencies not found. Install with:\n"
                 "pip install torch torchvision transformers>=4.47.0 accelerate"
             )
 
+        # Check if discovery mode is enabled
+        if self._config["discovery_mode"]:
+            return self._tag_with_discovery(image_path)
+
+        return self._tag_standard(image_path)
+
+    def _tag_standard(self, image_path: Path) -> TagResult:
+        """Tag using builtin vocabulary (standard mode)."""
         # Lazy load model and labels
         if self._model is None:
             self._load_model()
@@ -213,6 +242,87 @@ class SigLIPPlugin(PluginBase):
             model=model_name,
             version=PLUGIN_VERSION,
             inference_time_ms=round(inference_time, 2),
+        )
+
+    def _tag_with_discovery(self, image_path: Path) -> TagResult:
+        """Tag using discovered vocabulary from RAM++ and/or Florence-2.
+
+        Runs discovery plugins first to get candidate tags, then uses SigLIP
+        to score each candidate with real sigmoid confidence values.
+
+        Returns:
+            TagResult with scored tags and discovery metadata containing
+            full results from all models that ran.
+        """
+        # Determine which discovery sources are available and enabled
+        available_sources = []
+        if self._config["use_ram_plus"] and "ram_plus" in self._discovery_plugins:
+            plugin = self._discovery_plugins["ram_plus"]
+            if plugin.is_available():
+                available_sources.append("ram_plus")
+        if self._config["use_florence_2"] and "florence_2" in self._discovery_plugins:
+            plugin = self._discovery_plugins["florence_2"]
+            if plugin.is_available():
+                available_sources.append("florence_2")
+
+        if not available_sources:
+            raise PluginError(
+                "Discovery mode enabled but no discovery plugins available. "
+                "Either enable ram_plus or florence_2 in settings, ensure they "
+                "are installed, or disable discovery mode."
+            )
+
+        # Collect candidates from discovery plugins
+        all_candidates: set[str] = set()
+        discovery_results: dict[str, dict] = {}
+        total_discovery_time = 0.0
+
+        for name in available_sources:
+            plugin = self._discovery_plugins[name]
+            result = plugin.tag(image_path)
+
+            # Collect unique lowercase tags
+            for tag in result.tags:
+                all_candidates.add(tag.label.lower().strip())
+
+            # Store full results for display
+            discovery_results[name] = {
+                "tags": [t.to_dict() for t in result.tags],
+                "model": plugin.get_info().name,
+                "inference_time_ms": result.inference_time_ms or 0,
+                "total_tags": len(result.tags),
+            }
+            total_discovery_time += result.inference_time_ms or 0
+
+        # Set vocabulary to discovered tags
+        candidate_list = sorted(all_candidates)
+        self.set_vocabulary(candidate_list)
+
+        # Lazy load SigLIP model
+        if self._model is None:
+            self._load_model()
+
+        # Run SigLIP inference to score candidates
+        start_time = time.perf_counter()
+        tags = self._run_inference(image_path)
+        siglip_inference_time = (time.perf_counter() - start_time) * 1000
+
+        # Reset vocabulary for next call
+        self.reset_vocabulary()
+
+        model_name = f"siglip_{self._config['model_variant']}"
+        return TagResult(
+            tags=tags,
+            model=model_name,
+            version=PLUGIN_VERSION,
+            inference_time_ms=round(siglip_inference_time, 2),
+            metadata={
+                "discovery_mode": True,
+                "discovery_sources": available_sources,
+                "vocabulary_size": len(candidate_list),
+                "discovery_results": discovery_results,
+                "total_discovery_time_ms": round(total_discovery_time, 2),
+            },
         )
 
     def _get_model_id(self) -> str:
@@ -352,6 +462,55 @@ class SigLIPPlugin(PluginBase):
         # Use comprehensive label set for general image tagging
         # These are common tags that work well with SigLIP
         self._labels = self._get_tag_vocabulary()
+
+    def set_vocabulary(self, labels: list[str]) -> None:
+        """Set a custom vocabulary for zero-shot classification.
+
+        This allows using SigLIP to score tags from other models (RAM++, Florence-2)
+        with real confidence values.
+
+        Args:
+            labels: List of tag labels to score against
+        """
+        # Normalize to lowercase (SigLIP was trained on lowercase)
+        self._labels = [label.lower().strip() for label in labels if label.strip()]
+
+    def get_vocabulary(self) -> list[str] | None:
+        """Get the current vocabulary.
+
+        Returns:
+            Current label list, or None if not loaded
+        """
+        return self._labels
+
+    def reset_vocabulary(self) -> None:
+        """Reset vocabulary to default labels.
+
+        Call this before standard tagging to ensure the default vocabulary
+        is used instead of a previously set custom vocabulary from pipeline mode.
+        """
+        self._labels = None
+
+    def set_discovery_plugins(self, plugins: dict[str, PluginBase]) -> None:
+        """Set references to plugins used for vocabulary discovery.
+
+        Called by TaggingEngine after loading all plugins. When discovery_mode
+        is enabled, SigLIP will use these plugins to discover candidate tags
+        before scoring them.
+
+        Args:
+            plugins: Dict mapping plugin name to plugin instance
+                     (e.g., {"ram_plus": <plugin>, "florence_2": <plugin>})
+        """
+        self._discovery_plugins = plugins
+
+    def get_discovery_plugins(self) -> dict[str, PluginBase]:
+        """Get the currently configured discovery plugins.
+
+        Returns:
+            Dict of discovery plugin references
+        """
+        return self._discovery_plugins
 
     def _get_tag_vocabulary(self) -> list[str]:
         """Get comprehensive tag vocabulary for zero-shot classification.

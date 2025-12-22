@@ -1,0 +1,67 @@
+[plugin]
+name = "yolo"
+display_name = "YOLO"
+version = "1.0.0"
+description = "YOLOv8 Object Detection - Real-time detection with 80 COCO classes + location"
+entry_point = "YoloPlugin"
+python_requires = ">=3.11"
+provides_confidence = true  # YOLO outputs detection confidence
+
+[plugin.dependencies]
+ultralytics = ">=8.0"
+torch = ">=2.0"
+torchvision = ">=0.15"
+
+[plugin.hardware]
+gpu_recommended = true
+gpu_required = false
+min_ram_gb = 2
+min_vram_gb = 2
+
+# =============================================================================
+# USER-CONFIGURABLE SETTINGS
+# These can be overridden in ~/.config/visual-buffet/config.toml
+# =============================================================================
+
+[plugin.defaults]
+# Model variant: n (nano), s (small), m (medium), l (large), x (extra-large)
+# Smaller = faster, Larger = more accurate
+variant = "m"
+
+# Minimum detection confidence threshold (0.0-1.0)
+# YOLO default is 0.25, we use 0.4 to filter false positives like "clock"
+threshold = 0.4
+
+# Maximum number of tags to return per image
+# Set to 0 for unlimited
+limit = 50
+
+# Batch size for processing multiple images
+# Higher = faster but more VRAM
+batch_size = 8
+
+# Include detection count in tag label (e.g., "person (3)")
+include_count = false
+
+# NMS IoU threshold for overlapping boxes
+iou_threshold = 0.45
+
+[plugin.model]
+# Model architecture: "yolov8" or "yolo11"
+architecture = "yolov8"
+
+# Input image size (larger = more accurate, slower)
+# Common values: 320, 416, 640, 1280
+image_size = 640
+
+# Number of classes (COCO = 80)
+num_classes = 80
+
+[plugin.output]
+# Sort order: confidence | alphabetical | count
+sort_by = "confidence"
+
+# Return all detections as separate tags vs aggregate by class
+# aggregate: returns unique classes with max confidence
+# individual: returns each detection (may have duplicates)
+mode = "aggregate"

@@ -80,9 +80,9 @@ Thumbnails and tags are stored in an `visual-buffet/` folder next to each image:
 /photos/vacation/
 ├── beach.jpg
 └── visual-buffet/
-    ├── beach_480.webp       # Grid thumbnail (quick quality)
-    ├── beach_1080.webp      # Preview (standard quality)
-    ├── beach_2048.webp      # Zoom (high quality)
+    ├── beach_480.webp       # Grid thumbnail
+    ├── beach_1080.webp      # Preview (QUICK quality uses this)
+    ├── beach_2048.webp      # Zoom (STANDARD uses 480+2048)
     └── beach_tags.json      # Saved tags
 ```
 
@@ -108,6 +108,7 @@ See plugin-specific settings references:
 - [RAM++ Settings Reference](docs/reference/ram_plus_settings.md)
 - [Florence-2 Settings Reference](docs/reference/florence_2_settings.md)
 - [SigLIP Settings Reference](docs/reference/siglip_settings.md)
+- [PaddleOCR Settings Reference](docs/reference/paddle_ocr_settings.md)
 
 ## Plugin Development
 

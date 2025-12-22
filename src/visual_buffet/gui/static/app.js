@@ -12,7 +12,7 @@ const state = {
     selectedImage: null,
     settings: {
         plugins: [], // List of available plugins with their settings
-        // Per-plugin settings: { name: { enabled, threshold, limit } }
+        // Per-plugin settings: { name: { enabled, threshold, limit, discoveryMode, useRamPlus, useFlorence2 } }
         pluginSettings: {},
     },
     hardware: null,
@@ -52,7 +52,11 @@ const elements = {
     settingsModal: document.getElementById('settingsModal'),
     settingsClose: document.getElementById('settingsClose'),
     pluginsList: document.getElementById('pluginsList'),
+    pluginsSection: document.getElementById('pluginsSection'),
     hardwareInfo: document.getElementById('hardwareInfo'),
+    qualityButtons: document.querySelectorAll('.quality-btn'),
+    customQualityBtn: document.getElementById('customQualityBtn'),
+    qualityHint: document.getElementById('qualityHint'),
 
     // Toast
     toastContainer: document.getElementById('toastContainer'),
@@ -93,6 +97,10 @@ async function fetchStatus() {
                         limit: saved.limit ?? 50,
                         quality: saved.quality ?? 'standard',
                         providesConfidence: plugin.provides_confidence !== false,
+                        // SigLIP discovery settings
+                        discoveryMode: saved.discoveryMode ?? false,
+                        useRamPlus: saved.useRamPlus ?? true,
+                        useFlorence2: saved.useFlorence2 ?? true,
                     };
                 } else {
                     // Use plugin's recommended_threshold (critical for SigLIP which needs 0.01)
@@ -103,6 +111,10 @@ async function fetchStatus() {
                         limit: 50,
                         quality: 'standard',
                         providesConfidence: plugin.provides_confidence !== false,
+                        // SigLIP discovery settings (defaults)
+                        discoveryMode: false,
+                        useRamPlus: true,
+                        useFlorence2: true,
                     };
                 }
             }
@@ -110,6 +122,7 @@ async function fetchStatus() {
 
         renderPluginsList();
         renderHardwareInfo();
+        updateGlobalQualityUI();
 
         return data;
     } catch (error) {
@@ -144,11 +157,18 @@ async function tagImage(imageId) {
         const settings = state.settings.pluginSettings[plugin.name];
         if (settings && settings.enabled && plugin.available) {
             enabledPlugins.push(plugin.name);
-            pluginConfigs[plugin.name] = {
+            const config = {
                 threshold: settings.threshold,
                 limit: settings.limit,
                 quality: settings.quality || 'standard',
             };
+            // Add discovery settings for SigLIP
+            if (plugin.name === 'siglip') {
+                config.discovery_mode = settings.discoveryMode || false;
+                config.use_ram_plus = settings.useRamPlus !== false;
+                config.use_florence_2 = settings.useFlorence2 !== false;
+            }
+            pluginConfigs[plugin.name] = config;
         }
     }
 
@@ -172,6 +192,7 @@ async function tagImage(imageId) {
 
     return response.json();
 }
+
 
 async function deleteImage(imageId) {
     await fetch(`/api/image/${imageId}`, { method: 'DELETE' });
@@ -277,71 +298,239 @@ function updateStatusBar() {
 
 function renderPluginsList() {
     if (!state.settings.plugins.length) {
-        elements.pluginsList.innerHTML = '<p style="color: var(--text-tertiary); font-size: var(--font-size-sm);">No plugins found</p>';
+        elements.pluginsList.textContent = 'No plugins found';
         return;
     }
 
-    elements.pluginsList.innerHTML = state.settings.plugins.map(plugin => {
-        // Use plugin's recommended_threshold if settings not initialized
-        const defaultThreshold = plugin.recommended_threshold ?? 0.0;
-        const settings = state.settings.pluginSettings[plugin.name] || { enabled: false, threshold: defaultThreshold, limit: 50 };
-        const displayName = plugin.display_name || plugin.name;
-        const isAvailable = plugin.available;
-        const isEnabled = settings.enabled && isAvailable;
+    // Clear existing content using safe DOM methods
+    elements.pluginsList.textContent = '';
 
-        return `
-            <div class="plugin-card" data-plugin="${plugin.name}">
-                <div class="plugin-card-header">
-                    <div class="plugin-card-title">
-                        <span class="plugin-status-dot ${isAvailable ? 'available' : 'unavailable'}"></span>
-                        <span class="plugin-name">${displayName}</span>
-                    </div>
-                    <label class="toggle ${!isAvailable ? 'disabled' : ''}">
-                        <input type="checkbox"
-                            ${isEnabled ? 'checked' : ''}
-                            ${!isAvailable ? 'disabled' : ''}
-                            onchange="togglePlugin('${plugin.name}', this.checked)">
-                        <span class="toggle-slider"></span>
-                    </label>
-                </div>
-                <div class="plugin-card-settings ${!isEnabled ? 'disabled' : ''}">
-                    ${plugin.provides_confidence ? `
-                    <div class="plugin-setting">
-                        <label>Threshold</label>
-                        <div class="setting-control">
-                            <input type="range" min="0" max="100" value="${Math.round(settings.threshold * 100)}"
-                                ${!isEnabled ? 'disabled' : ''}
-                                oninput="updatePluginThreshold('${plugin.name}', this.value)">
-                            <span class="setting-value">${settings.threshold.toFixed(2)}</span>
-                        </div>
-                    </div>
-                    ` : ''}
-                    <div class="plugin-setting">
-                        <label>Quality</label>
-                        <div class="setting-control">
-                            <select class="quality-select"
-                                ${!isEnabled ? 'disabled' : ''}
-                                onchange="updatePluginQuality('${plugin.name}', this.value)">
-                                <option value="quick" ${settings.quality === 'quick' ? 'selected' : ''}>Quick</option>
-                                <option value="standard" ${settings.quality === 'standard' ? 'selected' : ''}>Standard</option>
-                                <option value="high" ${settings.quality === 'high' ? 'selected' : ''}>High</option>
-                                <option value="max" ${settings.quality === 'max' ? 'selected' : ''}>Max</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="plugin-setting">
-                        <label>Tag Limit</label>
-                        <div class="setting-control">
-                            <input type="range" min="5" max="100" value="${settings.limit}"
-                                ${!isEnabled ? 'disabled' : ''}
-                                oninput="updatePluginLimit('${plugin.name}', this.value)">
-                            <span class="setting-value">${settings.limit}</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `;
-    }).join('');
+    // Sort plugins: taggers first, then detection models
+    const pluginOrder = ['florence_2', 'ram_plus', 'siglip', 'yolo'];
+    const sortedPlugins = [...state.settings.plugins].sort((a, b) => {
+        const aIndex = pluginOrder.indexOf(a.name);
+        const bIndex = pluginOrder.indexOf(b.name);
+        // Unknown plugins go at the end
+        const aOrder = aIndex === -1 ? 999 : aIndex;
+        const bOrder = bIndex === -1 ? 999 : bIndex;
+        return aOrder - bOrder;
+    });
+
+    for (const plugin of sortedPlugins) {
+        const card = createPluginCard(plugin);
+        elements.pluginsList.appendChild(card);
+    }
+}
+
+function createPluginCard(plugin) {
+    const defaultThreshold = plugin.recommended_threshold ?? 0.0;
+    const settings = state.settings.pluginSettings[plugin.name] || { enabled: false, threshold: defaultThreshold, limit: 50 };
+    const displayName = plugin.display_name || plugin.name;
+    const isAvailable = plugin.available;
+    const isEnabled = settings.enabled && isAvailable;
+    const isSigLIP = plugin.name === 'siglip';
+    const discoveryEnabled = settings.discoveryMode || false;
+
+    const card = document.createElement('div');
+    card.className = 'plugin-card';
+    card.dataset.plugin = plugin.name;
+
+    // Header
+    const header = document.createElement('div');
+    header.className = 'plugin-card-header';
+
+    const title = document.createElement('div');
+    title.className = 'plugin-card-title';
+
+    const statusDot = document.createElement('span');
+    statusDot.className = `plugin-status-dot ${isAvailable ? 'available' : 'unavailable'}`;
+    title.appendChild(statusDot);
+
+    const nameSpan = document.createElement('span');
+    nameSpan.className = 'plugin-name';
+    nameSpan.textContent = displayName;
+    title.appendChild(nameSpan);
+
+    header.appendChild(title);
+
+    // Toggle
+    const toggleLabel = document.createElement('label');
+    toggleLabel.className = `toggle ${!isAvailable ? 'disabled' : ''}`;
+    const toggleInput = document.createElement('input');
+    toggleInput.type = 'checkbox';
+    toggleInput.checked = isEnabled;
+    toggleInput.disabled = !isAvailable;
+    toggleInput.addEventListener('change', () => togglePlugin(plugin.name, toggleInput.checked));
+    const toggleSlider = document.createElement('span');
+    toggleSlider.className = 'toggle-slider';
+    toggleLabel.appendChild(toggleInput);
+    toggleLabel.appendChild(toggleSlider);
+    header.appendChild(toggleLabel);
+
+    card.appendChild(header);
+
+    // Settings container
+    const settingsDiv = document.createElement('div');
+    settingsDiv.className = `plugin-card-settings ${!isEnabled ? 'disabled' : ''}`;
+
+    // SigLIP Discovery Mode settings
+    if (isSigLIP) {
+        // Discovery toggle
+        const discoverySetting = document.createElement('div');
+        discoverySetting.className = 'plugin-setting discovery-toggle';
+
+        const discoveryLabel = document.createElement('label');
+        discoveryLabel.textContent = 'Discovery Mode';
+        discoverySetting.appendChild(discoveryLabel);
+
+        const discoveryControl = document.createElement('div');
+        discoveryControl.className = 'setting-control';
+
+        const discoveryToggleLabel = document.createElement('label');
+        discoveryToggleLabel.className = `toggle ${!isEnabled ? 'disabled' : ''}`;
+        const discoveryToggleInput = document.createElement('input');
+        discoveryToggleInput.type = 'checkbox';
+        discoveryToggleInput.checked = discoveryEnabled;
+        discoveryToggleInput.disabled = !isEnabled;
+        discoveryToggleInput.addEventListener('change', () => toggleDiscoveryMode(plugin.name, discoveryToggleInput.checked));
+        const discoveryToggleSlider = document.createElement('span');
+        discoveryToggleSlider.className = 'toggle-slider';
+        discoveryToggleLabel.appendChild(discoveryToggleInput);
+        discoveryToggleLabel.appendChild(discoveryToggleSlider);
+        discoveryControl.appendChild(discoveryToggleLabel);
+
+        const discoveryHint = document.createElement('span');
+        discoveryHint.className = 'setting-hint';
+        discoveryHint.textContent = 'Use RAM++/Florence-2 for vocabulary';
+        discoveryControl.appendChild(discoveryHint);
+
+        discoverySetting.appendChild(discoveryControl);
+        settingsDiv.appendChild(discoverySetting);
+
+        // Discovery sources
+        const sourcesDiv = document.createElement('div');
+        sourcesDiv.className = `discovery-sources ${!discoveryEnabled || !isEnabled ? 'disabled' : ''}`;
+
+        const ramLabel = document.createElement('label');
+        ramLabel.className = 'checkbox-label';
+        const ramCheck = document.createElement('input');
+        ramCheck.type = 'checkbox';
+        ramCheck.checked = settings.useRamPlus !== false;
+        ramCheck.disabled = !discoveryEnabled || !isEnabled;
+        ramCheck.addEventListener('change', () => updateDiscoverySource(plugin.name, 'useRamPlus', ramCheck.checked));
+        ramLabel.appendChild(ramCheck);
+        const ramText = document.createElement('span');
+        ramText.textContent = 'RAM++';
+        ramLabel.appendChild(ramText);
+        sourcesDiv.appendChild(ramLabel);
+
+        const florenceLabel = document.createElement('label');
+        florenceLabel.className = 'checkbox-label';
+        const florenceCheck = document.createElement('input');
+        florenceCheck.type = 'checkbox';
+        florenceCheck.checked = settings.useFlorence2 !== false;
+        florenceCheck.disabled = !discoveryEnabled || !isEnabled;
+        florenceCheck.addEventListener('change', () => updateDiscoverySource(plugin.name, 'useFlorence2', florenceCheck.checked));
+        florenceLabel.appendChild(florenceCheck);
+        const florenceText = document.createElement('span');
+        florenceText.textContent = 'Florence-2';
+        florenceLabel.appendChild(florenceText);
+        sourcesDiv.appendChild(florenceLabel);
+
+        settingsDiv.appendChild(sourcesDiv);
+    }
+
+    // Threshold setting (only for plugins with confidence)
+    if (plugin.provides_confidence) {
+        const thresholdSetting = document.createElement('div');
+        thresholdSetting.className = 'plugin-setting';
+
+        const thresholdLabel = document.createElement('label');
+        thresholdLabel.textContent = 'Threshold';
+        thresholdSetting.appendChild(thresholdLabel);
+
+        const thresholdControl = document.createElement('div');
+        thresholdControl.className = 'setting-control';
+
+        const thresholdRange = document.createElement('input');
+        thresholdRange.type = 'range';
+        thresholdRange.min = '0';
+        thresholdRange.max = '100';
+        thresholdRange.value = Math.round(settings.threshold * 100);
+        thresholdRange.disabled = !isEnabled;
+        const thresholdValue = document.createElement('span');
+        thresholdValue.className = 'setting-value';
+        thresholdValue.textContent = settings.threshold.toFixed(2);
+        thresholdRange.addEventListener('input', () => {
+            updatePluginThreshold(plugin.name, thresholdRange.value);
+            thresholdValue.textContent = (thresholdRange.value / 100).toFixed(2);
+        });
+        thresholdControl.appendChild(thresholdRange);
+        thresholdControl.appendChild(thresholdValue);
+
+        thresholdSetting.appendChild(thresholdControl);
+        settingsDiv.appendChild(thresholdSetting);
+    }
+
+    // Quality setting
+    const qualitySetting = document.createElement('div');
+    qualitySetting.className = 'plugin-setting';
+
+    const qualityLabel = document.createElement('label');
+    qualityLabel.textContent = 'Quality';
+    qualitySetting.appendChild(qualityLabel);
+
+    const qualityControl = document.createElement('div');
+    qualityControl.className = 'setting-control';
+
+    const qualitySelect = document.createElement('select');
+    qualitySelect.className = 'quality-select';
+    qualitySelect.disabled = !isEnabled;
+    ['quick', 'standard', 'max'].forEach(q => {
+        const opt = document.createElement('option');
+        opt.value = q;
+        opt.textContent = q.charAt(0).toUpperCase() + q.slice(1);
+        opt.selected = settings.quality === q;
+        qualitySelect.appendChild(opt);
+    });
+    qualitySelect.addEventListener('change', () => updatePluginQuality(plugin.name, qualitySelect.value));
+    qualityControl.appendChild(qualitySelect);
+
+    qualitySetting.appendChild(qualityControl);
+    settingsDiv.appendChild(qualitySetting);
+
+    // Limit setting
+    const limitSetting = document.createElement('div');
+    limitSetting.className = 'plugin-setting';
+
+    const limitLabel = document.createElement('label');
+    limitLabel.textContent = 'Tag Limit';
+    limitSetting.appendChild(limitLabel);
+
+    const limitControl = document.createElement('div');
+    limitControl.className = 'setting-control';
+
+    const limitRange = document.createElement('input');
+    limitRange.type = 'range';
+    limitRange.min = '5';
+    limitRange.max = '100';
+    limitRange.value = settings.limit;
+    limitRange.disabled = !isEnabled;
+    const limitValue = document.createElement('span');
+    limitValue.className = 'setting-value';
+    limitValue.textContent = settings.limit;
+    limitRange.addEventListener('input', () => {
+        updatePluginLimit(plugin.name, limitRange.value);
+        limitValue.textContent = limitRange.value;
+    });
+    limitControl.appendChild(limitRange);
+    limitControl.appendChild(limitValue);
+
+    limitSetting.appendChild(limitControl);
+    settingsDiv.appendChild(limitSetting);
+
+    card.appendChild(settingsDiv);
+    return card;
 }
 
 function togglePlugin(pluginName, enabled) {
@@ -389,7 +578,23 @@ function updatePluginLimit(pluginName, value) {
 function updatePluginQuality(pluginName, value) {
     if (state.settings.pluginSettings[pluginName]) {
         state.settings.pluginSettings[pluginName].quality = value;
+        updateGlobalQualityUI(); // Sync global quality buttons
         saveSettings(); // Persist to disk
+    }
+}
+
+function toggleDiscoveryMode(pluginName, enabled) {
+    if (state.settings.pluginSettings[pluginName]) {
+        state.settings.pluginSettings[pluginName].discoveryMode = enabled;
+        renderPluginsList();
+        saveSettings();
+    }
+}
+
+function updateDiscoverySource(pluginName, source, enabled) {
+    if (state.settings.pluginSettings[pluginName]) {
+        state.settings.pluginSettings[pluginName][source] = enabled;
+        saveSettings();
     }
 }
 
@@ -477,64 +682,249 @@ function getPluginDisplayName(pluginName) {
 }
 
 function renderLightboxTags(image) {
-    if (!image.results || !image.results.results) {
-        elements.lightboxTags.innerHTML = '<p class="no-tags">Click "Tag Image" to analyze</p>';
+    // Clear existing content
+    elements.lightboxTags.textContent = '';
+
+    if (!image.results) {
+        const noTags = document.createElement('p');
+        noTags.className = 'no-tags';
+        noTags.textContent = 'Click "Tag Image" to analyze';
+        elements.lightboxTags.appendChild(noTags);
         elements.lightboxTagBtn.textContent = 'Tag Image';
         elements.lightboxTagBtn.disabled = false;
         return;
     }
 
+    // Standard results
+    if (!image.results.results) {
+        const noTags = document.createElement('p');
+        noTags.className = 'no-tags';
+        noTags.textContent = 'Click "Tag Image" to analyze';
+        elements.lightboxTags.appendChild(noTags);
+        elements.lightboxTagBtn.textContent = 'Tag Image';
+        elements.lightboxTagBtn.disabled = false;
+        return;
+    }
+
+    // Check if SigLIP result has discovery mode enabled (check metadata)
+    const siglipResult = image.results.results.siglip;
+    if (siglipResult && siglipResult.metadata && siglipResult.metadata.discovery_mode) {
+        renderDiscoveryTags(image);
+        return;
+    }
+
     const results = image.results.results;
-    let html = '';
 
     for (const [pluginName, pluginResult] of Object.entries(results)) {
         const displayName = getPluginDisplayName(pluginName);
-        html += `<div class="plugin-result">`;
+        const pluginDiv = document.createElement('div');
+        pluginDiv.className = 'plugin-result';
 
         if (pluginResult.error) {
-            html += `
-                <div class="plugin-header">
-                    <span class="plugin-name">${displayName}</span>
-                </div>
-                <p class="plugin-error">${pluginResult.error}</p>
-            `;
+            const header = document.createElement('div');
+            header.className = 'plugin-header';
+            const nameSpan = document.createElement('span');
+            nameSpan.className = 'plugin-name';
+            nameSpan.textContent = displayName;
+            header.appendChild(nameSpan);
+
+            const errorP = document.createElement('p');
+            errorP.className = 'plugin-error';
+            errorP.textContent = pluginResult.error;
+
+            pluginDiv.appendChild(header);
+            pluginDiv.appendChild(errorP);
         } else {
             const tags = pluginResult.tags || [];
             const timeMs = pluginResult.inference_time_ms || 0;
 
-            html += `
-                <div class="plugin-header">
-                    <span class="plugin-name">${displayName}</span>
-                    <span class="plugin-time">${timeMs.toFixed(0)}ms</span>
-                </div>
-                <div class="tags-list">
-                    ${tags.map(tag => {
-                        // Only show confidence if provided
-                        const hasConfidence = tag.confidence !== undefined && tag.confidence !== null;
-                        if (hasConfidence) {
-                            const conf = tag.confidence;
-                            const confClass = conf >= 0.8 ? 'high-confidence' : conf >= 0.6 ? 'medium-confidence' : '';
-                            return `
-                                <span class="tag ${confClass}">
-                                    ${tag.label}
-                                    <span class="tag-confidence">${conf.toFixed(2)}</span>
-                                </span>
-                            `;
-                        } else {
-                            return `<span class="tag">${tag.label}</span>`;
-                        }
-                    }).join('')}
-                </div>
-            `;
+            const header = document.createElement('div');
+            header.className = 'plugin-header';
+            const nameSpan = document.createElement('span');
+            nameSpan.className = 'plugin-name';
+            nameSpan.textContent = displayName;
+            const timeSpan = document.createElement('span');
+            timeSpan.className = 'plugin-time';
+            timeSpan.textContent = `${timeMs.toFixed(0)}ms`;
+            header.appendChild(nameSpan);
+            header.appendChild(timeSpan);
+
+            const tagsList = document.createElement('div');
+            tagsList.className = 'tags-list';
+
+            for (const tag of tags) {
+                const tagSpan = document.createElement('span');
+                const hasConfidence = tag.confidence !== undefined && tag.confidence !== null;
+
+                if (hasConfidence) {
+                    const conf = tag.confidence;
+                    const confClass = conf >= 0.8 ? 'high-confidence' : conf >= 0.6 ? 'medium-confidence' : '';
+                    tagSpan.className = `tag ${confClass}`;
+                    tagSpan.textContent = tag.label + ' ';
+                    const confSpan = document.createElement('span');
+                    confSpan.className = 'tag-confidence';
+                    confSpan.textContent = Math.round(conf * 100) + '%';
+                    tagSpan.appendChild(confSpan);
+                } else {
+                    tagSpan.className = 'tag';
+                    tagSpan.textContent = tag.label;
+                }
+                tagsList.appendChild(tagSpan);
+            }
+
+            pluginDiv.appendChild(header);
+            pluginDiv.appendChild(tagsList);
         }
 
-        html += '</div>';
+        elements.lightboxTags.appendChild(pluginDiv);
     }
 
-    elements.lightboxTags.innerHTML = html || '<p class="no-tags">No tags found</p>';
+    if (elements.lightboxTags.children.length === 0) {
+        const noTags = document.createElement('p');
+        noTags.className = 'no-tags';
+        noTags.textContent = 'No tags found';
+        elements.lightboxTags.appendChild(noTags);
+    }
+
     elements.lightboxTagBtn.textContent = 'Re-tag Image';
     elements.lightboxTagBtn.disabled = false;
 }
+
+function renderDiscoveryTags(image) {
+    const result = image.results;
+    const siglipResult = result.results.siglip;
+    const metadata = siglipResult.metadata || {};
+
+    // Clear existing content
+    elements.lightboxTags.textContent = '';
+
+    // Discovery summary header
+    const sources = metadata.discovery_sources || [];
+    const vocabSize = metadata.vocabulary_size || 0;
+
+    const summaryDiv = document.createElement('div');
+    summaryDiv.className = 'pipeline-summary';
+
+    const discoveryHeader = document.createElement('div');
+    discoveryHeader.className = 'pipeline-header';
+    const badge = document.createElement('span');
+    badge.className = 'pipeline-badge';
+    badge.textContent = 'Discovery Mode';
+    discoveryHeader.appendChild(badge);
+
+    const statsDiv = document.createElement('div');
+    statsDiv.className = 'pipeline-stats';
+    const statSpan = document.createElement('span');
+    statSpan.className = 'stat';
+    statSpan.textContent = `${vocabSize} candidates from ${sources.map(s => getPluginDisplayName(s)).join(' + ')}`;
+    statsDiv.appendChild(statSpan);
+
+    summaryDiv.appendChild(discoveryHeader);
+    summaryDiv.appendChild(statsDiv);
+    elements.lightboxTags.appendChild(summaryDiv);
+
+    // Render SigLIP scored results first
+    renderPluginResultDiv('siglip', siglipResult, 'scorer');
+
+    // Render discovery plugin results from metadata
+    const discoveryResults = metadata.discovery_results || {};
+    for (const [pluginName, pluginResult] of Object.entries(discoveryResults)) {
+        renderPluginResultDiv(pluginName, pluginResult, 'discovery');
+    }
+
+    // Render any other plugins that ran (non-SigLIP, non-discovery)
+    for (const [pluginName, pluginResult] of Object.entries(result.results)) {
+        if (pluginName === 'siglip') continue; // Already rendered
+        if (discoveryResults[pluginName]) continue; // Already rendered from metadata
+        renderPluginResultDiv(pluginName, pluginResult, '');
+    }
+
+    elements.lightboxTagBtn.textContent = 'Re-tag Image';
+    elements.lightboxTagBtn.disabled = false;
+}
+
+function renderPluginResultDiv(pluginName, pluginResult, role) {
+    if (!pluginResult) return;
+
+    const pluginDiv = document.createElement('div');
+    pluginDiv.className = 'plugin-result';
+
+    const displayName = getPluginDisplayName(pluginName);
+    const roleClass = role === 'scorer' ? 'role-scorer' : role === 'discovery' ? 'role-discovery' : '';
+
+    if (pluginResult.error) {
+        const header = document.createElement('div');
+        header.className = 'plugin-header';
+        const nameSpan = document.createElement('span');
+        nameSpan.className = 'plugin-name';
+        nameSpan.textContent = displayName;
+        header.appendChild(nameSpan);
+
+        const errorP = document.createElement('p');
+        errorP.className = 'plugin-error';
+        errorP.textContent = pluginResult.error;
+
+        pluginDiv.appendChild(header);
+        pluginDiv.appendChild(errorP);
+    } else {
+        const tags = pluginResult.tags || [];
+        const timeMs = pluginResult.inference_time_ms || 0;
+
+        // Build header
+        const header = document.createElement('div');
+        header.className = 'plugin-header';
+
+        const nameSpan = document.createElement('span');
+        nameSpan.className = 'plugin-name';
+        nameSpan.textContent = `${displayName}: ${tags.length} tags`;
+
+        if (role) {
+            const roleSpan = document.createElement('span');
+            roleSpan.className = `plugin-role ${roleClass}`;
+            roleSpan.textContent = role;
+            header.appendChild(nameSpan);
+            header.appendChild(roleSpan);
+        } else {
+            header.appendChild(nameSpan);
+        }
+
+        const timeSpan = document.createElement('span');
+        timeSpan.className = 'plugin-time';
+        timeSpan.textContent = `${timeMs.toFixed(0)}ms`;
+        header.appendChild(timeSpan);
+
+        // Build tags list
+        const tagsList = document.createElement('div');
+        tagsList.className = 'tags-list';
+
+        // Render each tag
+        for (const tag of tags) {
+            const tagSpan = document.createElement('span');
+            const hasConfidence = tag.confidence !== undefined && tag.confidence !== null;
+
+            if (hasConfidence) {
+                const conf = tag.confidence;
+                const confClass = conf >= 0.8 ? 'high-confidence' : conf >= 0.6 ? 'medium-confidence' : '';
+                tagSpan.className = `tag ${confClass}`;
+                tagSpan.textContent = tag.label + ' ';
+                const confSpan = document.createElement('span');
+                confSpan.className = 'tag-confidence';
+                confSpan.textContent = Math.round(conf * 100) + '%';
+                tagSpan.appendChild(confSpan);
+            } else {
+                tagSpan.className = 'tag';
+                tagSpan.textContent = tag.label;
+            }
+            tagsList.appendChild(tagSpan);
+        }
+
+        pluginDiv.appendChild(header);
+        pluginDiv.appendChild(tagsList);
+    }
+
+    elements.lightboxTags.appendChild(pluginDiv);
+}
+
 
 
 // ============================================================================
@@ -708,6 +1098,7 @@ async function tagSingleImage(imageId) {
 
     try {
         const result = await tagImage(imageId);
+
         image.results = result;
         image.processing = false;
         state.images.set(imageId, image);
@@ -762,6 +1153,74 @@ function openSettings() {
 
 function closeSettings() {
     elements.settingsModal.hidden = true;
+}
+
+/**
+ * Get the current global quality level.
+ * Returns "custom" if plugins have different quality settings.
+ */
+function getGlobalQuality() {
+    const enabledPlugins = state.settings.plugins.filter(p => {
+        const settings = state.settings.pluginSettings[p.name];
+        return settings && p.available;
+    });
+
+    if (enabledPlugins.length === 0) {
+        return 'standard'; // Default when no plugins
+    }
+
+    // Get quality of first plugin
+    const firstSettings = state.settings.pluginSettings[enabledPlugins[0].name];
+    const firstQuality = firstSettings?.quality || 'standard';
+
+    // Check if all plugins have the same quality
+    for (const plugin of enabledPlugins) {
+        const settings = state.settings.pluginSettings[plugin.name];
+        const quality = settings?.quality || 'standard';
+        if (quality !== firstQuality) {
+            return 'custom';
+        }
+    }
+
+    return firstQuality;
+}
+
+/**
+ * Update the global quality UI to reflect current state.
+ */
+function updateGlobalQualityUI() {
+    const currentQuality = getGlobalQuality();
+
+    // Update button active states
+    elements.qualityButtons.forEach(btn => {
+        const quality = btn.dataset.quality;
+        btn.classList.toggle('active', quality === currentQuality);
+    });
+
+    // Update hint text
+    if (currentQuality === 'custom') {
+        elements.qualityHint.textContent = 'Plugins have different quality settings';
+    } else {
+        elements.qualityHint.textContent = 'Applies to all plugins';
+    }
+}
+
+/**
+ * Set quality for all available plugins.
+ */
+function setGlobalQuality(quality) {
+    if (quality === 'custom') return; // Can't set "custom" directly
+
+    for (const plugin of state.settings.plugins) {
+        if (state.settings.pluginSettings[plugin.name] && plugin.available) {
+            state.settings.pluginSettings[plugin.name].quality = quality;
+        }
+    }
+
+    // Update the per-plugin dropdowns in the UI
+    renderPluginsList();
+    updateGlobalQualityUI();
+    saveSettings();
 }
 
 
@@ -871,6 +1330,16 @@ document.addEventListener('keydown', (e) => {
 elements.settingsBtn.addEventListener('click', openSettings);
 elements.settingsClose.addEventListener('click', closeSettings);
 elements.settingsModal.querySelector('.modal-overlay').addEventListener('click', closeSettings);
+
+// Global quality buttons
+elements.qualityButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+        const quality = btn.dataset.quality;
+        if (quality !== 'custom') {
+            setGlobalQuality(quality);
+        }
+    });
+});
 
 
 // ============================================================================

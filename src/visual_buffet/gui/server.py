@@ -197,7 +197,9 @@ async def get_settings():
 
     cfg = load_config()
     gui_settings = get_value(cfg, "gui", {})
-    return {"plugin_settings": gui_settings.get("plugin_settings", {})}
+    return {
+        "plugin_settings": gui_settings.get("plugin_settings", {}),
+    }
 
 
 @app.post("/api/settings")
@@ -454,11 +456,20 @@ async def get_image_meta(image_id: str):
 
 
 class PluginConfig(BaseModel):
+    """Per-plugin configuration for tagging requests."""
+
     # None means use plugin's recommended threshold
     # SigLIP needs 0.01, others use 0.0 (no filtering)
     threshold: float | None = None
     limit: int = 50
-    quality: Literal["quick", "standard", "high", "max"] = "standard"
+    quality: Literal["quick", "standard", "max"] = "standard"
+
+    # SigLIP discovery mode settings
+    discovery_mode: bool = False
+    use_ram_plus: bool = True
+    use_florence_2: bool = True
+
+    model_config = {"extra": "ignore"}  # Ignore unknown fields
 
 
 class TagRequest(BaseModel):
@@ -512,23 +523,30 @@ async def tag_image(image_id: str, request: TagRequest | None = None):
         raise HTTPException(500, f"Tagging failed: {str(e)}")
 
 
+
+
+class BatchTagRequest(BaseModel):
+    image_ids: list[str]
+    plugins: list[str] | None = None
+    plugin_configs: dict[str, PluginConfig] | None = None
+
+
 @app.post("/api/tag-batch")
-async def tag_batch(
-    image_ids: list[str],
-    plugins: list[str] | None = None,
-    threshold: float = 0.5,
-    limit: int = 50,
-):
+async def tag_batch_api(request: BatchTagRequest):
     """Tag multiple uploaded images."""
     results = []
 
-    for image_id in image_ids:
+    for image_id in request.image_ids:
         if image_id not in _sessions:
             results.append({"id": image_id, "error": "Image not found"})
             continue
 
         try:
-            result = await tag_image(image_id, plugins, threshold, limit)
+            tag_request = TagRequest(
+                plugins=request.plugins,
+                plugin_configs=request.plugin_configs,
+            )
+            result = await tag_image(image_id, tag_request)
             result["id"] = image_id
             results.append(result)
         except Exception as e:

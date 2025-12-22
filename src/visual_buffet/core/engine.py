@@ -4,7 +4,7 @@ Orchestrates the tagging process:
 1. Load plugins
 2. Validate images
 3. Run plugins on images (at appropriate resolution for quality setting)
-4. Aggregate results (merge if HIGH quality mode)
+4. Aggregate results (merge if multi-resolution quality mode)
 5. Save thumbnails and tags alongside source images
 """
 
@@ -33,9 +33,9 @@ class TaggingEngine:
     Supports per-plugin quality settings that determine which resolution
     thumbnails are used for tagging:
 
-    - QUICK: 480px thumbnail (fast, ~66% tag coverage)
-    - STANDARD: 1080px preview (balanced, ~87% tag coverage)
-    - HIGH: Multiple resolutions merged (~98% tag coverage)
+    - QUICK: 1080px preview (fast, ~87% tag coverage)
+    - STANDARD: 480px + 2048px merged (balanced, ~92% tag coverage)
+    - MAX: All resolutions merged (480 + 1080 + 2048 + 4096 + original, 100% coverage)
 
     Thumbnails and tags are saved in a 'visual-buffet/' folder next to each image:
 
@@ -53,7 +53,7 @@ class TaggingEngine:
         ...     Path("photo.jpg"),
         ...     plugin_configs={
         ...         "ram_plus": {"quality": "quick"},
-        ...         "florence_2": {"quality": "high"},
+        ...         "florence_2": {"quality": "max"},
         ...     }
         ... )
     """
@@ -71,6 +71,24 @@ class TaggingEngine:
             plugins = load_all_plugins()
 
         self._plugins = {p.get_info().name: p for p in plugins}
+
+        # Inject discovery plugins into SigLIP
+        self._setup_siglip_discovery()
+
+    def _setup_siglip_discovery(self) -> None:
+        """Give SigLIP references to discovery plugins (RAM++, Florence-2).
+
+        This enables SigLIP's discovery mode, where it first runs discovery
+        plugins to find candidate tags, then scores them with real confidence.
+        """
+        siglip = self._plugins.get("siglip")
+        if siglip and hasattr(siglip, "set_discovery_plugins"):
+            discovery_plugins = {}
+            if ram := self._plugins.get("ram_plus"):
+                discovery_plugins["ram_plus"] = ram
+            if florence := self._plugins.get("florence_2"):
+                discovery_plugins["florence_2"] = florence
+            siglip.set_discovery_plugins(discovery_plugins)
 
     @property
     def plugins(self) -> dict[str, PluginBase]:
@@ -197,7 +215,7 @@ class TaggingEngine:
         plugin: PluginBase,
         image_path: Path,
         resolution: int,
-    ) -> tuple[list[Tag], float]:
+    ) -> tuple[list[Tag], float, dict | None]:
         """Run plugin on image at specific resolution.
 
         Args:
@@ -206,7 +224,7 @@ class TaggingEngine:
             resolution: Resolution to tag at (0 = use original)
 
         Returns:
-            Tuple of (tags, inference_time_ms)
+            Tuple of (tags, inference_time_ms, metadata)
         """
         if resolution == 0:
             # Use original image directly
@@ -214,34 +232,38 @@ class TaggingEngine:
         else:
             thumb_path = self._get_or_create_thumbnail(image_path, resolution)
             result = plugin.tag(thumb_path)
-        return result.tags, result.inference_time_ms or 0.0
+        return result.tags, result.inference_time_ms or 0.0, result.metadata
 
     def _tag_with_quality(
         self,
         plugin: PluginBase,
         image_path: Path,
         quality: TagQuality,
-    ) -> tuple[list[Tag], list[int], float]:
+    ) -> tuple[list[Tag], list[int], float, dict | None]:
         """Tag image using quality-based resolution selection.
 
         Args:
             plugin: Plugin to use
             image_path: Original image path
-            quality: Quality level (QUICK, STANDARD, HIGH)
+            quality: Quality level (QUICK, STANDARD, MAX)
 
         Returns:
-            Tuple of (tags, resolutions_used, total_inference_time_ms)
+            Tuple of (tags, resolutions_used, total_inference_time_ms, metadata)
         """
         resolutions = quality.resolutions
         all_tags: list[Tag] = []
         total_time_ms = 0.0
+        last_metadata: dict | None = None
 
         for resolution in resolutions:
-            tags, time_ms = self._tag_at_resolution(plugin, image_path, resolution)
+            tags, time_ms, metadata = self._tag_at_resolution(plugin, image_path, resolution)
             all_tags.extend(tags)
             total_time_ms += time_ms
+            # Keep the last metadata (for discovery mode, there's only one pass)
+            if metadata:
+                last_metadata = metadata
 
-        return all_tags, resolutions, total_time_ms
+        return all_tags, resolutions, total_time_ms, last_metadata
 
     def tag_image(
         self,
@@ -266,7 +288,7 @@ class TaggingEngine:
                     "plugin_name": {
                         "threshold": 0.5,
                         "limit": 50,
-                        "quality": "high"  # quick | standard | high
+                        "quality": "max"  # quick | standard | max
                     }
                 }
             default_quality: Default quality level for plugins without config
@@ -355,13 +377,22 @@ class TaggingEngine:
                 else:
                     quality = default_quality
 
+                # Configure plugin with any extra settings (e.g., discovery mode for SigLIP)
+                if hasattr(plugin, 'configure'):
+                    # Pass all config settings to the plugin
+                    if hasattr(config, 'model_dump'):
+                        plugin.configure(**config.model_dump())
+                    elif isinstance(config, dict):
+                        plugin.configure(**config)
+
                 # Tag using quality-based resolution or original
+                plugin_metadata: dict | None = None
                 if use_thumbnails:
-                    all_tags, resolutions_used, inference_time_ms = self._tag_with_quality(
+                    all_tags, resolutions_used, inference_time_ms, plugin_metadata = self._tag_with_quality(
                         plugin, image_path, quality
                     )
 
-                    # For HIGH mode with multiple resolutions, merge tags
+                    # For multi-resolution modes, merge tags
                     if len(resolutions_used) > 1:
                         merged = merge_tags(all_tags)
                         # Convert back to Tag objects for filtering
@@ -378,6 +409,7 @@ class TaggingEngine:
                     resolutions_used = []
                     quality = TagQuality.STANDARD
                     inference_time_ms = result.inference_time_ms or 0.0
+                    plugin_metadata = result.metadata
 
                 # Apply threshold filter (only for tags with confidence scores)
                 filtered_tags = [
@@ -395,7 +427,7 @@ class TaggingEngine:
                     filtered_tags = filtered_tags[:plugin_limit]
 
                 # Build result dict (plugin_info already fetched at loop start)
-                results[name] = {
+                result_dict = {
                     "tags": [t.to_dict() for t in filtered_tags],
                     "model": plugin_info.name,
                     "version": plugin_info.version,
@@ -403,6 +435,12 @@ class TaggingEngine:
                     "resolutions": resolutions_used,
                     "inference_time_ms": round(inference_time_ms, 2),
                 }
+
+                # Include metadata if present (e.g., discovery mode results)
+                if plugin_metadata:
+                    result_dict["metadata"] = plugin_metadata
+
+                results[name] = result_dict
 
             except Exception as e:
                 results[name] = {"error": str(e)}

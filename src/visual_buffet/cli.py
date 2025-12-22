@@ -51,6 +51,11 @@ def main(ctx: click.Context, debug: bool) -> None:
 @click.option("--threshold", default=0.5, type=float, help="Minimum confidence (0.0-1.0)")
 @click.option("--limit", default=50, type=int, help="Max tags per plugin")
 @click.option("--recursive", is_flag=True, help="Search folders recursively")
+@click.option(
+    "--discover",
+    is_flag=True,
+    help="Discovery mode: SigLIP uses RAM++/Florence-2 to discover vocabulary",
+)
 @click.pass_context
 def tag(
     ctx: click.Context,
@@ -61,6 +66,7 @@ def tag(
     threshold: float,
     limit: int,
     recursive: bool,
+    discover: bool,
 ) -> None:
     """Tag image(s) using configured plugins.
 
@@ -73,6 +79,8 @@ def tag(
         visual-buffet tag ./photos --recursive
 
         visual-buffet tag *.jpg -o results.json
+
+        visual-buffet tag photo.jpg --discover
     """
     try:
         # Expand paths to file list
@@ -104,16 +112,39 @@ def tag(
         # Filter to requested plugins
         plugin_names = list(plugins) if plugins else None
 
-        # Process images
-        console.print(f"[dim]Using plugins: {', '.join(available)}[/dim]")
-        console.print(f"[dim]Threshold: {threshold}, Limit: {limit}[/dim]")
-        console.print()
+        # Build plugin configs
+        plugin_configs = {}
 
+        # Handle discovery mode
+        if discover:
+            console.print("[bold]Discovery mode:[/bold] SigLIP with RAM++/Florence-2 vocabulary")
+            console.print(f"[dim]Threshold: {threshold}, Limit: {limit}[/dim]")
+            console.print()
+
+            # Ensure siglip is included
+            if plugin_names and "siglip" not in plugin_names:
+                plugin_names = list(plugin_names) + ["siglip"]
+            elif not plugin_names:
+                plugin_names = ["siglip"]
+
+            # Configure SigLIP for discovery
+            plugin_configs["siglip"] = {
+                "discovery_mode": True,
+                "use_ram_plus": True,
+                "use_florence_2": True,
+            }
+        else:
+            console.print(f"[dim]Using plugins: {', '.join(available)}[/dim]")
+            console.print(f"[dim]Threshold: {threshold}, Limit: {limit}[/dim]")
+            console.print()
+
+        # Process images
         results = engine.tag_batch(
             image_paths,
             plugin_names=plugin_names,
             threshold=threshold,
             limit=limit,
+            plugin_configs=plugin_configs if plugin_configs else None,
         )
 
         # Output results
@@ -150,6 +181,13 @@ def _print_result(result: dict) -> None:
             continue
 
         tags = plugin_result.get("tags", [])
+        metadata = plugin_result.get("metadata", {})
+
+        # Check if this is a discovery mode result
+        if metadata.get("discovery_mode"):
+            _print_discovery_result(plugin_name, plugin_result)
+            continue
+
         if not tags:
             console.print(f"  [cyan]{plugin_name}:[/cyan] [dim]No tags above threshold[/dim]")
             continue
@@ -164,11 +202,63 @@ def _print_result(result: dict) -> None:
                 return f"{t['label']} ({t['confidence']:.2f})"
             return t["label"]
 
-        tag_str = " • ".join(fmt_tag(t) for t in tags[:10])
+        # Show ALL tags
+        all_tag_strs = [fmt_tag(t) for t in tags]
+        tag_str = " • ".join(all_tag_strs)
         console.print(f"    {tag_str}")
 
-        if len(tags) > 10:
-            console.print(f"    [dim]... and {len(tags) - 10} more[/dim]")
+
+def _print_discovery_result(plugin_name: str, plugin_result: dict) -> None:
+    """Pretty print a SigLIP discovery mode result with all model outputs."""
+    metadata = plugin_result.get("metadata", {})
+    discovery_results = metadata.get("discovery_results", {})
+    sources = metadata.get("discovery_sources", [])
+    vocab_size = metadata.get("vocabulary_size", 0)
+    discovery_time = metadata.get("total_discovery_time_ms", 0)
+
+    console.print(f"  [dim]Discovery: {vocab_size} candidates from {', '.join(sources)} ({discovery_time:.0f}ms)[/dim]")
+
+    # Print discovery plugin results (RAM++, Florence-2)
+    for source_name in ["ram_plus", "florence_2"]:
+        if source_name not in discovery_results:
+            continue
+
+        source_result = discovery_results[source_name]
+        tags = source_result.get("tags", [])
+        time_ms = source_result.get("inference_time_ms", 0)
+        total_tags = source_result.get("total_tags", len(tags))
+
+        console.print(f"  [cyan]{source_name}[/cyan] [green]\\[discovery][/green] [dim]({total_tags} tags, {time_ms:.0f}ms)[/dim]:")
+
+        def fmt_tag(t):
+            conf = t.get("confidence")
+            if conf is not None:
+                return f"{t['label']} ({conf:.2f})"
+            return t["label"]
+
+        all_tag_strs = [fmt_tag(t) for t in tags]
+        tag_str = " • ".join(all_tag_strs)
+        console.print(f"    {tag_str}")
+
+    # Print SigLIP scored results
+    tags = plugin_result.get("tags", [])
+    time_ms = plugin_result.get("inference_time_ms", 0)
+
+    if not tags:
+        console.print(f"  [cyan]{plugin_name}[/cyan] [magenta]\\[scorer][/magenta] [dim]No tags above threshold[/dim]")
+        return
+
+    console.print(f"  [cyan]{plugin_name}[/cyan] [magenta]\\[scorer][/magenta] [dim](scored {vocab_size} in {time_ms:.0f}ms)[/dim]:")
+
+    def fmt_tag(t):
+        conf = t.get("confidence")
+        if conf is not None:
+            return f"{t['label']} ({conf:.2f})"
+        return t["label"]
+
+    all_tag_strs = [fmt_tag(t) for t in tags]
+    tag_str = " • ".join(all_tag_strs)
+    console.print(f"    {tag_str}")
 
 
 # ============================================================================

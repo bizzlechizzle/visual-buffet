@@ -1,0 +1,18 @@
+{
+  "file": "images/testimage08.jpg",
+  "filename": "testimage08.jpg",
+  "tagged_at": "2025-12-22T08:23:49.141811",
+  "results": {
+    "yolo": {
+      "tags": [],
+      "model": "yolo",
+      "version": "1.0.0",
+      "quality": "standard",
+      "resolutions": [
+        480,
+        2048
+      ],
+      "inference_time_ms": 495.62
+    }
+  }
+}

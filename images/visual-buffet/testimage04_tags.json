@@ -1,0 +1,39 @@
+{
+  "file": "images/testimage04.jpg",
+  "filename": "testimage04.jpg",
+  "tagged_at": "2025-12-22T08:37:15.511298",
+  "results": {
+    "ram_plus": {
+      "tags": [
+        {
+          "label": "building",
+          "confidence": 1.0
+        },
+        {
+          "label": "room",
+          "confidence": 0.9034
+        },
+        {
+          "label": "cage",
+          "confidence": 0.8771
+        },
+        {
+          "label": "floor",
+          "confidence": 0.8472
+        },
+        {
+          "label": "debris",
+          "confidence": 0.8324
+        }
+      ],
+      "model": "ram_plus",
+      "version": "1.3.0",
+      "quality": "standard",
+      "resolutions": [
+        480,
+        2048
+      ],
+      "inference_time_ms": 303.97
+    }
+  }
+}

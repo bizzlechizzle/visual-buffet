@@ -320,9 +320,15 @@ class Florence2Plugin(PluginBase):
     def _extract_tags_from_caption(self, caption: str) -> list[Tag]:
         """Extract meaningful tags from a caption string.
 
+        Extracts both:
+        - Individual words (after removing stopwords)
+        - Compound phrases like "white_house", "swimming_pool" (slugified bigrams)
+
         Uses a minimal stop word list to preserve descriptive adjectives
         like 'red', 'wooden', 'empty', 'large', 'abandoned', etc.
         """
+        import re
+
         # Minimal stop words: articles, prepositions, conjunctions, pronouns
         # KEEP adjectives and descriptive words
         stop_words = {
@@ -345,23 +351,36 @@ class Florence2Plugin(PluginBase):
             "image", "shows", "showing", "appears", "seen", "visible", "there",
         }
 
-        import re
+        # Split into phrases on punctuation (keep word sequences together)
+        phrases = re.split(r"[,.;:!?\-\(\)\[\]\"']", caption.lower())
 
-        # Extract words (minimum 2 characters)
-        words = re.findall(r"\b[a-zA-Z]{2,}\b", caption.lower())
-        words = [w for w in words if w not in stop_words]
-
-        # Deduplicate while preserving order
         seen = set()
-        unique_words = []
-        for word in words:
-            if word not in seen:
-                seen.add(word)
-                unique_words.append(word)
+        all_tags = []
+
+        for phrase in phrases:
+            # Extract words from this phrase
+            words = re.findall(r"\b[a-zA-Z]{2,}\b", phrase)
+
+            # Extract compound phrases (bigrams) BEFORE filtering stopwords
+            # This keeps "white house" together even though we'd filter "the"
+            for i in range(len(words) - 1):
+                w1, w2 = words[i], words[i + 1]
+                # Only create compound if BOTH words are meaningful (not stopwords)
+                if w1 not in stop_words and w2 not in stop_words:
+                    compound = f"{w1}_{w2}"
+                    if compound not in seen:
+                        seen.add(compound)
+                        all_tags.append(compound)
+
+            # Also extract individual words
+            for word in words:
+                if word not in stop_words and word not in seen:
+                    seen.add(word)
+                    all_tags.append(word)
 
         # Florence-2 does not provide confidence scores
         tags = []
-        for word in unique_words[:100]:  # Increased limit to 100 tags
-            tags.append(Tag(label=word, confidence=None))
+        for label in all_tags[:100]:  # Limit to 100 tags
+            tags.append(Tag(label=label, confidence=None))
 
         return tags

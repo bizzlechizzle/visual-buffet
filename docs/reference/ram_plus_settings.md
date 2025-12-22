@@ -40,7 +40,7 @@ pip install git+https://github.com/xinyu1205/recognize-anything.git
 
 | Setting | CLI Flag | Config Key | Default | Range |
 |---------|----------|------------|---------|-------|
-| Quality | `--quality` | `plugins.ram_plus.quality` | `standard` | quick/standard/high/max |
+| Quality | `--quality` | `plugins.ram_plus.quality` | `standard` | quick/standard/max |
 | Threshold | `--threshold` | `plugins.ram_plus.threshold` | `0.0` | 0.0-1.0 |
 | Limit | `--limit` | `plugins.ram_plus.limit` | `50` | 0-unlimited |
 | Batch Size | `--batch-size` | `plugins.ram_plus.batch_size` | `4` | 1-32 |
@@ -58,19 +58,18 @@ Controls how many resolution passes are used for tagging. More passes = more com
 |-------|-------------|--------|-------|----------|
 | `quick` | 1080px | 1 | Fastest | ~87% |
 | `standard` | 480 + 2048px | 2 | Fast | ~92% |
-| `high` | 480 + 1080 + 2048px | 3 | Slow | ~96% |
 | `max` | 480 + 1080 + 2048 + 4096 + original | 5 | Slowest | 100% |
 
 **CLI:**
 ```bash
-visual-buffet tag image.jpg --quality high
+visual-buffet tag image.jpg --quality max
 visual-buffet tag image.jpg -q quick
 ```
 
 **Config:**
 ```toml
 [plugins.ram_plus]
-quality = "high"
+quality = "max"
 ```
 
 **GUI:** Quality dropdown in plugin settings panel.
@@ -300,7 +299,7 @@ limit = 50
 
 [plugins.siglip]
 enabled = true
-quality = "high"
+quality = "max"
 threshold = 0.01
 limit = 30
 ```
@@ -313,7 +312,7 @@ limit = 30
 # Basic tagging
 visual-buffet tag photo.jpg
 
-# High quality, all tags
+# Max quality, all tags
 visual-buffet tag photo.jpg --quality max --limit 0
 
 # Quick tagging with filter

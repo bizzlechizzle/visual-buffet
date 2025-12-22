@@ -18,7 +18,12 @@ from visual_buffet.plugins.base import PluginBase
 from visual_buffet.plugins.schemas import PluginInfo, Tag, TagResult
 
 # Version of this plugin
-PLUGIN_VERSION = "1.1.0"
+PLUGIN_VERSION = "1.3.0"
+
+# Default threshold for tag detection
+# RAM++ per-class thresholds (0.65-0.90) are too strict for discovery
+# Using 0.5 flat threshold gives ~3-4x more tags with good precision
+DEFAULT_THRESHOLD = 0.5
 
 # Model configuration
 MODEL_NAME = "ram_plus_swin_large_14m.pth"
@@ -41,13 +46,13 @@ class RamPlusPlugin(PluginBase):
         return PluginInfo(
             name="ram_plus",
             version=PLUGIN_VERSION,
-            description="Recognize Anything Plus Plus - General purpose image tagging with ~6500 tags",
+            description="Recognize Anything Plus Plus - General purpose image tagging with ~4585 tags",
             hardware_reqs={
                 "gpu": False,  # Works on CPU, but GPU recommended
                 "min_ram_gb": 4,
             },
-            provides_confidence=True,  # Now returns real sigmoid probabilities!
-            recommended_threshold=0.5,  # Scores are already above model's per-class threshold
+            provides_confidence=True,  # Returns real sigmoid probabilities
+            recommended_threshold=0.5,  # Flat threshold for good recall
         )
 
     def is_available(self) -> bool:
@@ -151,24 +156,25 @@ class RamPlusPlugin(PluginBase):
         try:
             import torch
             from PIL import Image
-            from .inference_with_scores import inference_ram_with_scores
+            from .inference_flat_threshold import inference_ram_flat_threshold
 
             # Load and transform image
             image = Image.open(image_path).convert("RGB")
             image_tensor = self._transform(image).unsqueeze(0).to(self._device)
 
-            # Run inference with confidence scores
+            # Run inference with flat 0.5 threshold (not per-class thresholds)
+            # This gives ~3-4x more tags than the strict per-class thresholds
             with torch.no_grad():
-                tags, scores, _, _ = inference_ram_with_scores(image_tensor, self._model)
+                tags, scores = inference_ram_flat_threshold(
+                    image_tensor, self._model, threshold=DEFAULT_THRESHOLD
+                )
 
-            # Create Tag objects WITH real confidence scores
-            # Scores are sigmoid probabilities [0,1] from the model
-            # Tags are already sorted by confidence (descending)
-            results = []
-            for tag_label, score in zip(tags, scores):
-                results.append(Tag(label=tag_label, confidence=round(score, 4)))
-
-            return results
+            # Create Tag objects with real confidence scores (sigmoid probabilities)
+            # Sorted by probability, highest first
+            return [
+                Tag(label=label, confidence=round(score, 4))
+                for label, score in zip(tags, scores)
+            ]
 
         except Exception as e:
             raise PluginError(f"Inference failed: {e}")

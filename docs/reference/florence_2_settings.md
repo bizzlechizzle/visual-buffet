@@ -41,7 +41,7 @@ pip install "transformers>=4.40.0,<4.50.0"
 
 | Setting | CLI Flag | Config Key | Default | Range/Options |
 |---------|----------|------------|---------|---------------|
-| Quality | `--quality` | `plugins.florence_2.quality` | `standard` | quick/standard/high/max |
+| Quality | `--quality` | `plugins.florence_2.quality` | `standard` | quick/standard/max |
 | Threshold | `--threshold` | `plugins.florence_2.threshold` | `0.0` | 0.0-1.0 |
 | Limit | `--limit` | `plugins.florence_2.limit` | `50` | 0-unlimited |
 | Variant | `--variant` | `plugins.florence_2.variant` | `large-ft` | base/large/base-ft/large-ft/large-no-flash |
@@ -132,12 +132,11 @@ Controls how many resolution passes are used for tagging.
 |-------|-------------|--------|-------|----------|
 | `quick` | 1080px | 1 | Fastest | ~87% |
 | `standard` | 480 + 2048px | 2 | Fast | ~92% |
-| `high` | 480 + 1080 + 2048px | 3 | Slow | ~96% |
 | `max` | 480 + 1080 + 2048 + 4096 + original | 5 | Slowest | 100% |
 
 **CLI:**
 ```bash
-visual-buffet tag image.jpg --plugin florence_2 --quality high
+visual-buffet tag image.jpg --plugin florence_2 --quality max
 ```
 
 ---
