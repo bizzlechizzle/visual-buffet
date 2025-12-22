@@ -9,8 +9,7 @@
 
 const state = {
     images: new Map(), // id -> { id, filename, thumbnail, width, height, format, results }
-    selectedImageId: null, // Currently selected card (for panel)
-    panelOpen: false,      // Is detail panel visible
+    selectedImageId: null, // Currently selected image (for tag modal)
     settings: {
         plugins: [], // List of available plugins with their settings
         // Per-plugin settings: { name: { enabled, threshold, limit, discoveryMode, useRamPlus, useFlorence2 } }
@@ -38,27 +37,20 @@ const elements = {
     cancelBtn: document.getElementById('cancelBtn'),
     clearAllBtn: document.getElementById('clearAllBtn'),
 
-    // Detail Panel
-    detailPanel: document.getElementById('detailPanel'),
-    panelBack: document.getElementById('panelBack'),
-    panelClose: document.getElementById('panelClose'),
-    panelTitle: document.getElementById('panelTitle'),
-    panelPreview: document.getElementById('panelPreview'),
-    panelPreviewImg: document.getElementById('panelPreviewImg'),
-    panelMetadata: document.getElementById('panelMetadata'),
-    panelTags: document.getElementById('panelTags'),
-    panelViewBtn: document.getElementById('panelViewBtn'),
-    panelTagBtn: document.getElementById('panelTagBtn'),
+    // Tag Modal (full screen, tag-focused)
+    tagModal: document.getElementById('tagModal'),
+    tagModalClose: document.getElementById('tagModalClose'),
+    tagModalFilename: document.getElementById('tagModalFilename'),
+    tagModalViewBtn: document.getElementById('tagModalViewBtn'),
+    tagModalTagBtn: document.getElementById('tagModalTagBtn'),
+    indexCardThumb: document.getElementById('indexCardThumb'),
+    indexCardMeta: document.getElementById('indexCardMeta'),
+    tagResults: document.getElementById('tagResults'),
 
-    // Lightbox
-    lightbox: document.getElementById('lightbox'),
-    lightboxImage: document.getElementById('lightboxImage'),
-    lightboxFilename: document.getElementById('lightboxFilename'),
-    lightboxMetadata: document.getElementById('lightboxMetadata'),
-    lightboxTags: document.getElementById('lightboxTags'),
-    lightboxTagBtn: document.getElementById('lightboxTagBtn'),
-    lightboxBack: document.getElementById('lightboxBack'),
-    lightboxClose: document.getElementById('lightboxClose'),
+    // Image Viewer (simple full-size view)
+    imageViewer: document.getElementById('imageViewer'),
+    imageViewerClose: document.getElementById('imageViewerClose'),
+    imageViewerImg: document.getElementById('imageViewerImg'),
 
     // Settings
     settingsBtn: document.getElementById('settingsBtn'),
@@ -285,7 +277,7 @@ function createImageCard(image) {
 
     const hasResults = image.results && !image.results.error;
     const isProcessing = image.processing;
-    const isSelected = state.selectedImageIdId === image.id;
+    const isSelected = state.selectedImageId === image.id;
 
     // Add selected class if this card is selected
     if (isSelected) {
@@ -360,8 +352,8 @@ function createImageCard(image) {
 
     card.appendChild(status);
 
-    // Click opens panel (not lightbox)
-    card.addEventListener('click', () => openPanel(image.id));
+    // Click opens tag modal
+    card.addEventListener('click', () => openTagModal(image.id));
 
     return card;
 }
@@ -709,59 +701,55 @@ function renderHardwareInfo() {
 
 
 // ============================================================================
-// Detail Panel
+// Tag Modal (Full Screen, Tag-Focused)
 // ============================================================================
 
 /**
- * Open the detail panel for an image
+ * Open the tag modal for an image
  */
-async function openPanel(imageId) {
+async function openTagModal(imageId) {
     const image = state.images.get(imageId);
     if (!image) return;
 
     // Update state
-    state.selectedImageIdId = imageId;
-    state.panelOpen = true;
+    state.selectedImageId = imageId;
 
-    // Update UI
-    elements.detailPanel.classList.add('open');
-    elements.detailPanel.setAttribute('aria-hidden', 'false');
-    elements.imageGrid.classList.add('panel-open');
+    // Show modal
+    elements.tagModal.hidden = false;
 
-    // Update panel content
-    elements.panelTitle.textContent = image.filename;
-    elements.panelPreviewImg.src = image.thumbnail;
-    elements.panelPreviewImg.alt = image.filename;
+    // Update content
+    elements.tagModalFilename.textContent = image.filename;
+    elements.indexCardThumb.src = image.thumbnail;
+    elements.indexCardThumb.alt = image.filename;
 
     // Update metadata
-    elements.panelMetadata.textContent = '';
+    elements.indexCardMeta.textContent = '';
     const sizeSpan = document.createElement('span');
     sizeSpan.textContent = `${image.width} × ${image.height}`;
-    elements.panelMetadata.appendChild(sizeSpan);
+    elements.indexCardMeta.appendChild(sizeSpan);
 
     const sep = document.createElement('span');
     sep.textContent = '•';
-    elements.panelMetadata.appendChild(sep);
+    elements.indexCardMeta.appendChild(sep);
 
     const formatSpan = document.createElement('span');
     formatSpan.textContent = image.format;
-    elements.panelMetadata.appendChild(formatSpan);
+    elements.indexCardMeta.appendChild(formatSpan);
 
     // Render grid to update selected state
     renderImageGrid();
 
-    // Render tags in panel
-    renderPanelTags(image);
+    // Render tags
+    renderTagResults(image);
 
-    // Try to load full preview and any server-side results
+    // Try to load server-side results if not already loaded
     try {
-        elements.panelPreviewImg.src = `/api/image/${imageId}`;
-
         const meta = await fetch(`/api/image/${imageId}/meta`).then(r => r.json());
         if (meta.results) {
             image.results = meta.results;
             state.images.set(imageId, image);
-            renderPanelTags(image);
+            renderTagResults(image);
+            renderImageGrid();
         }
     } catch (error) {
         console.error('Failed to load image details:', error);
@@ -769,22 +757,18 @@ async function openPanel(imageId) {
 
     // Move focus to close button for accessibility
     requestAnimationFrame(() => {
-        elements.panelClose.focus();
+        elements.tagModalClose.focus();
     });
 }
 
 /**
- * Close the detail panel
+ * Close the tag modal
  */
-function closePanel() {
-    const previouslySelected = state.selectedImageIdId;
+function closeTagModal() {
+    const previouslySelected = state.selectedImageId;
 
-    state.panelOpen = false;
-    state.selectedImageIdId = null;
-
-    elements.detailPanel.classList.remove('open');
-    elements.detailPanel.setAttribute('aria-hidden', 'true');
-    elements.imageGrid.classList.remove('panel-open');
+    state.selectedImageId = null;
+    elements.tagModal.hidden = true;
 
     // Re-render grid to remove selected state
     renderImageGrid();
@@ -799,19 +783,19 @@ function closePanel() {
 }
 
 /**
- * Render tag results in the panel with the new row format
+ * Render tag results in the modal - full list format
  */
-function renderPanelTags(image) {
+function renderTagResults(image) {
     // Clear existing content
-    elements.panelTags.textContent = '';
+    elements.tagResults.textContent = '';
 
     if (!image.results || !image.results.results) {
         const emptyState = document.createElement('p');
-        emptyState.className = 'panel-empty-state';
+        emptyState.className = 'tag-empty-state';
         emptyState.textContent = 'Click "Tag Image" to analyze';
-        elements.panelTags.appendChild(emptyState);
-        elements.panelTagBtn.textContent = 'Tag Image';
-        elements.panelTagBtn.disabled = false;
+        elements.tagResults.appendChild(emptyState);
+        elements.tagModalTagBtn.textContent = 'Tag Image';
+        elements.tagModalTagBtn.disabled = false;
         return;
     }
 
@@ -821,57 +805,56 @@ function renderPanelTags(image) {
     for (const [pluginName, pluginResult] of Object.entries(results)) {
         const displayName = getPluginDisplayName(pluginName);
         const section = document.createElement('div');
-        section.className = 'panel-plugin-section';
+        section.className = 'tag-plugin-section';
 
         // Plugin header
         const header = document.createElement('div');
-        header.className = 'panel-plugin-header';
+        header.className = 'tag-plugin-header';
 
         const nameSpan = document.createElement('span');
-        nameSpan.className = 'panel-plugin-name';
+        nameSpan.className = 'tag-plugin-name';
         nameSpan.textContent = displayName;
         header.appendChild(nameSpan);
 
         if (pluginResult.error) {
-            const errorSpan = document.createElement('span');
-            errorSpan.className = 'panel-plugin-error';
-            errorSpan.textContent = 'Error';
-            header.appendChild(errorSpan);
             section.appendChild(header);
 
             const errorMsg = document.createElement('p');
-            errorMsg.className = 'panel-empty-state';
+            errorMsg.className = 'tag-plugin-error';
             errorMsg.textContent = pluginResult.error;
             section.appendChild(errorMsg);
         } else {
             const tags = pluginResult.tags || [];
             hasAnyTags = hasAnyTags || tags.length > 0;
 
+            // Stats
+            const statsDiv = document.createElement('div');
+            statsDiv.className = 'tag-plugin-stats';
+
             const countSpan = document.createElement('span');
-            countSpan.className = 'panel-plugin-count';
             countSpan.textContent = `${tags.length} tags`;
-            header.appendChild(countSpan);
+            statsDiv.appendChild(countSpan);
 
             if (pluginResult.inference_time_ms) {
                 const timeSpan = document.createElement('span');
-                timeSpan.className = 'panel-plugin-time';
                 timeSpan.textContent = `${pluginResult.inference_time_ms.toFixed(0)}ms`;
-                header.appendChild(timeSpan);
+                statsDiv.appendChild(timeSpan);
             }
 
+            header.appendChild(statsDiv);
             section.appendChild(header);
 
-            // Tag rows
+            // Tag list
             const tagList = document.createElement('div');
-            tagList.className = 'panel-tag-list';
+            tagList.className = 'tag-list';
 
             for (const tag of tags) {
                 const row = document.createElement('div');
-                row.className = 'panel-tag-row';
+                row.className = 'tag-row';
 
                 // Label
                 const label = document.createElement('span');
-                label.className = 'panel-tag-label';
+                label.className = 'tag-label';
                 label.textContent = tag.label;
                 row.appendChild(label);
 
@@ -879,31 +862,44 @@ function renderPanelTags(image) {
                 if (tag.confidence !== undefined && tag.confidence !== null) {
                     const conf = tag.confidence;
                     const confSpan = document.createElement('span');
-                    confSpan.className = 'panel-tag-confidence';
+                    confSpan.className = 'tag-confidence';
                     if (conf >= 0.8) confSpan.classList.add('high');
                     else if (conf >= 0.6) confSpan.classList.add('medium');
                     else confSpan.classList.add('low');
                     confSpan.textContent = `${Math.round(conf * 100)}%`;
                     row.appendChild(confSpan);
+
+                    // Show raw confidence if boosted
+                    if (tag.raw_confidence !== undefined && tag.raw_confidence !== tag.confidence) {
+                        const rawSpan = document.createElement('span');
+                        rawSpan.className = 'tag-raw';
+                        rawSpan.textContent = `(${Math.round(tag.raw_confidence * 100)}% raw)`;
+                        row.appendChild(rawSpan);
+                    }
                 }
 
                 // Source dots (for multi-resolution results)
                 if (tag.sources !== undefined && tag.max_sources !== undefined) {
+                    const sourcesDiv = document.createElement('div');
+                    sourcesDiv.className = 'tag-sources';
+
                     const dotsDiv = document.createElement('div');
-                    dotsDiv.className = 'panel-tag-dots';
+                    dotsDiv.className = 'tag-dots';
 
                     for (let i = 0; i < tag.max_sources; i++) {
                         const dot = document.createElement('span');
-                        dot.className = 'panel-tag-dot';
+                        dot.className = 'tag-dot';
                         if (i < tag.sources) dot.classList.add('filled');
                         dotsDiv.appendChild(dot);
                     }
-                    row.appendChild(dotsDiv);
+                    sourcesDiv.appendChild(dotsDiv);
 
-                    const sourcesSpan = document.createElement('span');
-                    sourcesSpan.className = 'panel-tag-sources';
-                    sourcesSpan.textContent = `${tag.sources}/${tag.max_sources}`;
-                    row.appendChild(sourcesSpan);
+                    const countSpan = document.createElement('span');
+                    countSpan.className = 'tag-source-count';
+                    countSpan.textContent = `${tag.sources}/${tag.max_sources}`;
+                    sourcesDiv.appendChild(countSpan);
+
+                    row.appendChild(sourcesDiv);
                 }
 
                 tagList.appendChild(row);
@@ -912,63 +908,59 @@ function renderPanelTags(image) {
             section.appendChild(tagList);
         }
 
-        elements.panelTags.appendChild(section);
+        elements.tagResults.appendChild(section);
     }
 
     if (!hasAnyTags) {
         const emptyState = document.createElement('p');
-        emptyState.className = 'panel-empty-state';
+        emptyState.className = 'tag-empty-state';
         emptyState.textContent = 'No tags found';
-        elements.panelTags.appendChild(emptyState);
+        elements.tagResults.appendChild(emptyState);
     }
 
-    elements.panelTagBtn.textContent = 'Re-tag';
-    elements.panelTagBtn.disabled = false;
+    elements.tagModalTagBtn.textContent = 'Re-tag';
+    elements.tagModalTagBtn.disabled = false;
 }
 
 
 // ============================================================================
-// Lightbox
+// Image Viewer (Simple Full-Size View)
 // ============================================================================
 
-async function openLightbox(imageId) {
-    state.selectedImageIdId = imageId;
-    const image = state.images.get(imageId);
-
+/**
+ * Open the image viewer to show full-size image
+ */
+function openImageViewer(imageId) {
+    const image = state.images.get(imageId || state.selectedImageId);
     if (!image) return;
 
-    // Show lightbox immediately with thumbnail
-    elements.lightbox.hidden = false;
-    elements.lightboxFilename.textContent = image.filename;
-    elements.lightboxImage.src = image.thumbnail;
-    elements.lightboxMetadata.innerHTML = `
-        <span>Size: ${image.width} x ${image.height}</span>
-        <span>Format: ${image.format}</span>
-    `;
+    elements.imageViewerImg.src = `/api/image/${image.id}`;
+    elements.imageViewerImg.alt = image.filename;
+    elements.imageViewer.hidden = false;
 
-    // Load full image (now served as a file)
-    try {
-        elements.lightboxImage.src = `/api/image/${imageId}`;
+    // Focus close button
+    requestAnimationFrame(() => {
+        elements.imageViewerClose.focus();
+    });
+}
 
-        // Get metadata including results
-        const meta = await fetch(`/api/image/${imageId}/meta`).then(r => r.json());
+/**
+ * Close the image viewer
+ */
+function closeImageViewer() {
+    elements.imageViewer.hidden = true;
+    elements.imageViewerImg.src = '';
 
-        // Update results if available
-        if (meta.results) {
-            image.results = meta.results;
-            state.images.set(imageId, image);
-        }
-    } catch (error) {
-        console.error('Failed to load full image:', error);
+    // Return focus to tag modal if it's open
+    if (!elements.tagModal.hidden) {
+        elements.tagModalViewBtn.focus();
     }
-
-    renderLightboxTags(image);
 }
 
-function closeLightbox() {
-    elements.lightbox.hidden = true;
-    state.selectedImageId = null;
-}
+
+// ============================================================================
+// Utility Functions
+// ============================================================================
 
 /**
  * Get display name for a plugin (falls back to plugin name if not found)
@@ -977,251 +969,6 @@ function getPluginDisplayName(pluginName) {
     const plugin = state.settings.plugins.find(p => p.name === pluginName);
     return plugin ? (plugin.display_name || plugin.name) : pluginName;
 }
-
-function renderLightboxTags(image) {
-    // Clear existing content
-    elements.lightboxTags.textContent = '';
-
-    if (!image.results) {
-        const noTags = document.createElement('p');
-        noTags.className = 'no-tags';
-        noTags.textContent = 'Click "Tag Image" to analyze';
-        elements.lightboxTags.appendChild(noTags);
-        elements.lightboxTagBtn.textContent = 'Tag Image';
-        elements.lightboxTagBtn.disabled = false;
-        return;
-    }
-
-    // Standard results
-    if (!image.results.results) {
-        const noTags = document.createElement('p');
-        noTags.className = 'no-tags';
-        noTags.textContent = 'Click "Tag Image" to analyze';
-        elements.lightboxTags.appendChild(noTags);
-        elements.lightboxTagBtn.textContent = 'Tag Image';
-        elements.lightboxTagBtn.disabled = false;
-        return;
-    }
-
-    // Check if SigLIP result has discovery mode enabled (check metadata)
-    const siglipResult = image.results.results.siglip;
-    if (siglipResult && siglipResult.metadata && siglipResult.metadata.discovery_mode) {
-        renderDiscoveryTags(image);
-        return;
-    }
-
-    const results = image.results.results;
-
-    for (const [pluginName, pluginResult] of Object.entries(results)) {
-        const displayName = getPluginDisplayName(pluginName);
-        const pluginDiv = document.createElement('div');
-        pluginDiv.className = 'plugin-result';
-
-        if (pluginResult.error) {
-            const header = document.createElement('div');
-            header.className = 'plugin-header';
-            const nameSpan = document.createElement('span');
-            nameSpan.className = 'plugin-name';
-            nameSpan.textContent = displayName;
-            header.appendChild(nameSpan);
-
-            const errorP = document.createElement('p');
-            errorP.className = 'plugin-error';
-            errorP.textContent = pluginResult.error;
-
-            pluginDiv.appendChild(header);
-            pluginDiv.appendChild(errorP);
-        } else {
-            const tags = pluginResult.tags || [];
-            const timeMs = pluginResult.inference_time_ms || 0;
-
-            const header = document.createElement('div');
-            header.className = 'plugin-header';
-            const nameSpan = document.createElement('span');
-            nameSpan.className = 'plugin-name';
-            nameSpan.textContent = displayName;
-            const timeSpan = document.createElement('span');
-            timeSpan.className = 'plugin-time';
-            timeSpan.textContent = `${timeMs.toFixed(0)}ms`;
-            header.appendChild(nameSpan);
-            header.appendChild(timeSpan);
-
-            const tagsList = document.createElement('div');
-            tagsList.className = 'tags-list';
-
-            for (const tag of tags) {
-                const tagSpan = document.createElement('span');
-                const hasConfidence = tag.confidence !== undefined && tag.confidence !== null;
-
-                if (hasConfidence) {
-                    const conf = tag.confidence;
-                    const confClass = conf >= 0.8 ? 'high-confidence' : conf >= 0.6 ? 'medium-confidence' : '';
-                    tagSpan.className = `tag ${confClass}`;
-                    tagSpan.textContent = tag.label + ' ';
-                    const confSpan = document.createElement('span');
-                    confSpan.className = 'tag-confidence';
-                    confSpan.textContent = Math.round(conf * 100) + '%';
-                    tagSpan.appendChild(confSpan);
-                } else {
-                    tagSpan.className = 'tag';
-                    tagSpan.textContent = tag.label;
-                }
-                tagsList.appendChild(tagSpan);
-            }
-
-            pluginDiv.appendChild(header);
-            pluginDiv.appendChild(tagsList);
-        }
-
-        elements.lightboxTags.appendChild(pluginDiv);
-    }
-
-    if (elements.lightboxTags.children.length === 0) {
-        const noTags = document.createElement('p');
-        noTags.className = 'no-tags';
-        noTags.textContent = 'No tags found';
-        elements.lightboxTags.appendChild(noTags);
-    }
-
-    elements.lightboxTagBtn.textContent = 'Re-tag Image';
-    elements.lightboxTagBtn.disabled = false;
-}
-
-function renderDiscoveryTags(image) {
-    const result = image.results;
-    const siglipResult = result.results.siglip;
-    const metadata = siglipResult.metadata || {};
-
-    // Clear existing content
-    elements.lightboxTags.textContent = '';
-
-    // Discovery summary header
-    const sources = metadata.discovery_sources || [];
-    const vocabSize = metadata.vocabulary_size || 0;
-
-    const summaryDiv = document.createElement('div');
-    summaryDiv.className = 'pipeline-summary';
-
-    const discoveryHeader = document.createElement('div');
-    discoveryHeader.className = 'pipeline-header';
-    const badge = document.createElement('span');
-    badge.className = 'pipeline-badge';
-    badge.textContent = 'Discovery Mode';
-    discoveryHeader.appendChild(badge);
-
-    const statsDiv = document.createElement('div');
-    statsDiv.className = 'pipeline-stats';
-    const statSpan = document.createElement('span');
-    statSpan.className = 'stat';
-    statSpan.textContent = `${vocabSize} candidates from ${sources.map(s => getPluginDisplayName(s)).join(' + ')}`;
-    statsDiv.appendChild(statSpan);
-
-    summaryDiv.appendChild(discoveryHeader);
-    summaryDiv.appendChild(statsDiv);
-    elements.lightboxTags.appendChild(summaryDiv);
-
-    // Render SigLIP scored results first
-    renderPluginResultDiv('siglip', siglipResult, 'scorer');
-
-    // Render discovery plugin results from metadata
-    const discoveryResults = metadata.discovery_results || {};
-    for (const [pluginName, pluginResult] of Object.entries(discoveryResults)) {
-        renderPluginResultDiv(pluginName, pluginResult, 'discovery');
-    }
-
-    // Render any other plugins that ran (non-SigLIP, non-discovery)
-    for (const [pluginName, pluginResult] of Object.entries(result.results)) {
-        if (pluginName === 'siglip') continue; // Already rendered
-        if (discoveryResults[pluginName]) continue; // Already rendered from metadata
-        renderPluginResultDiv(pluginName, pluginResult, '');
-    }
-
-    elements.lightboxTagBtn.textContent = 'Re-tag Image';
-    elements.lightboxTagBtn.disabled = false;
-}
-
-function renderPluginResultDiv(pluginName, pluginResult, role) {
-    if (!pluginResult) return;
-
-    const pluginDiv = document.createElement('div');
-    pluginDiv.className = 'plugin-result';
-
-    const displayName = getPluginDisplayName(pluginName);
-    const roleClass = role === 'scorer' ? 'role-scorer' : role === 'discovery' ? 'role-discovery' : '';
-
-    if (pluginResult.error) {
-        const header = document.createElement('div');
-        header.className = 'plugin-header';
-        const nameSpan = document.createElement('span');
-        nameSpan.className = 'plugin-name';
-        nameSpan.textContent = displayName;
-        header.appendChild(nameSpan);
-
-        const errorP = document.createElement('p');
-        errorP.className = 'plugin-error';
-        errorP.textContent = pluginResult.error;
-
-        pluginDiv.appendChild(header);
-        pluginDiv.appendChild(errorP);
-    } else {
-        const tags = pluginResult.tags || [];
-        const timeMs = pluginResult.inference_time_ms || 0;
-
-        // Build header
-        const header = document.createElement('div');
-        header.className = 'plugin-header';
-
-        const nameSpan = document.createElement('span');
-        nameSpan.className = 'plugin-name';
-        nameSpan.textContent = `${displayName}: ${tags.length} tags`;
-
-        if (role) {
-            const roleSpan = document.createElement('span');
-            roleSpan.className = `plugin-role ${roleClass}`;
-            roleSpan.textContent = role;
-            header.appendChild(nameSpan);
-            header.appendChild(roleSpan);
-        } else {
-            header.appendChild(nameSpan);
-        }
-
-        const timeSpan = document.createElement('span');
-        timeSpan.className = 'plugin-time';
-        timeSpan.textContent = `${timeMs.toFixed(0)}ms`;
-        header.appendChild(timeSpan);
-
-        // Build tags list
-        const tagsList = document.createElement('div');
-        tagsList.className = 'tags-list';
-
-        // Render each tag
-        for (const tag of tags) {
-            const tagSpan = document.createElement('span');
-            const hasConfidence = tag.confidence !== undefined && tag.confidence !== null;
-
-            if (hasConfidence) {
-                const conf = tag.confidence;
-                const confClass = conf >= 0.8 ? 'high-confidence' : conf >= 0.6 ? 'medium-confidence' : '';
-                tagSpan.className = `tag ${confClass}`;
-                tagSpan.textContent = tag.label + ' ';
-                const confSpan = document.createElement('span');
-                confSpan.className = 'tag-confidence';
-                confSpan.textContent = Math.round(conf * 100) + '%';
-                tagSpan.appendChild(confSpan);
-            } else {
-                tagSpan.className = 'tag';
-                tagSpan.textContent = tag.label;
-            }
-            tagsList.appendChild(tagSpan);
-        }
-
-        pluginDiv.appendChild(header);
-        pluginDiv.appendChild(tagsList);
-    }
-
-    elements.lightboxTags.appendChild(pluginDiv);
-}
-
 
 
 // ============================================================================
@@ -1386,16 +1133,10 @@ async function tagSingleImage(imageId) {
     image.processing = true;
     state.images.set(imageId, image);
 
-    // Update panel button if open for this image
-    if (state.selectedImageId === imageId && state.panelOpen) {
-        elements.panelTagBtn.disabled = true;
-        elements.panelTagBtn.textContent = 'Processing...';
-    }
-
-    // Update lightbox button if open for this image
-    if (state.selectedImageId === imageId && !elements.lightbox.hidden) {
-        elements.lightboxTagBtn.disabled = true;
-        elements.lightboxTagBtn.textContent = 'Processing...';
+    // Update tag modal button if open for this image
+    if (state.selectedImageId === imageId && !elements.tagModal.hidden) {
+        elements.tagModalTagBtn.disabled = true;
+        elements.tagModalTagBtn.textContent = 'Processing...';
     }
 
     renderImageGrid();
@@ -1407,15 +1148,9 @@ async function tagSingleImage(imageId) {
         image.processing = false;
         state.images.set(imageId, image);
 
-        if (state.selectedImageId === imageId) {
-            // Update panel if open
-            if (state.panelOpen) {
-                renderPanelTags(image);
-            }
-            // Update lightbox if open
-            if (!elements.lightbox.hidden) {
-                renderLightboxTags(image);
-            }
+        // Update tag modal if open for this image
+        if (state.selectedImageId === imageId && !elements.tagModal.hidden) {
+            renderTagResults(image);
         }
 
         renderImageGrid();
@@ -1424,17 +1159,10 @@ async function tagSingleImage(imageId) {
         state.images.set(imageId, image);
         showToast(`Tagging failed: ${error.message}`, 'error');
 
-        if (state.selectedImageId === imageId) {
-            // Reset panel button
-            if (state.panelOpen) {
-                elements.panelTagBtn.disabled = false;
-                elements.panelTagBtn.textContent = 'Tag Image';
-            }
-            // Reset lightbox button
-            if (!elements.lightbox.hidden) {
-                elements.lightboxTagBtn.disabled = false;
-                elements.lightboxTagBtn.textContent = 'Tag Image';
-            }
+        // Reset tag modal button if open for this image
+        if (state.selectedImageId === imageId && !elements.tagModal.hidden) {
+            elements.tagModalTagBtn.disabled = false;
+            elements.tagModalTagBtn.textContent = 'Tag Image';
         }
 
         renderImageGrid();
@@ -1624,43 +1352,29 @@ document.addEventListener('drop', async (e) => {
 elements.cancelBtn.addEventListener('click', cancelProcessing);
 elements.clearAllBtn.addEventListener('click', clearAll);
 
-// Detail Panel
-elements.panelBack.addEventListener('click', closePanel);
-elements.panelClose.addEventListener('click', closePanel);
-elements.panelPreview.addEventListener('click', () => {
-    if (state.selectedImageId) {
-        openLightbox(state.selectedImageId);
-    }
-});
-elements.panelViewBtn.addEventListener('click', () => {
-    if (state.selectedImageId) {
-        openLightbox(state.selectedImageId);
-    }
-});
-elements.panelTagBtn.addEventListener('click', () => {
+// Tag Modal
+elements.tagModalClose.addEventListener('click', closeTagModal);
+elements.tagModal.querySelector('.tag-modal-overlay').addEventListener('click', closeTagModal);
+elements.indexCardThumb.addEventListener('click', () => openImageViewer());
+elements.tagModalViewBtn.addEventListener('click', () => openImageViewer());
+elements.tagModalTagBtn.addEventListener('click', () => {
     if (state.selectedImageId) {
         tagSingleImage(state.selectedImageId);
     }
 });
 
-// Lightbox
-elements.lightboxBack.addEventListener('click', closeLightbox);
-elements.lightboxClose.addEventListener('click', closeLightbox);
-elements.lightbox.querySelector('.lightbox-overlay').addEventListener('click', closeLightbox);
-elements.lightboxTagBtn.addEventListener('click', () => {
-    if (state.selectedImageId) {
-        tagSingleImage(state.selectedImageId);
-    }
-});
+// Image Viewer
+elements.imageViewerClose.addEventListener('click', closeImageViewer);
+elements.imageViewer.querySelector('.image-viewer-overlay').addEventListener('click', closeImageViewer);
 
 // Keyboard shortcuts
 document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
-        // Close modals/panels in order of priority
-        if (!elements.lightbox.hidden) {
-            closeLightbox();
-        } else if (state.panelOpen) {
-            closePanel();
+        // Close modals in order of priority (most specific first)
+        if (!elements.imageViewer.hidden) {
+            closeImageViewer();
+        } else if (!elements.tagModal.hidden) {
+            closeTagModal();
         } else if (!elements.settingsModal.hidden) {
             closeSettings();
         }
