@@ -295,6 +295,15 @@ visual-buffet config set general.default_threshold 0.6
 visual-buffet config get general.default_threshold
 ```
 
+### Environment Variables
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `PROGRESS_SOCKET` | Unix socket path for progress reporting | (none) |
+| `PROGRESS_SESSION_ID` | Session identifier for progress messages | (none) |
+
+When `PROGRESS_SOCKET` is set, visual-buffet sends JSON progress messages to the socket enabling orchestration tools to track processing status, ETA, and send control commands (pause/resume/cancel).
+
 ## Web GUI
 
 Visual Buffet includes a web-based GUI for visual comparison of tagging results.

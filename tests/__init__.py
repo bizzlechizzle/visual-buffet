@@ -1,1 +1,1 @@
-"""IMLAGE tests."""
+"""Tests for visual-buffet."""
