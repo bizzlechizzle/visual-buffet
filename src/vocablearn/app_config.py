@@ -11,7 +11,6 @@ Example:
 """
 
 from pathlib import Path
-from typing import Optional
 
 
 class AppConfig:
@@ -30,7 +29,7 @@ class AppConfig:
     def __init__(
         self,
         app_name: str,
-        base_dir: Optional[Path] = None,
+        base_dir: Path | None = None,
     ):
         self.app_name = app_name
         self._base_dir = base_dir or Path.home() / f".{app_name}"

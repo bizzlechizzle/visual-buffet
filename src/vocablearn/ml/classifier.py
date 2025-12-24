@@ -12,7 +12,6 @@ Example:
 import logging
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Optional
 
 logger = logging.getLogger(__name__)
 
@@ -106,7 +105,7 @@ class SceneClassifier:
         >>> print(f"{result.label}: {result.confidence:.1%}")
     """
 
-    def __init__(self, model_variant: str = "so400m", device: Optional[str] = None):
+    def __init__(self, model_variant: str = "so400m", device: str | None = None):
         """Initialize the classifier.
 
         Args:

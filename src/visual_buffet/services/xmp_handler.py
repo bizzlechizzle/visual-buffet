@@ -11,16 +11,15 @@ Pipeline Order:
 
 import json
 import logging
-import subprocess
 import shutil
+import subprocess
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
 from visual_buffet.constants import (
     XMP_NAMESPACE_PREFIX,
-    XMP_NAMESPACE_URI,
     XMP_SCHEMA_VERSION,
 )
 from visual_buffet.exceptions import VisualBuffetError
@@ -57,7 +56,7 @@ class XMPTagData:
 
     def __post_init__(self):
         if not self.tagged_at:
-            self.tagged_at = datetime.now(timezone.utc).isoformat()
+            self.tagged_at = datetime.now(UTC).isoformat()
 
 
 def _get_exiftool_path() -> str | None:
@@ -284,7 +283,7 @@ def write_xmp_sidecar(
         if existing and "CustodyChain" in str(existing):
             # Increment event count
             args.append("-XMP-wnb:EventCount+=1")
-            args.append(f"-XMP-wnb:SidecarUpdated={datetime.now(timezone.utc).isoformat()}")
+            args.append(f"-XMP-wnb:SidecarUpdated={datetime.now(UTC).isoformat()}")
 
     # Target the sidecar file
     args.append(str(sidecar_path))
@@ -514,7 +513,7 @@ class XMPHandler:
             data = {
                 "file": str(image_path),
                 "filename": image_path.name,
-                "tagged_at": datetime.now(timezone.utc).isoformat(),
+                "tagged_at": datetime.now(UTC).isoformat(),
                 "threshold": threshold,
                 "size": size_used,
                 "inference_time_ms": inference_time_ms,

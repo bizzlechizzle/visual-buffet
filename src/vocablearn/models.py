@@ -6,7 +6,6 @@ Defines core entities for vocabulary tracking and learning.
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
-from typing import Optional
 
 
 class TagSource(str, Enum):
@@ -34,9 +33,9 @@ class ConfidenceTier(int, Enum):
     @classmethod
     def from_scores(
         cls,
-        ram_confidence: Optional[float],
+        ram_confidence: float | None,
         florence_found: bool,
-        siglip_confidence: Optional[float] = None,
+        siglip_confidence: float | None = None,
         is_compound: bool = False,
     ) -> "ConfidenceTier":
         """Determine tier from model scores.
@@ -116,8 +115,8 @@ class Tag:
     model_agreement_count: int = 0
 
     # Metadata
-    first_seen: Optional[datetime] = None
-    last_seen: Optional[datetime] = None
+    first_seen: datetime | None = None
+    last_seen: datetime | None = None
 
     @property
     def sample_size(self) -> int:
@@ -197,23 +196,23 @@ class TagEvent:
 
     # Source and confidence
     source: TagSource
-    raw_confidence: Optional[float]
+    raw_confidence: float | None
     unified_confidence: float
     confidence_tier: ConfidenceTier
 
     # Multi-model data
-    ram_confidence: Optional[float] = None
+    ram_confidence: float | None = None
     florence_found: bool = False
-    siglip_confidence: Optional[float] = None
+    siglip_confidence: float | None = None
 
     # Feedback
     human_verified: bool = False
-    human_correct: Optional[bool] = None
-    verified_at: Optional[datetime] = None
-    verified_by: Optional[str] = None
+    human_correct: bool | None = None
+    verified_at: datetime | None = None
+    verified_by: str | None = None
 
     # Metadata
-    tagged_at: Optional[datetime] = None
+    tagged_at: datetime | None = None
 
     def to_dict(self) -> dict:
         """Convert to dictionary for serialization."""
@@ -254,7 +253,7 @@ class CalibrationPoint:
     model: str
     raw_confidence: float
     was_correct: bool
-    recorded_at: Optional[datetime] = None
+    recorded_at: datetime | None = None
 
     def to_dict(self) -> dict:
         """Convert to dictionary for serialization."""
@@ -328,9 +327,9 @@ def is_compound_tag(label: str) -> bool:
 
 
 def calculate_unified_confidence(
-    ram_confidence: Optional[float],
+    ram_confidence: float | None,
     florence_found: bool,
-    siglip_confidence: Optional[float] = None,
+    siglip_confidence: float | None = None,
     is_compound: bool = False,
     prior_confidence: float = 0.5,
 ) -> float:

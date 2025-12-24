@@ -4,6 +4,33 @@
 
 Visual Buffet is a CLI-first application that processes images through multiple ML tagging plugins and aggregates comparative results. Everything runs locally with no cloud dependencies.
 
+## TLDR: Two Pipelines
+
+### Image Tagging (RAM++ + Florence-2 + SigLIP)
+
+```bash
+# Full 3-model tagging with discovery + XMP output
+visual-buffet tag ./photos --discover --threshold 0.5 --xmp --recursive
+```
+
+**How it works**: RAM++ (4585 tags, max coverage) → Florence-2 (caption parsing) → SigLIP (vocabulary scoring)
+
+### OCR Verification (PaddleOCR + docTR + SigLIP)
+
+```bash
+# Verified OCR extraction for auto-tagging
+visual-buffet ocr ./photos --recursive -o ocr_results.json
+```
+
+**How it works**: PaddleOCR (95% recall) → docTR (cross-verify) → SigLIP (semantic validate) → Confidence tiers
+
+| Tier | Action | Threshold |
+|------|--------|-----------|
+| VERIFIED | Auto-tag | score ≥ 0.7 or both OCR agree |
+| LIKELY | Auto-tag | score ≥ 0.5 or high OCR conf |
+| UNVERIFIED | Manual review | everything else |
+| REJECTED | Discard | very low conf, no verification |
+
 ## Features
 
 - **10 ML Plugins** - Image tagging, object detection, OCR, and vision-language models
@@ -16,6 +43,7 @@ Visual Buffet is a CLI-first application that processes images through multiple 
 - **Discovery Mode** - SigLIP vocabulary discovery using RAM++/Florence-2
 - **Scene Classification** - SigLIP zero-shot classification (indoor/outdoor, time of day)
 - **Duplicate Detection** - Find similar/duplicate images using embeddings
+- **OCR Verification** - Trust-but-verify OCR with confidence tiers for auto-tagging
 
 ## Installation
 
@@ -139,7 +167,11 @@ visual-buffet tag ./photos --discover --threshold 0.5 --xmp --recursive
 | `config set KEY VALUE` | Set a configuration value |
 | `config get KEY` | Get a configuration value |
 | `vocab [SUBCOMMAND]` | Vocabulary learning commands |
+| `ocr PATH [OPTIONS]` | Verified OCR extraction with confidence tiers |
 | `gui [OPTIONS]` | Launch the web GUI |
+| `serve [OPTIONS]` | Start daemon server (keeps models warm) |
+| `status [OPTIONS]` | Check daemon status |
+| `stop [OPTIONS]` | Stop daemon gracefully |
 
 ### Tag Command Options
 
@@ -213,6 +245,137 @@ The vocabulary learning system:
 - **Calculates Bayesian priors** based on historical accuracy
 - **Builds isotonic regression calibrators** for confidence calibration
 - **Supports active learning** to prioritize uncertain images for review
+
+### OCR Command Options
+
+| Option | Default | Description |
+|--------|---------|-------------|
+| `-o, --output FILE` | stdout | Save JSON results to file |
+| `--threshold FLOAT` | 0.3 | Minimum OCR confidence threshold |
+| `--recursive` | false | Search folders recursively |
+| `--no-siglip` | false | Skip SigLIP validation (faster) |
+| `--tier TIER` | auto | Filter results: all, verified, likely, auto |
+
+### OCR Verification Workflow (Trust but Verify)
+
+For archive applications needing auto-tagging without human review:
+
+```bash
+# Run verified OCR extraction
+visual-buffet ocr photo.jpg
+
+# Process folder, save to JSON
+visual-buffet ocr ./photos --recursive -o ocr_results.json
+
+# Fast mode (skip SigLIP validation)
+visual-buffet ocr ./photos --no-siglip
+```
+
+**Architecture**: PaddleOCR (max recall) → docTR (cross-verification) → SigLIP (semantic validation)
+
+**Confidence Tiers**:
+
+| Tier | Action | When |
+|------|--------|------|
+| **VERIFIED** | Auto-tag, prime search | Both OCR engines agree OR high OCR + SigLIP validates |
+| **LIKELY** | Auto-tag, secondary search | High OCR confidence OR single verification signal |
+| **UNVERIFIED** | Store, manual review queue | Low confidence, no verification |
+| **REJECTED** | Don't store (noise) | Very low confidence, no verification |
+
+**Verification Score Formula**:
+```
+verification_score = 0.5 × paddle_conf + 0.3 × doctr_found + 0.2 × siglip_score
+```
+
+## Daemon Mode (Server Mode)
+
+Visual Buffet can run as a persistent daemon that keeps ML models warm in GPU memory, eliminating cold-start latency for subsequent requests.
+
+### Starting the Daemon
+
+```bash
+# Start daemon (foreground)
+visual-buffet serve
+
+# Start with custom socket path
+visual-buffet serve --socket /tmp/vb.sock
+
+# Limit VRAM usage to 70%
+visual-buffet serve --max-vram 0.70
+
+# Start in managed mode (for orchestrators)
+visual-buffet serve --managed
+```
+
+### Checking Daemon Status
+
+```bash
+visual-buffet status
+```
+
+Output:
+```
+Daemon running
+  Version: 0.1.13
+  Uptime: 3600s
+  Requests: 1523
+  Failed: 2
+  In-flight: 0
+  Models: ram_plus, siglip
+  VRAM: 8500MB / 24576MB (35%)
+```
+
+### Stopping the Daemon
+
+```bash
+visual-buffet stop
+```
+
+### Daemon Command Options
+
+| Option | Default | Description |
+|--------|---------|-------------|
+| `--socket, -s PATH` | /tmp/visual-buffet.sock | Unix socket path |
+| `--managed` | false | Run in managed mode for orchestrators |
+| `--max-vram FLOAT` | 0.80 | Maximum VRAM usage (0.0-1.0) |
+| `--log-level LEVEL` | INFO | Log level (DEBUG, INFO, WARNING, ERROR) |
+
+### Testing with netcat
+
+```bash
+# Health check
+echo '{"type":"health"}' | nc -U /tmp/visual-buffet.sock
+
+# Tag an image
+echo '{"type":"tag","request_id":"test-1","path":"/path/to/image.jpg"}' | nc -U /tmp/visual-buffet.sock
+```
+
+### Python Client Library
+
+```python
+from visual_buffet.daemon import DaemonClient
+
+# Synchronous client
+with DaemonClient() as client:
+    result = client.tag("/path/to/image.jpg")
+    print(result.results)
+
+    health = client.health()
+    print(f"Models loaded: {health.models_loaded}")
+```
+
+```python
+from visual_buffet.daemon import AsyncDaemonClient
+import asyncio
+
+# Async client
+async def tag_images():
+    async with AsyncDaemonClient() as client:
+        result = await client.tag("/path/to/image.jpg")
+        print(result.results)
+
+asyncio.run(tag_images())
+```
 
 ## XMP Pipeline Integration
 

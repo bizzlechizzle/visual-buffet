@@ -6,20 +6,17 @@ and calibration.
 
 import json
 from pathlib import Path
-from typing import Optional
 
-from vocablearn.learning.active import ReviewCandidate, select_for_review
+from vocablearn.learning.active import select_for_review
 from vocablearn.learning.calibration import GlobalCalibrator, TagCalibrator
-from vocablearn.learning.priors import calculate_prior, update_all_priors
+from vocablearn.learning.priors import update_all_priors
 from vocablearn.models import (
     ConfidenceTier,
     Tag,
     TagEvent,
     TagSource,
-    VocabularyStats,
     calculate_unified_confidence,
     is_compound_tag,
-    normalize_tag,
 )
 from vocablearn.storage.sqlite import SQLiteStorage
 
@@ -148,7 +145,7 @@ class VocabLearn:
         image_id: str,
         tag_label: str,
         correct: bool,
-        verified_by: Optional[str] = None,
+        verified_by: str | None = None,
     ) -> None:
         """Record human feedback on a tag.
 
@@ -201,7 +198,7 @@ class VocabLearn:
     # RETRIEVAL
     # =========================================================================
 
-    def get_tag(self, label: str) -> Optional[Tag]:
+    def get_tag(self, label: str) -> Tag | None:
         """Get vocabulary entry for a tag.
 
         Args:
@@ -274,10 +271,10 @@ class VocabLearn:
 
     def search_vocabulary(
         self,
-        query: Optional[str] = None,
+        query: str | None = None,
         min_occurrences: int = 0,
         min_confidence: float = 0.0,
-        is_compound: Optional[bool] = None,
+        is_compound: bool | None = None,
         limit: int = 100,
     ) -> list[Tag]:
         """Search vocabulary with filters.
@@ -321,7 +318,7 @@ class VocabLearn:
     def rebuild_calibrators(
         self,
         min_samples: int = 50,
-        tags: Optional[list[str]] = None,
+        tags: list[str] | None = None,
     ) -> int:
         """Rebuild isotonic regression calibrators.
 

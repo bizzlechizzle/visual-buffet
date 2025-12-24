@@ -6,7 +6,6 @@ to map raw model confidence to calibrated confidence.
 
 import pickle
 from abc import ABC, abstractmethod
-from typing import Optional
 
 # Numpy is optional - only needed for calibration fitting
 try:

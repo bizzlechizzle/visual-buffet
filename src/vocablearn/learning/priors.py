@@ -4,7 +4,6 @@ Computes confidence priors for tags based on historical feedback,
 using Beta distribution for principled uncertainty quantification.
 """
 
-from typing import Optional
 
 from vocablearn.models import Tag
 from vocablearn.storage.sqlite import SQLiteStorage

@@ -7,7 +7,6 @@ import argparse
 import json
 import sys
 from pathlib import Path
-from typing import Optional
 
 from vocablearn.api import VocabLearn
 
@@ -358,7 +357,7 @@ def cmd_classify(args: argparse.Namespace) -> int:
 def _classify_siglip(args: argparse.Namespace) -> int:
     """Classify using SigLIP zero-shot (better accuracy)."""
     try:
-        from vocablearn.ml.classifier import SceneClassifier, SCENE_CATEGORIES
+        from vocablearn.ml.classifier import SCENE_CATEGORIES, SceneClassifier
     except ImportError:
         print("SigLIP dependencies not installed. Install with:", file=sys.stderr)
         print("  pip install torch torchvision transformers>=4.47.0", file=sys.stderr)
@@ -388,7 +387,7 @@ def _classify_siglip(args: argparse.Namespace) -> int:
         print(f"Classification: {result.label.upper()}")
         print(f"Confidence: {result.confidence:.1%}")
         print(f"Method: {result.method}")
-        print(f"All scores:")
+        print("All scores:")
         for label, score in sorted(result.all_scores.items(), key=lambda x: -x[1]):
             print(f"  {label}: {score:.1%}")
 
@@ -459,7 +458,7 @@ def _classify_tags(args: argparse.Namespace) -> int:
     else:
         print(f"Classification: {classification.upper()}")
         print(f"Confidence: {confidence:.1%}")
-        print(f"Method: tag_rules")
+        print("Method: tag_rules")
         print(f"Indoor signals ({indoor_score}): {', '.join(indoor_matches[:5]) or 'none'}")
         print(f"Outdoor signals ({outdoor_score}): {', '.join(outdoor_matches[:5]) or 'none'}")
 
@@ -575,7 +574,6 @@ def cmd_embeddings(args: argparse.Namespace) -> int:
 
 def cmd_duplicates(args: argparse.Namespace) -> int:
     """Find duplicate images based on tag similarity."""
-    import hashlib
 
     vocab = VocabLearn(args.database)
     from vocablearn.storage.sqlite import SQLiteStorage
@@ -640,7 +638,7 @@ def cmd_duplicates(args: argparse.Namespace) -> int:
     return 0
 
 
-def main(argv: Optional[list[str]] = None) -> int:
+def main(argv: list[str] | None = None) -> int:
     """Main entry point."""
     parser = argparse.ArgumentParser(
         prog="vocablearn",

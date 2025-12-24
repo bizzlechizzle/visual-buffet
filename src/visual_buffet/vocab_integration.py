@@ -9,14 +9,11 @@ Integrates vocabulary learning into the tagging pipeline:
 
 import hashlib
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 from vocablearn import (
     ConfidenceTier,
-    Tag,
-    TagSource,
     VocabLearn,
-    VocabularyStats,
     calculate_unified_confidence,
     is_compound_tag,
 )
@@ -249,7 +246,7 @@ class VocabIntegration:
         image_path: Path | str,
         tag_label: str,
         correct: bool,
-        user: Optional[str] = None,
+        user: str | None = None,
     ) -> None:
         """Record human feedback on a tag.
 
@@ -267,7 +264,7 @@ class VocabIntegration:
             verified_by=user,
         )
 
-    def get_tag_info(self, label: str) -> Optional[dict[str, Any]]:
+    def get_tag_info(self, label: str) -> dict[str, Any] | None:
         """Get vocabulary information for a tag.
 
         Args:

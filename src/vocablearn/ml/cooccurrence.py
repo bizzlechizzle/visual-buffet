@@ -14,7 +14,6 @@ import logging
 import math
 from collections import defaultdict
 from dataclasses import dataclass
-from typing import Optional
 
 logger = logging.getLogger(__name__)
 
@@ -281,7 +280,7 @@ class CooccurrenceBooster:
         self,
         tag_a: str,
         tag_b: str,
-    ) -> Optional[CooccurrenceStats]:
+    ) -> CooccurrenceStats | None:
         """Get co-occurrence statistics for a tag pair.
 
         Args:

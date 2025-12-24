@@ -5,11 +5,11 @@ of detected text across a collection.
 """
 
 import sqlite3
+from collections.abc import Iterator
 from contextlib import contextmanager
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
-from typing import Iterator, Optional
 
 SCHEMA_VERSION = 1
 
@@ -142,12 +142,12 @@ class OCRDetection:
     text_id: int
     ocr_engine: str
     confidence: float
-    bbox_x: Optional[float]
-    bbox_y: Optional[float]
-    bbox_width: Optional[float]
-    bbox_height: Optional[float]
+    bbox_x: float | None
+    bbox_y: float | None
+    bbox_width: float | None
+    bbox_height: float | None
     human_verified: bool
-    human_correct: Optional[bool]
+    human_correct: bool | None
     detected_at: datetime
 
 
@@ -210,9 +210,9 @@ class OCRStorage:
         ocr_engine: str,
         confidence: float,
         text_type: str = "unknown",
-        bbox: Optional[tuple[float, float, float, float]] = None,
-        surrounding_tags: Optional[list[str]] = None,
-        scene_context: Optional[str] = None,
+        bbox: tuple[float, float, float, float] | None = None,
+        surrounding_tags: list[str] | None = None,
+        scene_context: str | None = None,
     ) -> int:
         """Record an OCR detection."""
         import json
@@ -260,7 +260,7 @@ class OCRStorage:
             conn.commit()
             return cursor.lastrowid
 
-    def get_text(self, text: str) -> Optional[OCRText]:
+    def get_text(self, text: str) -> OCRText | None:
         """Get OCR vocabulary entry by text."""
         normalized = self._normalize_text(text)
 
@@ -320,8 +320,8 @@ class OCRStorage:
 
     def search_vocabulary(
         self,
-        query: Optional[str] = None,
-        text_type: Optional[str] = None,
+        query: str | None = None,
+        text_type: str | None = None,
         min_occurrences: int = 0,
         min_confidence: float = 0.0,
         limit: int = 100,
@@ -384,7 +384,7 @@ class OCRStorage:
         image_id: str,
         text: str,
         correct: bool,
-        verified_by: Optional[str] = None,
+        verified_by: str | None = None,
     ) -> None:
         """Record human feedback on OCR detection."""
         text_entry = self.get_text(text)

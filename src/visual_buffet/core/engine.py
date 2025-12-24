@@ -11,9 +11,10 @@ import json
 import logging
 import os
 import tempfile
-from datetime import datetime, timezone
+from collections.abc import Callable
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Callable
+from typing import Any
 
 from PIL import Image
 
@@ -243,7 +244,7 @@ class TaggingEngine:
         tags_doc = {
             "file": str(image_path),
             "filename": image_path.name,
-            "tagged_at": datetime.now(timezone.utc).isoformat(),
+            "tagged_at": datetime.now(UTC).isoformat(),
             "results": results,
         }
 

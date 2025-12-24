@@ -49,6 +49,7 @@ visual-buffet/
 │       ├── cli.py      # CLI entry point
 │       ├── core/       # Core logic
 │       ├── plugins/    # Plugin interface and registry
+│       ├── services/   # Service layer (XMP, OCR verification)
 │       └── gui/        # Web GUI (FastAPI + frontend)
 ├── plugins/            # Installed plugins (git-ignored)
 ├── tests/
@@ -472,3 +473,127 @@ xmp = [
 1. Add XMP writing alongside JSON (both outputs)
 2. Add `--xmp-only` flag to skip JSON
 3. Eventually deprecate JSON output
+
+---
+
+## OCR Verification Service
+
+The OCR verification service implements a "trust but verify" architecture for auto-tagging text in images without human review.
+
+### Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                           IMAGE INPUT                                        │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                    │
+                    ┌───────────────┼───────────────┐
+                    ▼               ▼               ▼
+            ┌──────────────┐ ┌──────────────┐ ┌──────────────┐
+            │  PaddleOCR   │ │    docTR     │ │   SigLIP     │
+            │  (Primary)   │ │  (Verifier)  │ │  (Validator) │
+            │  threshold   │ │  threshold   │ │  threshold   │
+            │    0.3       │ │    0.3       │ │    0.001     │
+            └──────────────┘ └──────────────┘ └──────────────┘
+                    │               │               │
+                    ▼               ▼               ▼
+            ┌─────────────────────────────────────────────────────────────────┐
+            │                    VERIFICATION ENGINE                           │
+            │  verification_score = 0.5 * paddle + 0.3 * doctr + 0.2 * siglip │
+            └─────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+            ┌─────────────────────────────────────────────────────────────────┐
+            │                    CONFIDENCE TIERS                              │
+            │  VERIFIED:   score >= 0.7 OR (paddle >= 0.9 AND doctr_found)    │
+            │  LIKELY:     score >= 0.5 OR paddle >= 0.7                      │
+            │  UNVERIFIED: everything else                                     │
+            │  REJECTED:   paddle < 0.3 AND !doctr AND siglip < 0.001         │
+            └─────────────────────────────────────────────────────────────────┘
+```
+
+### Service Location
+
+```
+src/visual_buffet/services/
+├── __init__.py              # Exports OCR verification classes
+├── xmp_handler.py           # XMP metadata integration
+└── ocr_verification.py      # OCR verification service
+```
+
+### Key Classes
+
+| Class | Purpose |
+|-------|---------|
+| `OCRVerificationService` | Main service, runs verification pipeline |
+| `VerificationTier` | Enum: VERIFIED, LIKELY, UNVERIFIED, REJECTED |
+| `VerifiedText` | Single verified text result with tier and scores |
+| `OCRVerificationResult` | Complete result for an image |
+| `OCRSource` | Result from a single OCR engine |
+
+### Usage
+
+```python
+from visual_buffet.services import (
+    OCRVerificationService,
+    VerificationTier,
+)
+
+# Initialize with loaded plugins
+service = OCRVerificationService(
+    plugins={"paddle_ocr": paddle_plugin, "doctr": doctr_plugin, "siglip": siglip_plugin},
+    paddle_threshold=0.3,
+    doctr_threshold=0.3,
+)
+
+# Verify single image
+result = service.verify_image(Path("photo.jpg"))
+
+# Get auto-taggable texts
+for text in result.auto_tag_texts:
+    print(f"{text.text} [{text.tier.value}] score={text.verification_score:.2f}")
+
+# Batch processing
+results = service.verify_batch(image_paths, on_progress=callback)
+```
+
+### CLI Command
+
+```bash
+# Basic usage
+visual-buffet ocr photo.jpg
+
+# Recursive with output
+visual-buffet ocr ./photos --recursive -o results.json
+
+# Fast mode (skip SigLIP)
+visual-buffet ocr ./photos --no-siglip
+
+# Filter by tier
+visual-buffet ocr photo.jpg --tier verified
+```
+
+### Configuration
+
+OCR verification uses the existing plugin thresholds from config.toml:
+
+```toml
+[plugins.paddle_ocr]
+threshold = 0.3
+
+[plugins.doctr]
+threshold = 0.3
+
+[plugins.siglip]
+threshold = 0.01
+```
+
+### Performance
+
+| Engine | Time (GPU) | Time (CPU) |
+|--------|------------|------------|
+| PaddleOCR | ~3s | ~63s |
+| docTR | ~1s | ~1.4s |
+| SigLIP | ~0.5s | ~2s |
+
+Total pipeline: ~4.5s per image on GPU

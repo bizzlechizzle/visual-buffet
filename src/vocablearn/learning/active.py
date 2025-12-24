@@ -6,7 +6,6 @@ of the most informative images.
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Optional
 
 from vocablearn.storage.sqlite import SQLiteStorage
 

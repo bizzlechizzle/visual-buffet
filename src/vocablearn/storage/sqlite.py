@@ -3,12 +3,11 @@
 Implements vocabulary storage using SQLite database.
 """
 
-import json
 import sqlite3
+from collections.abc import Iterator
 from contextlib import contextmanager
 from datetime import datetime
 from pathlib import Path
-from typing import Iterator, Optional
 
 from vocablearn.models import (
     CalibrationPoint,
@@ -235,7 +234,7 @@ class SQLiteStorage:
             )
             return cursor.lastrowid
 
-    def get_tag(self, label: str) -> Optional[Tag]:
+    def get_tag(self, label: str) -> Tag | None:
         """Get vocabulary entry by label.
 
         Args:
@@ -257,7 +256,7 @@ class SQLiteStorage:
 
             return self._row_to_tag(row)
 
-    def get_tag_by_id(self, tag_id: int) -> Optional[Tag]:
+    def get_tag_by_id(self, tag_id: int) -> Tag | None:
         """Get vocabulary entry by ID.
 
         Args:
@@ -279,10 +278,10 @@ class SQLiteStorage:
 
     def search_vocabulary(
         self,
-        query: Optional[str] = None,
+        query: str | None = None,
         min_occurrences: int = 0,
         min_confidence: float = 0.0,
-        is_compound: Optional[bool] = None,
+        is_compound: bool | None = None,
         limit: int = 100,
         offset: int = 0,
     ) -> list[Tag]:
@@ -413,10 +412,10 @@ class SQLiteStorage:
         source: TagSource,
         unified_confidence: float,
         confidence_tier: ConfidenceTier,
-        raw_confidence: Optional[float] = None,
-        ram_confidence: Optional[float] = None,
+        raw_confidence: float | None = None,
+        ram_confidence: float | None = None,
         florence_found: bool = False,
-        siglip_confidence: Optional[float] = None,
+        siglip_confidence: float | None = None,
     ) -> int:
         """Record a tag assignment event.
 
@@ -473,7 +472,7 @@ class SQLiteStorage:
             )
             return [self._row_to_event(row) for row in cursor.fetchall()]
 
-    def get_event(self, image_id: str, tag_id: int) -> Optional[TagEvent]:
+    def get_event(self, image_id: str, tag_id: int) -> TagEvent | None:
         """Get specific tag event.
 
         Args:
@@ -498,7 +497,7 @@ class SQLiteStorage:
         image_id: str,
         tag_id: int,
         correct: bool,
-        verified_by: Optional[str] = None,
+        verified_by: str | None = None,
     ) -> None:
         """Record human feedback on a tag event.
 
@@ -580,8 +579,8 @@ class SQLiteStorage:
 
     def get_calibration_data(
         self,
-        tag_id: Optional[int] = None,
-        model: Optional[str] = None,
+        tag_id: int | None = None,
+        model: str | None = None,
         min_samples: int = 0,
     ) -> list[CalibrationPoint]:
         """Get calibration data points.
@@ -617,7 +616,7 @@ class SQLiteStorage:
 
     def save_calibration_model(
         self,
-        tag_id: Optional[int],
+        tag_id: int | None,
         source_model: str,
         model_data: bytes,
         sample_count: int,
@@ -642,9 +641,9 @@ class SQLiteStorage:
 
     def get_calibration_model(
         self,
-        tag_id: Optional[int],
+        tag_id: int | None,
         source_model: str,
-    ) -> Optional[bytes]:
+    ) -> bytes | None:
         """Get a calibration model.
 
         Args:

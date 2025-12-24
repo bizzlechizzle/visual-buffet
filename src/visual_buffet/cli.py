@@ -5,6 +5,11 @@ Commands:
     plugins   Manage plugins (list, setup)
     hardware  Show detected hardware
     config    View/edit configuration
+    vocab     Vocabulary learning commands
+    ocr       Verified OCR extraction
+    serve     Start daemon server (keeps models warm)
+    status    Check daemon status
+    stop      Stop daemon gracefully
 """
 
 import json
@@ -1186,6 +1191,457 @@ def vocab_review(app: str | None, db_path: str, count: int, strategy: str) -> No
         sys.exit(1)
     except Exception as e:
         console.print(f"[red]Error: {e}[/red]")
+        sys.exit(1)
+
+
+# ============================================================================
+# OCR COMMAND (Verified OCR Extraction)
+# ============================================================================
+
+
+@main.command()
+@click.argument("path", nargs=-1, required=True)
+@click.option(
+    "-o", "--output", type=click.Path(), help="Output JSON file"
+)
+@click.option(
+    "--threshold",
+    default=0.3,
+    type=float,
+    help="OCR confidence threshold (default: 0.3 for max recall)",
+)
+@click.option("--recursive", is_flag=True, help="Search folders recursively")
+@click.option(
+    "--no-siglip",
+    is_flag=True,
+    help="Skip SigLIP validation (faster, less verification)",
+)
+@click.option(
+    "--tier",
+    type=click.Choice(["all", "verified", "likely", "auto"]),
+    default="auto",
+    help="Which tiers to output (auto = VERIFIED + LIKELY)",
+)
+@click.pass_context
+def ocr(
+    ctx: click.Context,
+    path: tuple,
+    output: str | None,
+    threshold: float,
+    recursive: bool,
+    no_siglip: bool,
+    tier: str,
+) -> None:
+    """Verified OCR extraction with confidence tiers.
+
+    Uses PaddleOCR + docTR + SigLIP for trust-but-verify text extraction.
+    Produces confidence tiers suitable for auto-tagging.
+
+    Tiers:
+      VERIFIED  - Both OCR engines agree or high confidence with SigLIP validation
+      LIKELY    - High OCR confidence or single verification signal
+      UNVERIFIED - Low confidence, needs manual review
+      REJECTED  - Very low confidence, filtered as noise
+
+    Examples:
+
+        visual-buffet ocr photo.jpg
+
+        visual-buffet ocr ./photos --recursive
+
+        visual-buffet ocr *.jpg -o ocr_results.json --tier all
+
+        visual-buffet ocr photo.jpg --no-siglip  # Faster, OCR-only verification
+    """
+    try:
+        from visual_buffet.plugins.loader import load_all_plugins
+        from visual_buffet.services.ocr_verification import (
+            OCRVerificationService,
+            VerificationTier,
+        )
+
+        # Expand paths
+        image_paths = expand_paths(list(path), recursive=recursive)
+
+        if not image_paths:
+            console.print("[red]No images found[/red]")
+            sys.exit(ExitCode.FILE_NOT_FOUND)
+
+        console.print(f"[dim]Found {len(image_paths)} image(s)[/dim]")
+        console.print(f"[dim]Mode: PaddleOCR + docTR{'' if no_siglip else ' + SigLIP'}[/dim]")
+        console.print()
+
+        # Load plugins
+        plugins_list = load_all_plugins()
+        plugins = {p.get_info().name: p for p in plugins_list}
+
+        # Check required plugins
+        if "paddle_ocr" not in plugins or not plugins["paddle_ocr"].is_available():
+            console.print("[red]PaddleOCR plugin not available[/red]")
+            console.print("Run: visual-buffet plugins setup paddle_ocr")
+            sys.exit(ExitCode.NO_PLUGINS)
+
+        # Initialize service
+        service = OCRVerificationService(
+            plugins=plugins,
+            paddle_threshold=threshold,
+            doctr_threshold=threshold,
+        )
+
+        # Process images
+        all_results = []
+
+        with Progress(
+            SpinnerColumn(),
+            TextColumn("[bold blue]{task.description}"),
+            BarColumn(bar_width=30),
+            MofNCompleteColumn(),
+            TimeElapsedColumn(),
+            console=console,
+            transient=False,
+        ) as progress:
+            task = progress.add_task("OCR Verification", total=len(image_paths))
+
+            for image_path in image_paths:
+                progress.update(
+                    task,
+                    description=f"[bold blue]{truncate_middle(image_path.name, 25)}",
+                )
+
+                try:
+                    result = service.verify_image(
+                        image_path,
+                        run_siglip=not no_siglip,
+                    )
+                    all_results.append(result)
+
+                except Exception as e:
+                    console.print(f"[red]Error processing {image_path.name}: {e}[/red]")
+
+                progress.update(task, advance=1)
+
+            progress.update(task, description="[bold green]Complete")
+
+        # Filter by tier
+        tier_filter = None
+        if tier == "verified":
+            tier_filter = {VerificationTier.VERIFIED}
+        elif tier == "likely":
+            tier_filter = {VerificationTier.LIKELY}
+        elif tier == "auto":
+            tier_filter = {VerificationTier.VERIFIED, VerificationTier.LIKELY}
+        # tier == "all" means no filter
+
+        # Print summary
+        total_texts = 0
+        tier_counts = {"verified": 0, "likely": 0, "unverified": 0, "rejected": 0}
+
+        for result in all_results:
+            tier_counts["verified"] += result.verified_count
+            tier_counts["likely"] += result.likely_count
+            tier_counts["unverified"] += result.unverified_count
+            tier_counts["rejected"] += result.rejected_count
+            total_texts += len(result.texts)
+
+        console.print()
+        console.print("[bold]Summary:[/bold]")
+        console.print(f"  Total texts: {total_texts}")
+        console.print(f"  [green]VERIFIED:[/green] {tier_counts['verified']}")
+        console.print(f"  [blue]LIKELY:[/blue] {tier_counts['likely']}")
+        console.print(f"  [yellow]UNVERIFIED:[/yellow] {tier_counts['unverified']}")
+        console.print(f"  [red]REJECTED:[/red] {tier_counts['rejected']}")
+
+        if total_texts > 0:
+            auto_rate = (tier_counts['verified'] + tier_counts['likely']) / total_texts * 100
+        else:
+            auto_rate = 0
+        console.print(f"\n  Auto-tag rate: {auto_rate:.0f}%")
+
+        # Output results
+        if output:
+            # Filter results if needed
+            output_data = []
+            for result in all_results:
+                result_dict = result.to_dict()
+                if tier_filter:
+                    result_dict["texts"] = [
+                        t for t in result_dict["texts"]
+                        if VerificationTier(t["tier"]) in tier_filter
+                    ]
+                output_data.append(result_dict)
+
+            with open(output, "w") as f:
+                json.dump(output_data, f, indent=2)
+            console.print(f"\n[green]Results saved to {output}[/green]")
+
+        else:
+            # Print results to console
+            for result in all_results:
+                if not result.texts:
+                    continue
+
+                console.print(f"\n[bold]{result.image_path}[/bold]")
+
+                for verified_text in result.texts:
+                    if tier_filter and verified_text.tier not in tier_filter:
+                        continue
+
+                    tier_color = {
+                        VerificationTier.VERIFIED: "green",
+                        VerificationTier.LIKELY: "blue",
+                        VerificationTier.UNVERIFIED: "yellow",
+                        VerificationTier.REJECTED: "red",
+                    }[verified_text.tier]
+
+                    sources = []
+                    if verified_text.paddle_ocr:
+                        sources.append(f"Paddle:{verified_text.paddle_ocr.confidence:.0%}")
+                    if verified_text.doctr:
+                        sources.append(f"docTR:{verified_text.doctr.confidence:.0%}")
+                    if verified_text.siglip_score is not None:
+                        sources.append(f"SigLIP:{verified_text.siglip_score:.4f}")
+
+                    console.print(
+                        f"  [{tier_color}]{verified_text.tier.value.upper()}[/{tier_color}] "
+                        f"'{verified_text.text}' "
+                        f"[dim]({', '.join(sources)})[/dim]"
+                    )
+
+    except VisualBuffetError as e:
+        console.print(f"[red]Error: {e}[/red]")
+        sys.exit(ExitCode.GENERAL_ERROR)
+    except KeyboardInterrupt:
+        console.print("\n[yellow]Interrupted[/yellow]")
+        sys.exit(ExitCode.KEYBOARD_INTERRUPT)
+
+
+# ============================================================================
+# SERVE COMMAND (Daemon Mode)
+# ============================================================================
+
+
+@main.command()
+@click.option(
+    "--socket",
+    "-s",
+    default="/tmp/visual-buffet.sock",
+    help="Unix socket path (default: /tmp/visual-buffet.sock)",
+)
+@click.option(
+    "--managed",
+    is_flag=True,
+    help="Run in managed mode (for orchestrators like abandoned-archive)",
+)
+@click.option(
+    "--max-vram",
+    default=0.80,
+    type=float,
+    help="Maximum VRAM percentage for model pool (default: 0.80)",
+)
+@click.option(
+    "--log-level",
+    default="INFO",
+    type=click.Choice(["DEBUG", "INFO", "WARNING", "ERROR"]),
+    help="Logging level",
+)
+def serve(socket: str, managed: bool, max_vram: float, log_level: str) -> None:
+    """Start the visual-buffet daemon server.
+
+    Runs a persistent daemon that keeps ML models warm in VRAM,
+    accepting tagging requests via Unix domain socket.
+
+    Examples:
+
+        visual-buffet serve
+
+        visual-buffet serve --socket /tmp/vb.sock
+
+        visual-buffet serve --managed  # For orchestrator spawning
+
+        visual-buffet serve --max-vram 0.70  # Limit to 70% VRAM
+
+    The daemon supports:
+      - Single image tagging
+      - Batch tagging with progress
+      - Health checks
+      - Model status queries
+      - Graceful shutdown
+
+    Test with netcat:
+
+        echo '{"type":"health"}' | nc -U /tmp/visual-buffet.sock
+    """
+    import asyncio
+    import logging
+
+    # Configure logging
+    logging.basicConfig(
+        level=getattr(logging, log_level),
+        format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+    )
+
+    logger = logging.getLogger("visual_buffet.daemon")
+
+    try:
+        from visual_buffet.daemon.server import DaemonServer, setup_signal_handlers
+
+        console.print("\n[bold]Visual Buffet Daemon[/bold]")
+        console.print(f"Socket: [cyan]{socket}[/cyan]")
+        console.print(f"Max VRAM: [cyan]{max_vram:.0%}[/cyan]")
+        if managed:
+            console.print("[dim]Running in managed mode[/dim]")
+        console.print("[dim]Press Ctrl+C to stop[/dim]\n")
+
+        server = DaemonServer(
+            socket_path=socket,
+            max_vram_percent=max_vram,
+            managed=managed,
+        )
+
+        async def main_async():
+            setup_signal_handlers(server)
+            await server.start()
+
+        asyncio.run(main_async())
+
+    except KeyboardInterrupt:
+        console.print("\n[yellow]Daemon stopped[/yellow]")
+    except Exception as e:
+        console.print(f"[red]Daemon error: {e}[/red]")
+        if click.get_current_context().obj and click.get_current_context().obj.get("debug"):
+            import traceback
+            console.print(traceback.format_exc())
+        sys.exit(1)
+
+
+@main.command()
+@click.option(
+    "--socket",
+    "-s",
+    default="/tmp/visual-buffet.sock",
+    help="Unix socket path",
+)
+def status(socket: str) -> None:
+    """Check daemon status.
+
+    Shows whether the daemon is running and its health status.
+
+    Examples:
+
+        visual-buffet status
+
+        visual-buffet status --socket /tmp/vb.sock
+    """
+    import socket as sock
+
+    socket_path = Path(socket)
+
+    if not socket_path.exists():
+        console.print(f"[red]Daemon not running[/red] (socket not found: {socket})")
+        sys.exit(1)
+
+    try:
+        # Connect and send health check
+        client = sock.socket(sock.AF_UNIX, sock.SOCK_STREAM)
+        client.settimeout(5.0)
+        client.connect(str(socket_path))
+
+        # Read ready message
+        ready_line = b""
+        while not ready_line.endswith(b"\n"):
+            ready_line += client.recv(1)
+        ready = json.loads(ready_line.decode())
+
+        # Send health request
+        client.sendall(b'{"type":"health"}\n')
+
+        # Read response
+        response_line = b""
+        while not response_line.endswith(b"\n"):
+            response_line += client.recv(1)
+        health = json.loads(response_line.decode())
+
+        client.close()
+
+        # Display status
+        console.print("[green]Daemon running[/green]")
+        console.print(f"  Version: {ready.get('version', 'unknown')}")
+        console.print(f"  Uptime: {health.get('uptime_seconds', 0):.0f}s")
+        console.print(f"  Requests: {health.get('requests_processed', 0)}")
+        console.print(f"  Failed: {health.get('requests_failed', 0)}")
+        console.print(f"  In-flight: {health.get('in_flight', 0)}")
+
+        models = health.get('models_loaded', [])
+        if models:
+            console.print(f"  Models: {', '.join(models)}")
+        else:
+            console.print("  Models: [dim]none loaded[/dim]")
+
+        vram_used = health.get('vram_used_mb', 0)
+        vram_total = health.get('vram_total_mb', 0)
+        if vram_total > 0:
+            console.print(f"  VRAM: {vram_used}MB / {vram_total}MB ({vram_used/vram_total:.0%})")
+
+    except sock.timeout:
+        console.print("[red]Daemon not responding[/red] (timeout)")
+        sys.exit(1)
+    except ConnectionRefusedError:
+        console.print("[red]Daemon not running[/red] (connection refused)")
+        sys.exit(1)
+    except Exception as e:
+        console.print(f"[red]Error checking status: {e}[/red]")
+        sys.exit(1)
+
+
+@main.command()
+@click.option(
+    "--socket",
+    "-s",
+    default="/tmp/visual-buffet.sock",
+    help="Unix socket path",
+)
+def stop(socket: str) -> None:
+    """Stop the daemon gracefully.
+
+    Sends a shutdown request to the running daemon.
+
+    Examples:
+
+        visual-buffet stop
+
+        visual-buffet stop --socket /tmp/vb.sock
+    """
+    import socket as sock
+
+    socket_path = Path(socket)
+
+    if not socket_path.exists():
+        console.print(f"[yellow]Daemon not running[/yellow] (socket not found)")
+        return
+
+    try:
+        client = sock.socket(sock.AF_UNIX, sock.SOCK_STREAM)
+        client.settimeout(5.0)
+        client.connect(str(socket_path))
+
+        # Read ready message
+        ready_line = b""
+        while not ready_line.endswith(b"\n"):
+            ready_line += client.recv(1)
+
+        # Send shutdown request
+        client.sendall(b'{"type":"shutdown","reason":"User requested via CLI"}\n')
+
+        # Read ack
+        response_line = b""
+        while not response_line.endswith(b"\n"):
+            response_line += client.recv(1)
+
+        client.close()
+        console.print("[green]Shutdown signal sent[/green]")
+
+    except Exception as e:
+        console.print(f"[red]Error stopping daemon: {e}[/red]")
         sys.exit(1)
 
 

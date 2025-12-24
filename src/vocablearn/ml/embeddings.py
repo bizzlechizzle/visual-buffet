@@ -11,10 +11,8 @@ Example:
 """
 
 import logging
-import struct
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Optional
 
 logger = logging.getLogger(__name__)
 
@@ -54,7 +52,7 @@ class DuplicatePair:
 def get_image_embedding(
     image_path: Path | str,
     model_variant: str = "so400m",
-    device: Optional[str] = None,
+    device: str | None = None,
 ) -> list[float]:
     """Get SigLIP image embedding for an image.
 
@@ -157,7 +155,7 @@ class EmbeddingIndex:
     def __init__(
         self,
         model_variant: str = "so400m",
-        device: Optional[str] = None,
+        device: str | None = None,
     ):
         """Initialize the index.
 
@@ -264,7 +262,7 @@ class EmbeddingIndex:
     def add_image(
         self,
         image_path: Path | str,
-        image_id: Optional[str] = None,
+        image_id: str | None = None,
     ) -> str:
         """Add an image to the index.
 
@@ -297,7 +295,7 @@ class EmbeddingIndex:
         """
         self._embeddings[image_id] = embedding
 
-    def get_embedding(self, image_id: str) -> Optional[list[float]]:
+    def get_embedding(self, image_id: str) -> list[float] | None:
         """Get embedding for an image.
 
         Args:

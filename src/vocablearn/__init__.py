@@ -30,7 +30,6 @@ __version__ = "0.1.11"
 
 from vocablearn.api import VocabLearn
 from vocablearn.app_config import AppConfig
-from vocablearn.storage.ocr import OCRStorage, OCRText, OCRDetection
 from vocablearn.models import (
     CalibrationPoint,
     ConfidenceTier,
@@ -42,6 +41,8 @@ from vocablearn.models import (
     is_compound_tag,
     normalize_tag,
 )
+from vocablearn.storage.ocr import OCRDetection, OCRStorage, OCRText
+
 
 # Lazy imports for ML modules (require torch/transformers)
 def get_scene_classifier():
