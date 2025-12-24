@@ -334,8 +334,6 @@ class DaemonServer:
 
         try:
             for i, path_str in enumerate(paths):
-                path = Path(path_str)
-
                 # Send progress
                 await self._send(
                     writer,
@@ -344,10 +342,17 @@ class DaemonServer:
                         "request_id": request_id,
                         "current": i,
                         "total": total,
-                        "current_file": path.name,
+                        "current_file": Path(path_str).name,
                         "percent": (i / total) * 100,
                     },
                 )
+
+                # Validate path (security)
+                try:
+                    path = self._validate_image_path(path_str)
+                except ValueError as e:
+                    results.append({"path": path_str, "status": "error", "error": str(e)})
+                    continue
 
                 try:
                     result = self.engine.tag_image(
