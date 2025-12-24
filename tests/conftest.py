@@ -2,9 +2,24 @@
 
 import tempfile
 from pathlib import Path
+from unittest.mock import MagicMock, patch
 
 import pytest
+from click.testing import CliRunner
 from PIL import Image
+
+
+@pytest.fixture
+def cli():
+    """Create a Click CLI test runner."""
+    return CliRunner()
+
+
+@pytest.fixture
+def cli_isolated(cli):
+    """Create an isolated CLI runner with a temporary filesystem."""
+    with cli.isolated_filesystem():
+        yield cli
 
 
 @pytest.fixture
@@ -107,3 +122,66 @@ class MockPlugin(PluginBase):
     (plugin_dir / "models").mkdir()
 
     return plugin_dir
+
+
+@pytest.fixture
+def mock_tagging_engine():
+    """Create a mock tagging engine."""
+    engine = MagicMock()
+    engine.plugins = {"mock_plugin": MagicMock()}
+    engine.plugins["mock_plugin"].is_available.return_value = True
+    engine.tag_batch.return_value = [
+        {
+            "file": "test.jpg",
+            "results": {
+                "mock_plugin": {
+                    "tags": [{"label": "test", "confidence": 0.95}],
+                    "model": "mock",
+                    "version": "1.0.0",
+                    "inference_time_ms": 10.0,
+                }
+            },
+        }
+    ]
+    return engine
+
+
+@pytest.fixture
+def mock_hardware_profile():
+    """Create a mock hardware profile."""
+    from visual_buffet.core.hardware import HardwareProfile
+
+    return HardwareProfile(
+        cpu_model="Test CPU",
+        cpu_cores=8,
+        ram_total_gb=16.0,
+        ram_available_gb=8.0,
+        gpu_type="cuda",
+        gpu_name="Test GPU",
+        gpu_vram_gb=8.0,
+    )
+
+
+@pytest.fixture
+def large_test_image(temp_dir):
+    """Create a larger test image for processing tests."""
+    image_path = temp_dir / "large_test.jpg"
+    img = Image.new("RGB", (1920, 1080), color="green")
+    img.save(image_path, "JPEG", quality=95)
+    return image_path
+
+
+@pytest.fixture
+def corrupted_file(temp_dir):
+    """Create a file that looks like an image but isn't."""
+    file_path = temp_dir / "corrupted.jpg"
+    file_path.write_bytes(b"not a valid image file")
+    return file_path
+
+
+@pytest.fixture
+def empty_file(temp_dir):
+    """Create an empty file."""
+    file_path = temp_dir / "empty.jpg"
+    file_path.touch()
+    return file_path

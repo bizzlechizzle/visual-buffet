@@ -2,20 +2,25 @@
 
 **Compare visual tagging results from local ML tools.**
 
-## Overview
-
 Visual Buffet is a CLI-first application that processes images through multiple ML tagging plugins and aggregates comparative results. Everything runs locally with no cloud dependencies.
 
-### Features
+## Features
 
-- **9 ML Plugins** - Image tagging, object detection, OCR, and vision-language models
+- **10 ML Plugins** - Image tagging, object detection, OCR, and vision-language models
+- **XMP Integration** - Works with wake-n-blake/shoemaker pipeline for unified metadata
 - **Web GUI** - Drag-and-drop interface with lightbox view and side-by-side comparison
-- **Quality Levels** - Quick (480px), Standard (1080px), Max (2048px) processing
+- **Quality Levels** - Little (480px), Small (1080px), Large (2048px), Huge (4096px) processing
 - **RAW Support** - Process Sony ARW, Canon CR2/CR3, Nikon NEF, Adobe DNG, and more
 - **HEIC/HEIF Support** - Native Apple image format support
-- **Automatic Thumbnails** - Generated in `visual-buffet/` folder next to images
+- **Discovery Mode** - SigLIP vocabulary discovery using RAM++/Florence-2
 
 ## Installation
+
+### Prerequisites
+
+- Python 3.11+
+- [uv](https://github.com/astral-sh/uv) (recommended) or pip
+- Optional: [exiftool](https://exiftool.org/) for XMP integration
 
 ```bash
 # Clone the repository
@@ -23,13 +28,26 @@ git clone https://github.com/bizzlechizzle/visual-buffet.git
 cd visual-buffet
 
 # Install with uv (recommended)
-uv pip install -e ".[gui,all_models]"
+uv sync
 
 # Or with pip
-pip install -e ".[gui,all_models]"
+pip install -e .
 ```
 
-### Optional Dependencies
+### Install exiftool for XMP Integration
+
+```bash
+# macOS
+brew install exiftool
+
+# Ubuntu/Debian
+sudo apt-get install libimage-exiftool-perl
+
+# Windows
+# Download from https://exiftool.org/
+```
+
+### Optional Plugin Dependencies
 
 ```bash
 # Individual plugin installs
@@ -41,6 +59,12 @@ uv pip install -e ".[easyocr]"       # EasyOCR text recognition
 uv pip install -e ".[doctr]"         # docTR OCR
 uv pip install -e ".[qwen3_vl]"      # Qwen3-VL (requires Ollama)
 
+# All plugins
+uv pip install -e ".[all_models]"
+
+# GUI dependencies
+uv pip install -e ".[gui]"
+
 # Development tools
 uv pip install -e ".[dev]"
 ```
@@ -51,14 +75,26 @@ uv pip install -e ".[dev]"
 # Tag a single image
 visual-buffet tag photo.jpg
 
-# Tag multiple images
+# Tag multiple images recursively
 visual-buffet tag ./photos --recursive
 
 # Save results to file
 visual-buffet tag photo.jpg -o results.json
 
+# Use specific threshold
+visual-buffet tag photo.jpg --threshold 0.5
+
+# Use smaller image size for faster processing
+visual-buffet tag photo.jpg --size small
+
+# Discovery mode (SigLIP + vocabulary from other plugins)
+visual-buffet tag photo.jpg --discover
+
 # List available plugins
 visual-buffet plugins list
+
+# Setup a plugin
+visual-buffet plugins setup ram_plus
 
 # Show hardware capabilities
 visual-buffet hardware
@@ -67,43 +103,70 @@ visual-buffet hardware
 visual-buffet gui
 ```
 
-## Commands
+## CLI Reference
+
+### Main Commands
 
 | Command | Description |
 |---------|-------------|
-| `tag PATH` | Tag image(s) using configured plugins |
+| `tag PATH [OPTIONS]` | Tag image(s) using configured plugins |
 | `plugins list` | List available plugins |
 | `plugins setup NAME` | Download and setup a plugin |
 | `plugins info NAME` | Show plugin details |
-| `hardware` | Show detected hardware capabilities |
+| `hardware [--refresh]` | Show detected hardware capabilities |
 | `config show` | Show current configuration |
 | `config set KEY VALUE` | Set a configuration value |
-| `gui` | Launch the web GUI |
+| `config get KEY` | Get a configuration value |
+| `gui [OPTIONS]` | Launch the web GUI |
 
-## Web GUI
+### Tag Command Options
 
-Visual Buffet includes a web-based GUI for visual comparison of tagging results.
+| Option | Default | Description |
+|--------|---------|-------------|
+| `-p, --plugin NAME` | all | Use specific plugin(s), can repeat |
+| `-o, --output FILE` | stdout | Save JSON results to file |
+| `-f, --format FORMAT` | json | Output format |
+| `--threshold FLOAT` | 0.5 | Minimum confidence (0.0-1.0) |
+| `--recursive` | false | Search folders recursively |
+| `--size SIZE` | original | Image size: little, small, large, huge, original |
+| `--discover` | false | Enable SigLIP discovery mode |
 
-```bash
-# Launch GUI (opens browser automatically)
-visual-buffet gui
+### GUI Command Options
 
-# Custom port
-visual-buffet gui --port 9000
+| Option | Default | Description |
+|--------|---------|-------------|
+| `--host HOST` | 127.0.0.1 | Host to bind to |
+| `--port PORT` | 8420 | Port to bind to |
+| `--no-browser` | false | Don't open browser automatically |
 
-# Without auto-opening browser
-visual-buffet gui --no-browser
+### Image Size Presets
+
+| Size | Resolution | Use Case |
+|------|------------|----------|
+| `little` | 480px | Fastest, batch processing |
+| `small` | 1080px | Balanced speed/quality |
+| `large` | 2048px | High detail |
+| `huge` | 4096px | Maximum detail |
+| `original` | Native | Default, no resize |
+
+## XMP Pipeline Integration
+
+Visual Buffet integrates with the wake-n-blake → shoemaker → visual-buffet pipeline:
+
+```
+┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
+│  wake-n-blake   │ ──► │    shoemaker    │ ──► │  visual-buffet  │
+│   (import)      │     │  (thumbnails)   │     │   (ML tags)     │
+└─────────────────┘     └─────────────────┘     └─────────────────┘
 ```
 
-### GUI Features
+When exiftool is available, visual-buffet:
+- Reads existing XMP sidecars created by wake-n-blake
+- Adds ML tags to both `vbuffet:` namespace and `dc:subject`
+- Preserves existing metadata from other tools
+- Updates custody chain events
 
-- Drag-and-drop image upload
-- Thumbnail grid view with batch processing
-- Full-screen tag modal with side-by-side plugin comparison
-- Per-plugin settings (threshold, quality, discovery mode)
-- Global quality presets (Quick/Standard/Max)
-- Hardware and plugin status display
-- Persistent settings saved to disk
+Without exiftool, visual-buffet falls back to JSON files (`{filename}_tags.json`).
 
 ## Plugins
 
@@ -111,73 +174,9 @@ visual-buffet gui --no-browser
 
 | Plugin | Description | Tags | Recommended Setting |
 |--------|-------------|------|---------------------|
-| **RAM++** | Recognize Anything Plus Plus - general purpose tagging | ~4585 | `--threshold 0.5` |
-| **SigLIP** | Google's zero-shot classifier with discovery mode | Custom vocabulary | `--threshold 0.01` |
-| **Florence-2** | Microsoft vision foundation model | Captioning + tags | `--task "<DETAILED_CAPTION>"` |
-
-### RAM++ Threshold Recommendation
-
-**Use `--threshold 0.5` for RAM++** (not 0.6 or 0.8).
-
-Empirical testing revealed that contextual tags (debris, damage, rust, antique, historic) have confidence scores in the 0.50-0.70 range. These tags are **accurate** but would be filtered out at higher thresholds.
-
-| Threshold | What You Get | What You Lose |
-|-----------|--------------|---------------|
-| 0.8 | Primary objects only | All contextual tags |
-| 0.6 | Primary + some context | rust, antique, some contextual |
-| **0.5** | **All accurate tags** | **Only noise** |
-
-```bash
-# Recommended for database building
-visual-buffet tag photo.jpg --threshold 0.5
-
-# For display/UI (cleaner, fewer tags)
-visual-buffet tag photo.jpg --threshold 0.6
-```
-
-See [RAM++ SME Guide](docs/sme/ram_plus.sme.md) for complete analysis.
-
-### Florence-2 Task Recommendation
-
-Florence-2 is **task-based, not threshold-based** and provides **no confidence scores**. Tags are extracted from captions via NLP parsing with built-in slugification (e.g., `white_house`, `abandoned_building`).
-
-> **Critical Finding**: `<OD>` (Object Detection) only achieves 14.9% coverage vs 70%+ for caption tasks. Do NOT use `<OD>` alone!
-
-#### Top 3 Configurations (Benchmarked on 10 Images)
-
-| Rank | Profile | Tasks | Coverage | FP | Tags | Time |
-|------|---------|-------|----------|----|----- |------|
-| #1 | **Maximum** | `<DETAILED_CAPTION>` + `<MORE_DETAILED_CAPTION>` + `<DENSE_REGION_CAPTION>` | 76.1% | 6 | 77 | 2915ms |
-| #2 | **Balanced** ⭐ | `<MORE_DETAILED_CAPTION>` + `<DENSE_REGION_CAPTION>` | 73.4% | 3 | 65 | 2141ms |
-| #3 | **Fast** | `<MORE_DETAILED_CAPTION>` only | 70.5% | 1 | 46 | 1212ms |
-
-#### When to Use Each
-
-**#1 Maximum Coverage** - Archives, museums, digital asset management where completeness matters more than speed.
-
-**#2 Balanced (Recommended)** - Best for most archival work. Removes `<DETAILED_CAPTION>` (redundant with MORE_DETAILED) for 27% faster processing with minimal coverage loss.
-
-**#3 Fast** - High-volume processing, previews, or when you need quick results. Single task = simplest pipeline.
-
-```bash
-# Balanced (recommended for database building)
-visual-buffet tag photo.jpg --plugin florence_2 --profile balanced
-
-# Maximum coverage
-visual-buffet tag photo.jpg --plugin florence_2 --profile maximum
-
-# Fast processing
-visual-buffet tag photo.jpg --plugin florence_2 --profile fast
-```
-
-#### Key Benchmark Findings
-
-- **Caption stacking works**: Combining caption tasks yields 73-76% coverage
-- **`<OD>` is worthless alone**: Only 14.9% coverage, 3 tags avg, 5 false positives
-- **`<DENSE_REGION_CAPTION>` adds regional context**: Boosts coverage 3-6%
-- **`<CAPTION>` is redundant**: Adds minimal value when other captions present
-
-See [Florence-2 SME Guide](docs/sme/florence_2.sme.md) for complete benchmark data and all 31 combinations tested.
+| **RAM++** | Recognize Anything Plus Plus | ~4585 | `--threshold 0.5` |
+| **SigLIP** | Google zero-shot classifier | Custom vocabulary | `--threshold 0.01` |
+| **Florence-2** | Microsoft vision foundation model | Captioning + tags | `--profile balanced` |
 
 ### Object Detection
 
@@ -200,11 +199,35 @@ See [Florence-2 SME Guide](docs/sme/florence_2.sme.md) for complete benchmark da
 |--------|-------------|----------|
 | **Qwen3-VL** | Prompted image analysis with tagging, describe, or both modes | Ollama |
 
+### RAM++ Threshold Recommendation
+
+**Use `--threshold 0.5` for RAM++** (not 0.6 or 0.8).
+
+Contextual tags (debris, damage, rust, antique, historic) have confidence scores in the 0.50-0.70 range. These tags are accurate but would be filtered out at higher thresholds.
+
+| Threshold | What You Get | What You Lose |
+|-----------|--------------|---------------|
+| 0.8 | Primary objects only | All contextual tags |
+| 0.6 | Primary + some context | rust, antique, some contextual |
+| **0.5** | **All accurate tags** | **Only noise** |
+
+### Florence-2 Task Recommendation
+
+Florence-2 is task-based and provides no confidence scores. Tags are extracted from captions via NLP parsing.
+
+| Profile | Tasks | Coverage | Time |
+|---------|-------|----------|------|
+| **Maximum** | DETAILED + MORE_DETAILED + DENSE_REGION | 76% | 2915ms |
+| **Balanced** ⭐ | MORE_DETAILED + DENSE_REGION | 73% | 2141ms |
+| **Fast** | MORE_DETAILED only | 70% | 1212ms |
+
 ## Supported Image Formats
 
 ### Standard Formats
 - JPEG, PNG, WebP, BMP, TIFF
-- HEIC/HEIF (Apple)
+
+### Apple Formats
+- HEIC, HEIF
 
 ### RAW Formats
 - Sony: ARW
@@ -234,16 +257,6 @@ See [Florence-2 SME Guide](docs/sme/florence_2.sme.md) for complete benchmark da
         "quality": "standard",
         "resolutions": [1080],
         "inference_time_ms": 142
-      },
-      "siglip": {
-        "tags": [
-          {"label": "golden retriever", "confidence": 0.87}
-        ],
-        "model": "SigLIP",
-        "version": "1.0.0",
-        "quality": "standard",
-        "resolutions": [1080],
-        "inference_time_ms": 89
       }
     }
   }
@@ -252,17 +265,205 @@ See [Florence-2 SME Guide](docs/sme/florence_2.sme.md) for complete benchmark da
 
 ## Configuration
 
-Settings are stored in `~/.config/visual-buffet/` and include:
-- Plugin enable/disable states
-- Per-plugin thresholds and quality levels
-- Discovery mode settings for SigLIP
-- VLM mode settings for Qwen3-VL
+Settings are stored in `~/.config/visual-buffet/config.toml`:
+
+```toml
+[general]
+default_threshold = 0.5
+default_format = "json"
+
+[plugins.ram_plus]
+enabled = true
+threshold = 0.5
+batch_size = 4
+
+[plugins.siglip]
+enabled = true
+threshold = 0.01
+```
+
+### Configuration Commands
+
+```bash
+# View all settings
+visual-buffet config show
+
+# Set a value
+visual-buffet config set general.default_threshold 0.6
+
+# Get a value
+visual-buffet config get general.default_threshold
+```
+
+## Web GUI
+
+Visual Buffet includes a web-based GUI for visual comparison of tagging results.
+
+```bash
+# Launch GUI (opens browser automatically)
+visual-buffet gui
+
+# Custom port
+visual-buffet gui --port 9000
+
+# Without auto-opening browser
+visual-buffet gui --no-browser
+```
+
+### GUI Features
+
+- Drag-and-drop image upload
+- Thumbnail grid view with batch processing
+- Full-screen tag modal with side-by-side plugin comparison
+- Per-plugin settings (threshold, quality, discovery mode)
+- Global quality presets (Little/Small/Large/Huge/Original)
+- Hardware and plugin status display
+- Persistent settings saved to disk
 
 ## Hardware Requirements
 
-- **Minimum**: CPU with 8GB RAM
-- **Recommended**: NVIDIA GPU with 8GB+ VRAM (CUDA)
-- **Optimal**: RTX 3090/4090 with 24GB VRAM for all plugins simultaneously
+| Level | CPU | RAM | GPU |
+|-------|-----|-----|-----|
+| **Minimum** | Any | 8GB | None (CPU-only) |
+| **Recommended** | Modern | 16GB | NVIDIA 8GB+ VRAM |
+| **Optimal** | Modern | 32GB | RTX 3090/4090 24GB |
+
+## Development
+
+### Setup
+
+```bash
+# Clone and install
+git clone https://github.com/bizzlechizzle/visual-buffet.git
+cd visual-buffet
+uv sync --dev
+
+# Run tests
+uv run pytest
+
+# Run linter
+uv run ruff check .
+
+# Run type checker
+uv run mypy src
+```
+
+### Project Structure
+
+```
+visual-buffet/
+├── src/visual_buffet/
+│   ├── cli.py              # CLI entry point
+│   ├── constants.py        # Application constants
+│   ├── exceptions.py       # Exception hierarchy
+│   ├── core/
+│   │   ├── engine.py       # Tagging orchestrator
+│   │   └── hardware.py     # Hardware detection
+│   ├── plugins/
+│   │   ├── base.py         # Plugin base class
+│   │   ├── loader.py       # Plugin discovery
+│   │   └── schemas.py      # Data schemas
+│   ├── services/
+│   │   └── xmp_handler.py  # XMP metadata integration
+│   ├── utils/
+│   │   ├── config.py       # TOML config management
+│   │   └── image.py        # Image loading utilities
+│   └── gui/
+│       ├── server.py       # FastAPI backend
+│       └── static/         # Frontend assets
+├── plugins/                # ML plugin implementations
+├── tests/                  # Test suite
+└── docs/                   # Documentation
+```
+
+### Creating a Plugin
+
+```python
+from pathlib import Path
+from visual_buffet.plugins.base import PluginBase
+from visual_buffet.plugins.schemas import PluginInfo, Tag, TagResult
+
+class MyPlugin(PluginBase):
+    def get_info(self) -> PluginInfo:
+        return PluginInfo(
+            name="my_plugin",
+            version="1.0.0",
+            description="My custom plugin",
+        )
+
+    def is_available(self) -> bool:
+        return self.get_model_path().exists()
+
+    def tag(self, image_path: Path) -> TagResult:
+        # Your ML inference here
+        return TagResult(
+            tags=[Tag(label="example", confidence=0.95)],
+            model="my_model",
+            version="1.0.0",
+        )
+```
+
+## Troubleshooting
+
+### "No plugins available"
+
+Plugins need to be set up before use:
+
+```bash
+# List all plugins
+visual-buffet plugins list
+
+# Setup a specific plugin
+visual-buffet plugins setup ram_plus
+```
+
+### "exiftool not found"
+
+XMP integration requires exiftool:
+
+```bash
+# macOS
+brew install exiftool
+
+# Ubuntu/Debian
+sudo apt-get install libimage-exiftool-perl
+```
+
+### Out of memory errors
+
+Reduce batch size or use smaller image size:
+
+```bash
+# Use smaller images
+visual-buffet tag photos/ --size small
+
+# Or configure in config.toml
+visual-buffet config set plugins.ram_plus.batch_size 1
+```
+
+### GPU not detected
+
+Check CUDA installation:
+
+```bash
+# Check hardware detection
+visual-buffet hardware --refresh
+
+# Force CPU-only mode (via environment)
+CUDA_VISIBLE_DEVICES="" visual-buffet tag photo.jpg
+```
+
+## Exit Codes
+
+| Code | Meaning |
+|------|---------|
+| 0 | Success |
+| 1 | General error |
+| 2 | File not found |
+| 3 | Invalid input |
+| 4 | Plugin error |
+| 5 | No plugins available |
+| 130 | Keyboard interrupt |
 
 ## License
 

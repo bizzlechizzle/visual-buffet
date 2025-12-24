@@ -10,12 +10,21 @@ Commands:
 import json
 import sys
 from pathlib import Path
+from typing import Any
 
 import click
 from rich.console import Console
 from rich.table import Table
 
 from visual_buffet import __version__
+from visual_buffet.constants import (
+    DEFAULT_GUI_HOST,
+    DEFAULT_GUI_PORT,
+    DEFAULT_THRESHOLD,
+    MAX_THRESHOLD,
+    MIN_THRESHOLD,
+    ExitCode,
+)
 from visual_buffet.core.engine import TaggingEngine
 from visual_buffet.core.hardware import detect_hardware, get_recommended_batch_size
 from visual_buffet.exceptions import VisualBuffetError
@@ -24,6 +33,24 @@ from visual_buffet.utils.config import get_value, load_config, save_config, set_
 from visual_buffet.utils.image import expand_paths
 
 console = Console()
+
+
+def _validate_threshold(
+    ctx: click.Context, param: click.Parameter, value: float
+) -> float:
+    """Validate threshold is within valid range."""
+    if not MIN_THRESHOLD <= value <= MAX_THRESHOLD:
+        raise click.BadParameter(
+            f"Threshold must be between {MIN_THRESHOLD} and {MAX_THRESHOLD}"
+        )
+    return value
+
+
+def _validate_port(ctx: click.Context, param: click.Parameter, value: int) -> int:
+    """Validate port is within valid range."""
+    if not 1 <= value <= 65535:
+        raise click.BadParameter("Port must be between 1 and 65535")
+    return value
 
 
 @click.group()
@@ -48,8 +75,20 @@ def main(ctx: click.Context, debug: bool) -> None:
 @click.option(
     "-f", "--format", "fmt", default="json", type=click.Choice(["json"]), help="Output format"
 )
-@click.option("--threshold", default=0.5, type=float, help="Minimum confidence (0.0-1.0)")
+@click.option(
+    "--threshold",
+    default=DEFAULT_THRESHOLD,
+    type=float,
+    callback=_validate_threshold,
+    help=f"Minimum confidence ({MIN_THRESHOLD}-{MAX_THRESHOLD})",
+)
 @click.option("--recursive", is_flag=True, help="Search folders recursively")
+@click.option(
+    "--size",
+    type=click.Choice(["little", "small", "large", "huge", "original"]),
+    default="original",
+    help="Image size for tagging (default: original)",
+)
 @click.option(
     "--discover",
     is_flag=True,
@@ -64,6 +103,7 @@ def tag(
     fmt: str,
     threshold: float,
     recursive: bool,
+    size: str,
     discover: bool,
 ) -> None:
     """Tag image(s) using configured plugins.
@@ -78,6 +118,8 @@ def tag(
 
         visual-buffet tag *.jpg -o results.json
 
+        visual-buffet tag photo.jpg --size small
+
         visual-buffet tag photo.jpg --discover
     """
     try:
@@ -86,7 +128,7 @@ def tag(
 
         if not image_paths:
             console.print("[red]No images found[/red]")
-            sys.exit(1)
+            sys.exit(ExitCode.FILE_NOT_FOUND)
 
         console.print(f"[dim]Found {len(image_paths)} image(s)[/dim]")
 
@@ -97,7 +139,7 @@ def tag(
             console.print("[red]No plugins available[/red]")
             console.print("Run 'visual-buffet plugins list' to see available plugins")
             console.print("Run 'visual-buffet plugins setup <name>' to set up a plugin")
-            sys.exit(1)
+            sys.exit(ExitCode.NO_PLUGINS)
 
         # Check if any plugins are available
         available = [name for name, p in engine.plugins.items() if p.is_available()]
@@ -105,7 +147,7 @@ def tag(
             console.print("[yellow]No plugins are ready to use[/yellow]")
             for name, p in engine.plugins.items():
                 console.print(f"  - {name}: Run 'visual-buffet plugins setup {name}'")
-            sys.exit(1)
+            sys.exit(ExitCode.NO_PLUGINS)
 
         # Filter to requested plugins
         plugin_names = list(plugins) if plugins else None
@@ -133,7 +175,7 @@ def tag(
             }
         else:
             console.print(f"[dim]Using plugins: {', '.join(available)}[/dim]")
-            console.print(f"[dim]Threshold: {threshold}[/dim]")
+            console.print(f"[dim]Size: {size} | Threshold: {threshold}[/dim]")
             console.print()
 
         # Process images
@@ -142,6 +184,7 @@ def tag(
             plugin_names=plugin_names,
             threshold=threshold,
             plugin_configs=plugin_configs if plugin_configs else None,
+            size=size,
         )
 
         # Output results
@@ -157,10 +200,10 @@ def tag(
 
     except VisualBuffetError as e:
         console.print(f"[red]Error: {e}[/red]")
-        sys.exit(1)
+        sys.exit(ExitCode.GENERAL_ERROR)
     except KeyboardInterrupt:
         console.print("\n[yellow]Interrupted[/yellow]")
-        sys.exit(130)
+        sys.exit(ExitCode.KEYBOARD_INTERRUPT)
 
 
 def _print_result(result: dict) -> None:
@@ -524,8 +567,14 @@ def config_get(key: str) -> None:
 
 
 @main.command()
-@click.option("--host", default="127.0.0.1", help="Host to bind to")
-@click.option("--port", default=8420, type=int, help="Port to bind to")
+@click.option("--host", default=DEFAULT_GUI_HOST, help="Host to bind to")
+@click.option(
+    "--port",
+    default=DEFAULT_GUI_PORT,
+    type=int,
+    callback=_validate_port,
+    help="Port to bind to",
+)
 @click.option("--no-browser", is_flag=True, help="Don't open browser automatically")
 def gui(host: str, port: int, no_browser: bool) -> None:
     """Launch the web GUI.

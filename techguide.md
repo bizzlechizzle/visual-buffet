@@ -72,22 +72,18 @@ Hardware detection results cached at:
 
 Delete to force re-detection.
 
-### Thumbnail & Tag Storage
+### Tag Storage
 
-Thumbnails and tags are stored in an `visual-buffet/` folder next to each image:
+Tags are stored as JSON files next to each source image:
 
 ```
 /photos/vacation/
 ├── beach.jpg
-└── visual-buffet/
-    ├── beach_480.webp       # Grid thumbnail
-    ├── beach_1080.webp      # Preview (QUICK quality uses this)
-    ├── beach_2048.webp      # Zoom (STANDARD uses 480+2048)
-    └── beach_tags.json      # Saved tags
+└── beach_tags.json      # Saved tags
 ```
 
-This keeps all generated data with the source images, making it:
-- Portable (move folder, data follows)
+This keeps tag data with the source images, making it:
+- Portable (move folder, tags follow)
 - Backup-friendly (backup images, tags come along)
 - Easy to inspect/debug
 
@@ -98,9 +94,7 @@ Each plugin has its own config section in the main config:
 ```toml
 [plugins.ram_plus]
 enabled = true
-quality = "standard"
 threshold = 0.0
-limit = 50
 batch_size = 4
 ```
 
@@ -174,6 +168,49 @@ On first run, Visual Buffet detects:
 
 Results inform plugin batch sizes and model variant selection.
 
+## CLI Usage
+
+### Basic Tagging
+
+```bash
+# Tag a single image
+visual-buffet tag photo.jpg
+
+# Tag folder contents
+visual-buffet tag ./photos
+
+# Tag recursively
+visual-buffet tag ./photos --recursive
+```
+
+### Image Size Option
+
+Control the resolution used for ML inference with `--size`:
+
+| Size | Resolution | Use Case |
+|------|------------|----------|
+| `little` | 480px | Fastest, good for batch processing |
+| `small` | 1080px | Balanced speed/quality |
+| `large` | 2048px | High detail |
+| `huge` | 4096px | Maximum detail |
+| `original` | Native | Default, no resize |
+
+```bash
+# Use small resolution for faster processing
+visual-buffet tag photo.jpg --size small
+
+# Use large resolution for more detail
+visual-buffet tag photo.jpg --size large
+```
+
+### Discovery Mode
+
+Use SigLIP with RAM++/Florence-2 vocabulary discovery:
+
+```bash
+visual-buffet tag photo.jpg --discover
+```
+
 ## GUI Architecture
 
 When GUI mode is requested:
@@ -244,7 +281,7 @@ const state = {
     selectedImage: null,   // For lightbox view
     settings: {
         threshold: 0.5,
-        limit: 50,
+        size: "original",  // little, small, large, huge, original
         plugins: [],
     },
     hardware: null,
@@ -336,3 +373,102 @@ uv run visual-buffet tag folder/ --parallel
 ```
 
 Requires sufficient RAM for all active models.
+
+---
+
+## XMP Pipeline Integration
+
+visual-buffet is the **third stage** in the media processing pipeline, running after wake-n-blake and shoemaker.
+
+### Pipeline Order (CRITICAL)
+
+```
+┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
+│  wake-n-blake   │ ──► │    shoemaker    │ ──► │  visual-buffet  │
+│   (import)      │     │  (thumbnails)   │     │   (ML tags)     │
+└─────────────────┘     └─────────────────┘     └─────────────────┘
+```
+
+**wake-n-blake MUST run first** to create the base XMP sidecar with provenance data.
+
+### Current Implementation: JSON Files
+
+**visual-buffet does NOT currently write to XMP.** Tags are stored in JSON files:
+
+```
+/photos/vacation/
+├── beach.jpg
+├── beach.jpg.xmp        # wake-n-blake + shoemaker data
+└── beach_tags.json      # visual-buffet tags (SEPARATE FILE)
+```
+
+This breaks the unified XMP pipeline.
+
+### TODO: XMP Integration
+
+visual-buffet needs to write ML tags to XMP sidecars instead of (or in addition to) JSON files.
+
+**Option A: Use wake-n-blake's namespace**
+
+Add ML tags to the `wnb:` namespace:
+```xml
+<wnb:MLTags>
+  <rdf:Bag>
+    <rdf:li rdf:parseType="Resource">
+      <wnb:Plugin>ram_plus</wnb:Plugin>
+      <wnb:Label>beach</wnb:Label>
+      <wnb:Confidence>0.95</wnb:Confidence>
+    </rdf:li>
+  </rdf:Bag>
+</wnb:MLTags>
+```
+
+**Option B: Use Dublin Core keywords**
+
+Write to standard XMP fields:
+```xml
+<dc:subject>
+  <rdf:Bag>
+    <rdf:li>beach</rdf:li>
+    <rdf:li>water</rdf:li>
+    <rdf:li>sand</rdf:li>
+  </rdf:Bag>
+</dc:subject>
+```
+
+**Option C: Custom namespace**
+
+Create `vbuffet:` namespace:
+```
+Namespace URI: http://visual-buffet.dev/xmp/1.0/
+Prefix: vbuffet
+```
+
+### Implementation Requirements
+
+1. **Read existing XMP** before writing (don't overwrite)
+2. **Use ExifTool or pyexiftool** to preserve other namespaces
+3. **Add custody event** to `wnb:CustodyChain`:
+   ```xml
+   <wnb:EventAction>metadata_modification</wnb:EventAction>
+   <wnb:EventTool>visual-buffet/0.1.10</wnb:EventTool>
+   <wnb:EventNotes>Added ML tags from ram_plus, florence_2</wnb:EventNotes>
+   ```
+4. **Check `wnb:IsPrimaryFile`** to avoid tagging duplicate files
+5. **Update `wnb:SidecarUpdated`** timestamp
+
+### Proposed Dependencies
+
+```toml
+# pyproject.toml additions for XMP support
+[project.optional-dependencies]
+xmp = [
+    "pyexiftool>=0.5.6",
+]
+```
+
+### Migration Path
+
+1. Add XMP writing alongside JSON (both outputs)
+2. Add `--xmp-only` flag to skip JSON
+3. Eventually deprecate JSON output

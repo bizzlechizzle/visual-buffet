@@ -81,7 +81,7 @@ class RamPlusPlugin(PluginBase):
         """Tag an image using RAM++."""
         if not self.is_available():
             raise ModelNotFoundError(
-                "RAM++ model not found. Run 'imlage plugins setup ram_plus'"
+                "RAM++ model not found. Run 'visual-buffet plugins setup ram_plus'"
             )
 
         # Lazy load model
