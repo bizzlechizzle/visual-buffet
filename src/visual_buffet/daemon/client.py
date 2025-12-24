@@ -10,7 +10,7 @@ import socket
 import uuid
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable
 
 
 @dataclass
@@ -203,7 +203,7 @@ class DaemonClient:
         plugins: list[str] | None = None,
         size: str = "small",
         timeout: float = 600.0,
-        on_progress: callable | None = None,
+        on_progress: Callable[[int, int, str], None] | None = None,
     ) -> list[TagResult]:
         """Tag multiple images.
 
