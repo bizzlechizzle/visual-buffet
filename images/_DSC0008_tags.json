@@ -1,0 +1,809 @@
+{
+  "file": "/Volumes/projects/visual-buffet/images/_DSC0008.ARW",
+  "filename": "_DSC0008.ARW",
+  "tagged_at": "2025-12-24T19:12:31.590622+00:00",
+  "results": {
+    "siglip": {
+      "tags": [
+        {
+          "label": "abandoned_room",
+          "confidence": 0.9721167087554932
+        },
+        {
+          "label": "disrepair",
+          "confidence": 0.8544397354125977
+        },
+        {
+          "label": "armchairs",
+          "confidence": 0.2519274353981018
+        },
+        {
+          "label": "three_armchairs",
+          "confidence": 0.22805844247341156
+        },
+        {
+          "label": "abandoned",
+          "confidence": 0.160610169172287
+        },
+        {
+          "label": "room",
+          "confidence": 0.15157654881477356
+        },
+        {
+          "label": "hallway",
+          "confidence": 0.14703592658042908
+        },
+        {
+          "label": "peeling_paint",
+          "confidence": 0.11586885154247284
+        },
+        {
+          "label": "walls",
+          "confidence": 0.07009625434875488
+        },
+        {
+          "label": "furniture",
+          "confidence": 0.0699438601732254
+        },
+        {
+          "label": "corridor",
+          "confidence": 0.06535576283931732
+        },
+        {
+          "label": "waiting room",
+          "confidence": 0.06534131616353989
+        },
+        {
+          "label": "couch",
+          "confidence": 0.05009935051202774
+        },
+        {
+          "label": "peeling_plaster",
+          "confidence": 0.048804886639118195
+        },
+        {
+          "label": "doorway",
+          "confidence": 0.028908230364322662
+        },
+        {
+          "label": "armchair",
+          "confidence": 0.02493118681013584
+        },
+        {
+          "label": "plaster",
+          "confidence": 0.016086148098111153
+        },
+        {
+          "label": "living room",
+          "confidence": 0.013326890766620636
+        },
+        {
+          "label": "broken_windows",
+          "confidence": 0.01320367306470871
+        },
+        {
+          "label": "large_window",
+          "confidence": 0.01209203153848648
+        },
+        {
+          "label": "chair",
+          "confidence": 0.010320259258151054
+        }
+      ],
+      "model": "siglip",
+      "version": "1.0.0",
+      "size": "original",
+      "inference_time_ms": 863.21,
+      "metadata": {
+        "discovery_mode": true,
+        "discovery_sources": [
+          "ram_plus",
+          "florence_2"
+        ],
+        "vocabulary_size": 174,
+        "discovery_results": {
+          "ram_plus": {
+            "tags": [
+              {
+                "label": "room",
+                "confidence": 1.0
+              },
+              {
+                "label": "building",
+                "confidence": 0.9751
+              },
+              {
+                "label": "chair",
+                "confidence": 0.9296
+              },
+              {
+                "label": "window",
+                "confidence": 0.9077
+              },
+              {
+                "label": "couch",
+                "confidence": 0.9007
+              },
+              {
+                "label": "living room",
+                "confidence": 0.8831
+              },
+              {
+                "label": "floor",
+                "confidence": 0.881
+              },
+              {
+                "label": "furniture",
+                "confidence": 0.8792
+              },
+              {
+                "label": "armchair",
+                "confidence": 0.8572
+              },
+              {
+                "label": "sit",
+                "confidence": 0.8409
+              },
+              {
+                "label": "wall",
+                "confidence": 0.7864
+              },
+              {
+                "label": "debris",
+                "confidence": 0.7827
+              },
+              {
+                "label": "house",
+                "confidence": 0.7614
+              },
+              {
+                "label": "peel",
+                "confidence": 0.7587
+              },
+              {
+                "label": "fill",
+                "confidence": 0.7396
+              },
+              {
+                "label": "rubble",
+                "confidence": 0.7294
+              },
+              {
+                "label": "radiator",
+                "confidence": 0.7224
+              },
+              {
+                "label": "dirt",
+                "confidence": 0.7065
+              },
+              {
+                "label": "open",
+                "confidence": 0.7032
+              },
+              {
+                "label": "light",
+                "confidence": 0.6994
+              },
+              {
+                "label": "blanket",
+                "confidence": 0.697
+              },
+              {
+                "label": "break",
+                "confidence": 0.6956
+              },
+              {
+                "label": "garbage",
+                "confidence": 0.6952
+              },
+              {
+                "label": "see",
+                "confidence": 0.6899
+              },
+              {
+                "label": "window screen",
+                "confidence": 0.6808
+              },
+              {
+                "label": "draw",
+                "confidence": 0.675
+              },
+              {
+                "label": "area",
+                "confidence": 0.6748
+              },
+              {
+                "label": "ruins",
+                "confidence": 0.6699
+              },
+              {
+                "label": "doorway",
+                "confidence": 0.6658
+              },
+              {
+                "label": "photo",
+                "confidence": 0.6656
+              },
+              {
+                "label": "sunshine",
+                "confidence": 0.6598
+              },
+              {
+                "label": "white",
+                "confidence": 0.6587
+              },
+              {
+                "label": "ceiling",
+                "confidence": 0.6553
+              },
+              {
+                "label": "picture",
+                "confidence": 0.6552
+              },
+              {
+                "label": "hallway",
+                "confidence": 0.6509
+              },
+              {
+                "label": "door",
+                "confidence": 0.6448
+              },
+              {
+                "label": "barrel",
+                "confidence": 0.6436
+              },
+              {
+                "label": "dark",
+                "confidence": 0.6417
+              },
+              {
+                "label": "damage",
+                "confidence": 0.6403
+              },
+              {
+                "label": "burn",
+                "confidence": 0.6396
+              },
+              {
+                "label": "lamp",
+                "confidence": 0.6388
+              },
+              {
+                "label": "side",
+                "confidence": 0.6364
+              },
+              {
+                "label": "remain",
+                "confidence": 0.6353
+              },
+              {
+                "label": "image",
+                "confidence": 0.6291
+              },
+              {
+                "label": "corner",
+                "confidence": 0.6286
+              },
+              {
+                "label": "miss",
+                "confidence": 0.6278
+              },
+              {
+                "label": "shine",
+                "confidence": 0.623
+              },
+              {
+                "label": "bed",
+                "confidence": 0.6215
+              },
+              {
+                "label": "person",
+                "confidence": 0.621
+              },
+              {
+                "label": "tear",
+                "confidence": 0.6206
+              },
+              {
+                "label": "rust",
+                "confidence": 0.6192
+              },
+              {
+                "label": "daybed",
+                "confidence": 0.6155
+              },
+              {
+                "label": "apartment",
+                "confidence": 0.6146
+              },
+              {
+                "label": "surround",
+                "confidence": 0.6128
+              },
+              {
+                "label": "stand",
+                "confidence": 0.6097
+              },
+              {
+                "label": "table",
+                "confidence": 0.6082
+              },
+              {
+                "label": "blue",
+                "confidence": 0.6024
+              },
+              {
+                "label": "home",
+                "confidence": 0.6009
+              },
+              {
+                "label": "bedroom",
+                "confidence": 0.5992
+              },
+              {
+                "label": "bright",
+                "confidence": 0.5885
+              },
+              {
+                "label": "bin",
+                "confidence": 0.588
+              },
+              {
+                "label": "lie",
+                "confidence": 0.5857
+              },
+              {
+                "label": "gray",
+                "confidence": 0.5822
+              },
+              {
+                "label": "loveseat",
+                "confidence": 0.5808
+              },
+              {
+                "label": "lay",
+                "confidence": 0.5789
+              },
+              {
+                "label": "concrete",
+                "confidence": 0.5778
+              },
+              {
+                "label": "set",
+                "confidence": 0.5768
+              },
+              {
+                "label": "couple",
+                "confidence": 0.5767
+              },
+              {
+                "label": "brown",
+                "confidence": 0.5762
+              },
+              {
+                "label": "show",
+                "confidence": 0.5751
+              },
+              {
+                "label": "place",
+                "confidence": 0.5745
+              },
+              {
+                "label": "hospital",
+                "confidence": 0.5732
+              },
+              {
+                "label": "dust",
+                "confidence": 0.5706
+              },
+              {
+                "label": "destruction",
+                "confidence": 0.5682
+              },
+              {
+                "label": "green",
+                "confidence": 0.5676
+              },
+              {
+                "label": "daylight",
+                "confidence": 0.565
+              },
+              {
+                "label": "peak",
+                "confidence": 0.5642
+              },
+              {
+                "label": "wood",
+                "confidence": 0.5604
+              },
+              {
+                "label": "fall",
+                "confidence": 0.554
+              },
+              {
+                "label": "grow",
+                "confidence": 0.5539
+              },
+              {
+                "label": "land",
+                "confidence": 0.5519
+              },
+              {
+                "label": "pillar",
+                "confidence": 0.5514
+              },
+              {
+                "label": "take",
+                "confidence": 0.5512
+              },
+              {
+                "label": "beam",
+                "confidence": 0.5503
+              },
+              {
+                "label": "repair",
+                "confidence": 0.5495
+              },
+              {
+                "label": "seat",
+                "confidence": 0.5482
+              },
+              {
+                "label": "back",
+                "confidence": 0.547
+              },
+              {
+                "label": "contain",
+                "confidence": 0.5457
+              },
+              {
+                "label": "antique",
+                "confidence": 0.5394
+              },
+              {
+                "label": "mess",
+                "confidence": 0.5365
+              },
+              {
+                "label": "waiting room",
+                "confidence": 0.5357
+              },
+              {
+                "label": "close-up",
+                "confidence": 0.5351
+              },
+              {
+                "label": "space",
+                "confidence": 0.5338
+              },
+              {
+                "label": "black",
+                "confidence": 0.5323
+              },
+              {
+                "label": "stuff",
+                "confidence": 0.532
+              },
+              {
+                "label": "television",
+                "confidence": 0.5307
+              },
+              {
+                "label": "waste",
+                "confidence": 0.5304
+              },
+              {
+                "label": "thing",
+                "confidence": 0.5304
+              },
+              {
+                "label": "stool",
+                "confidence": 0.5291
+              },
+              {
+                "label": "make",
+                "confidence": 0.529
+              },
+              {
+                "label": "face",
+                "confidence": 0.5283
+              },
+              {
+                "label": "out",
+                "confidence": 0.5277
+              },
+              {
+                "label": "website",
+                "confidence": 0.5249
+              },
+              {
+                "label": "sun",
+                "confidence": 0.5239
+              },
+              {
+                "label": "paper",
+                "confidence": 0.5224
+              },
+              {
+                "label": "mold",
+                "confidence": 0.5223
+              },
+              {
+                "label": "den",
+                "confidence": 0.5219
+              },
+              {
+                "label": "wear",
+                "confidence": 0.5215
+              },
+              {
+                "label": "build",
+                "confidence": 0.5206
+              },
+              {
+                "label": "estate",
+                "confidence": 0.5205
+              },
+              {
+                "label": "beautiful",
+                "confidence": 0.5196
+              },
+              {
+                "label": "color",
+                "confidence": 0.5192
+              },
+              {
+                "label": "use",
+                "confidence": 0.5189
+              },
+              {
+                "label": "hassock",
+                "confidence": 0.5164
+              },
+              {
+                "label": "pillow",
+                "confidence": 0.5157
+              },
+              {
+                "label": "stain",
+                "confidence": 0.5132
+              },
+              {
+                "label": "factory",
+                "confidence": 0.5123
+              },
+              {
+                "label": "plant",
+                "confidence": 0.5123
+              },
+              {
+                "label": "scrap",
+                "confidence": 0.5117
+              },
+              {
+                "label": "warehouse",
+                "confidence": 0.5113
+              },
+              {
+                "label": "pad",
+                "confidence": 0.5089
+              },
+              {
+                "label": "stack",
+                "confidence": 0.5085
+              },
+              {
+                "label": "bench",
+                "confidence": 0.5082
+              },
+              {
+                "label": "luggage",
+                "confidence": 0.5081
+              },
+              {
+                "label": "hospital room",
+                "confidence": 0.5071
+              },
+              {
+                "label": "decorate",
+                "confidence": 0.5069
+              },
+              {
+                "label": "type",
+                "confidence": 0.505
+              },
+              {
+                "label": "go",
+                "confidence": 0.5045
+              },
+              {
+                "label": "style",
+                "confidence": 0.5037
+              },
+              {
+                "label": "corridor",
+                "confidence": 0.5032
+              },
+              {
+                "label": "residence",
+                "confidence": 0.5029
+              },
+              {
+                "label": "rustic",
+                "confidence": 0.5023
+              },
+              {
+                "label": "dry",
+                "confidence": 0.5018
+              },
+              {
+                "label": "red",
+                "confidence": 0.5013
+              },
+              {
+                "label": "fire",
+                "confidence": 0.5005
+              },
+              {
+                "label": "loft",
+                "confidence": 0.5
+              }
+            ],
+            "model": "ram_plus",
+            "inference_time_ms": 143.08,
+            "total_tags": 136
+          },
+          "florence_2": {
+            "tags": [
+              {
+                "label": "abandoned_room"
+              },
+              {
+                "label": "peeling_paint"
+              },
+              {
+                "label": "debris_scattered"
+              },
+              {
+                "label": "peeling_plaster"
+              },
+              {
+                "label": "large_window"
+              },
+              {
+                "label": "left_side"
+              },
+              {
+                "label": "white_radiator"
+              },
+              {
+                "label": "right_side"
+              },
+              {
+                "label": "three_armchairs"
+              },
+              {
+                "label": "red_bucket"
+              },
+              {
+                "label": "ground_next"
+              },
+              {
+                "label": "broken_windows"
+              },
+              {
+                "label": "debris_covering"
+              },
+              {
+                "label": "entire_floor"
+              },
+              {
+                "label": "abandoned"
+              },
+              {
+                "label": "room"
+              },
+              {
+                "label": "peeling"
+              },
+              {
+                "label": "paint"
+              },
+              {
+                "label": "debris"
+              },
+              {
+                "label": "scattered"
+              },
+              {
+                "label": "floor"
+              },
+              {
+                "label": "walls"
+              },
+              {
+                "label": "covered"
+              },
+              {
+                "label": "plaster"
+              },
+              {
+                "label": "ceiling"
+              },
+              {
+                "label": "large"
+              },
+              {
+                "label": "window"
+              },
+              {
+                "label": "left"
+              },
+              {
+                "label": "side"
+              },
+              {
+                "label": "white"
+              },
+              {
+                "label": "radiator"
+              },
+              {
+                "label": "right"
+              },
+              {
+                "label": "center"
+              },
+              {
+                "label": "row"
+              },
+              {
+                "label": "three"
+              },
+              {
+                "label": "armchairs"
+              },
+              {
+                "label": "red"
+              },
+              {
+                "label": "bucket"
+              },
+              {
+                "label": "ground"
+              },
+              {
+                "label": "next"
+              },
+              {
+                "label": "them"
+              },
+              {
+                "label": "state"
+              },
+              {
+                "label": "disrepair"
+              },
+              {
+                "label": "broken"
+              },
+              {
+                "label": "windows"
+              },
+              {
+                "label": "covering"
+              },
+              {
+                "label": "entire"
+              }
+            ],
+            "model": "florence_2",
+            "inference_time_ms": 1333.61,
+            "total_tags": 47
+          }
+        },
+        "total_discovery_time_ms": 1476.69
+      }
+    }
+  }
+}

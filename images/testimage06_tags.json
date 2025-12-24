@@ -1,128 +1,687 @@
 {
   "file": "/Volumes/projects/visual-buffet/images/testimage06.jpg",
   "filename": "testimage06.jpg",
-  "tagged_at": "2025-12-24T16:05:22.439711+00:00",
-  "threshold": 0.5,
-  "size": "original",
-  "inference_time_ms": 899.02,
+  "tagged_at": "2025-12-24T19:12:53.819057+00:00",
   "results": {
-    "florence_2": {
-      "tags": [],
-      "model": "florence_2"
-    },
     "siglip": {
       "tags": [
         {
           "label": "dilapidated_white",
-          "confidence": 0.9500644207000732,
-          "plugin": "siglip"
+          "confidence": 0.9500644207000732
         },
         {
           "label": "dilapidated",
-          "confidence": 0.9286125898361206,
-          "plugin": "siglip"
-        },
-        {
-          "label": "abandoned",
-          "confidence": 0.6381912231445312,
-          "plugin": "siglip"
+          "confidence": 0.9286125898361206
         },
         {
           "label": "farmhouse",
-          "confidence": 0.5214616656303406,
-          "plugin": "siglip"
-        },
-        {
-          "label": "neglected",
-          "confidence": 0.25734928250312805,
-          "plugin": "siglip"
+          "confidence": 0.5214616656303406
         },
         {
           "label": "white house",
-          "confidence": 0.1693151891231537,
-          "plugin": "siglip"
+          "confidence": 0.1693151891231537
+        },
+        {
+          "label": "abandonment",
+          "confidence": 0.14814767241477966
         },
         {
           "label": "country house",
-          "confidence": 0.1067553237080574,
-          "plugin": "siglip"
+          "confidence": 0.1067553237080574
         },
         {
           "label": "rural",
-          "confidence": 0.08724343776702881,
-          "plugin": "siglip"
+          "confidence": 0.08724343776702881
         },
         {
           "label": "home",
-          "confidence": 0.08009716123342514,
-          "plugin": "siglip"
+          "confidence": 0.08009716123342514
         },
         {
           "label": "house",
-          "confidence": 0.0740690603852272,
-          "plugin": "siglip"
+          "confidence": 0.0740690603852272
+        },
+        {
+          "label": "neglect",
+          "confidence": 0.06898125261068344
         },
         {
           "label": "old",
-          "confidence": 0.05324580892920494,
-          "plugin": "siglip"
+          "confidence": 0.05324580892920494
         },
         {
           "label": "white_house",
-          "confidence": 0.04325128719210625,
-          "plugin": "siglip"
+          "confidence": 0.04325128719210625
         },
         {
           "label": "house exterior",
-          "confidence": 0.029007451608777046,
-          "plugin": "siglip"
+          "confidence": 0.029007451608777046
         },
         {
           "label": "stone house",
-          "confidence": 0.022527379915118217,
-          "plugin": "siglip"
+          "confidence": 0.022527379915118217
         },
         {
           "label": "hillside",
-          "confidence": 0.02025090530514717,
-          "plugin": "siglip"
+          "confidence": 0.02025090530514717
         },
         {
           "label": "estate",
-          "confidence": 0.018355095759034157,
-          "plugin": "siglip"
+          "confidence": 0.018355095759034157
         },
         {
           "label": "structure",
-          "confidence": 0.01677929051220417,
-          "plugin": "siglip"
+          "confidence": 0.01677929051220417
         },
         {
           "label": "farm",
-          "confidence": 0.01597481779754162,
-          "plugin": "siglip"
-        },
-        {
-          "label": "large_porch",
-          "confidence": 0.015114549547433853,
-          "plugin": "siglip"
+          "confidence": 0.01597481779754162
         },
         {
           "label": "countryside",
-          "confidence": 0.01383470743894577,
-          "plugin": "siglip"
-        },
-        {
-          "label": "front_facade",
-          "confidence": 0.0101566007360816,
-          "plugin": "siglip"
+          "confidence": 0.01383470743894577
         }
       ],
-      "model": "siglip"
-    },
-    "ram_plus": {
-      "tags": [],
-      "model": "ram_plus"
+      "model": "siglip",
+      "version": "1.0.0",
+      "size": "original",
+      "inference_time_ms": 925.18,
+      "metadata": {
+        "discovery_mode": true,
+        "discovery_sources": [
+          "ram_plus",
+          "florence_2"
+        ],
+        "vocabulary_size": 142,
+        "discovery_results": {
+          "ram_plus": {
+            "tags": [
+              {
+                "label": "house",
+                "confidence": 1.0
+              },
+              {
+                "label": "field",
+                "confidence": 0.9965
+              },
+              {
+                "label": "sit",
+                "confidence": 0.9551
+              },
+              {
+                "label": "white",
+                "confidence": 0.9133
+              },
+              {
+                "label": "grass",
+                "confidence": 0.8971
+              },
+              {
+                "label": "house exterior",
+                "confidence": 0.8685
+              },
+              {
+                "label": "tree",
+                "confidence": 0.8642
+              },
+              {
+                "label": "grassy",
+                "confidence": 0.83
+              },
+              {
+                "label": "home",
+                "confidence": 0.8291
+              },
+              {
+                "label": "building",
+                "confidence": 0.8109
+              },
+              {
+                "label": "surround",
+                "confidence": 0.7809
+              },
+              {
+                "label": "farmhouse",
+                "confidence": 0.7754
+              },
+              {
+                "label": "grassland",
+                "confidence": 0.7412
+              },
+              {
+                "label": "area",
+                "confidence": 0.7405
+              },
+              {
+                "label": "porch",
+                "confidence": 0.7345
+              },
+              {
+                "label": "hill",
+                "confidence": 0.7229
+              },
+              {
+                "label": "historic",
+                "confidence": 0.704
+              },
+              {
+                "label": "stand",
+                "confidence": 0.7026
+              },
+              {
+                "label": "weed",
+                "confidence": 0.68
+              },
+              {
+                "label": "dry",
+                "confidence": 0.6702
+              },
+              {
+                "label": "white house",
+                "confidence": 0.6697
+              },
+              {
+                "label": "open",
+                "confidence": 0.6686
+              },
+              {
+                "label": "forest",
+                "confidence": 0.6574
+              },
+              {
+                "label": "pasture",
+                "confidence": 0.6543
+              },
+              {
+                "label": "wood",
+                "confidence": 0.65
+              },
+              {
+                "label": "side",
+                "confidence": 0.6494
+              },
+              {
+                "label": "lush",
+                "confidence": 0.6471
+              },
+              {
+                "label": "green",
+                "confidence": 0.6468
+              },
+              {
+                "label": "picture",
+                "confidence": 0.6463
+              },
+              {
+                "label": "see",
+                "confidence": 0.6456
+              },
+              {
+                "label": "road",
+                "confidence": 0.6408
+              },
+              {
+                "label": "hydrant",
+                "confidence": 0.6399
+              },
+              {
+                "label": "yard",
+                "confidence": 0.6368
+              },
+              {
+                "label": "bush",
+                "confidence": 0.6357
+              },
+              {
+                "label": "hillside",
+                "confidence": 0.6354
+              },
+              {
+                "label": "fill",
+                "confidence": 0.6323
+              },
+              {
+                "label": "rural",
+                "confidence": 0.6315
+              },
+              {
+                "label": "daylight",
+                "confidence": 0.6307
+              },
+              {
+                "label": "fence",
+                "confidence": 0.6229
+              },
+              {
+                "label": "person",
+                "confidence": 0.6207
+              },
+              {
+                "label": "brown",
+                "confidence": 0.6188
+              },
+              {
+                "label": "photo",
+                "confidence": 0.6164
+              },
+              {
+                "label": "estate",
+                "confidence": 0.6104
+              },
+              {
+                "label": "barn",
+                "confidence": 0.6091
+              },
+              {
+                "label": "sunny",
+                "confidence": 0.6082
+              },
+              {
+                "label": "blanket",
+                "confidence": 0.6016
+              },
+              {
+                "label": "couple",
+                "confidence": 0.6009
+              },
+              {
+                "label": "image",
+                "confidence": 0.5969
+              },
+              {
+                "label": "peak",
+                "confidence": 0.5927
+              },
+              {
+                "label": "window",
+                "confidence": 0.5832
+              },
+              {
+                "label": "yellow",
+                "confidence": 0.583
+              },
+              {
+                "label": "cottage",
+                "confidence": 0.5818
+              },
+              {
+                "label": "walk",
+                "confidence": 0.5796
+              },
+              {
+                "label": "countryside",
+                "confidence": 0.5777
+              },
+              {
+                "label": "wild",
+                "confidence": 0.5759
+              },
+              {
+                "label": "rustic",
+                "confidence": 0.5742
+              },
+              {
+                "label": "back",
+                "confidence": 0.5736
+              },
+              {
+                "label": "grow",
+                "confidence": 0.5735
+              },
+              {
+                "label": "pillar",
+                "confidence": 0.5719
+              },
+              {
+                "label": "church",
+                "confidence": 0.5678
+              },
+              {
+                "label": "brush",
+                "confidence": 0.5656
+              },
+              {
+                "label": "antique",
+                "confidence": 0.5633
+              },
+              {
+                "label": "lawn",
+                "confidence": 0.5619
+              },
+              {
+                "label": "corner",
+                "confidence": 0.5614
+              },
+              {
+                "label": "farm",
+                "confidence": 0.5579
+              },
+              {
+                "label": "stone house",
+                "confidence": 0.5574
+              },
+              {
+                "label": "break",
+                "confidence": 0.5564
+              },
+              {
+                "label": "land",
+                "confidence": 0.5543
+              },
+              {
+                "label": "beautiful",
+                "confidence": 0.552
+              },
+              {
+                "label": "floor",
+                "confidence": 0.5502
+              },
+              {
+                "label": "group",
+                "confidence": 0.55
+              },
+              {
+                "label": "leaf",
+                "confidence": 0.5486
+              },
+              {
+                "label": "build",
+                "confidence": 0.5468
+              },
+              {
+                "label": "country house",
+                "confidence": 0.5443
+              },
+              {
+                "label": "sky",
+                "confidence": 0.544
+              },
+              {
+                "label": "door",
+                "confidence": 0.5432
+              },
+              {
+                "label": "website",
+                "confidence": 0.5426
+              },
+              {
+                "label": "structure",
+                "confidence": 0.5395
+              },
+              {
+                "label": "locate",
+                "confidence": 0.5378
+              },
+              {
+                "label": "vegetation",
+                "confidence": 0.5368
+              },
+              {
+                "label": "place",
+                "confidence": 0.5365
+              },
+              {
+                "label": "graze",
+                "confidence": 0.5363
+              },
+              {
+                "label": "savanna",
+                "confidence": 0.5353
+              },
+              {
+                "label": "set",
+                "confidence": 0.5341
+              },
+              {
+                "label": "plain",
+                "confidence": 0.5334
+              },
+              {
+                "label": "show",
+                "confidence": 0.533
+              },
+              {
+                "label": "close-up",
+                "confidence": 0.5318
+              },
+              {
+                "label": "lie",
+                "confidence": 0.5292
+              },
+              {
+                "label": "horse",
+                "confidence": 0.528
+              },
+              {
+                "label": "run",
+                "confidence": 0.5268
+              },
+              {
+                "label": "landscape",
+                "confidence": 0.5237
+              },
+              {
+                "label": "black",
+                "confidence": 0.5234
+              },
+              {
+                "label": "stop sign",
+                "confidence": 0.5215
+              },
+              {
+                "label": "remain",
+                "confidence": 0.5189
+              },
+              {
+                "label": "chimney",
+                "confidence": 0.5186
+              },
+              {
+                "label": "lay",
+                "confidence": 0.5176
+              },
+              {
+                "label": "fall",
+                "confidence": 0.5174
+              },
+              {
+                "label": "park",
+                "confidence": 0.5174
+              },
+              {
+                "label": "trim",
+                "confidence": 0.5169
+              },
+              {
+                "label": "flower",
+                "confidence": 0.5159
+              },
+              {
+                "label": "cabin",
+                "confidence": 0.5112
+              },
+              {
+                "label": "line",
+                "confidence": 0.5104
+              },
+              {
+                "label": "blue",
+                "confidence": 0.509
+              },
+              {
+                "label": "man",
+                "confidence": 0.5087
+              },
+              {
+                "label": "roof",
+                "confidence": 0.5063
+              },
+              {
+                "label": "wheat field",
+                "confidence": 0.506
+              },
+              {
+                "label": "clock",
+                "confidence": 0.5051
+              },
+              {
+                "label": "sign",
+                "confidence": 0.5035
+              },
+              {
+                "label": "patch",
+                "confidence": 0.5021
+              },
+              {
+                "label": "pine",
+                "confidence": 0.5014
+              },
+              {
+                "label": "take",
+                "confidence": 0.5013
+              },
+              {
+                "label": "clear",
+                "confidence": 0.5013
+              }
+            ],
+            "model": "ram_plus",
+            "inference_time_ms": 272.24,
+            "total_tags": 112
+          },
+          "florence_2": {
+            "tags": [
+              {
+                "label": "dilapidated_white"
+              },
+              {
+                "label": "white_house"
+              },
+              {
+                "label": "sloping_roof"
+              },
+              {
+                "label": "left_side"
+              },
+              {
+                "label": "several_windows"
+              },
+              {
+                "label": "second_floor"
+              },
+              {
+                "label": "bushes_surrounding"
+              },
+              {
+                "label": "overall_mood"
+              },
+              {
+                "label": "old"
+              },
+              {
+                "label": "dilapidated"
+              },
+              {
+                "label": "white"
+              },
+              {
+                "label": "house"
+              },
+              {
+                "label": "middle"
+              },
+              {
+                "label": "field"
+              },
+              {
+                "label": "sloping"
+              },
+              {
+                "label": "roof"
+              },
+              {
+                "label": "chimney"
+              },
+              {
+                "label": "left"
+              },
+              {
+                "label": "side"
+              },
+              {
+                "label": "front"
+              },
+              {
+                "label": "covered"
+              },
+              {
+                "label": "ivy"
+              },
+              {
+                "label": "several"
+              },
+              {
+                "label": "windows"
+              },
+              {
+                "label": "second"
+              },
+              {
+                "label": "floor"
+              },
+              {
+                "label": "broken"
+              },
+              {
+                "label": "peeling"
+              },
+              {
+                "label": "trees"
+              },
+              {
+                "label": "bushes"
+              },
+              {
+                "label": "surrounding"
+              },
+              {
+                "label": "sky"
+              },
+              {
+                "label": "blue"
+              },
+              {
+                "label": "grass"
+              },
+              {
+                "label": "tall"
+              },
+              {
+                "label": "green"
+              },
+              {
+                "label": "overall"
+              },
+              {
+                "label": "mood"
+              },
+              {
+                "label": "one"
+              },
+              {
+                "label": "neglect"
+              },
+              {
+                "label": "abandonment"
+              }
+            ],
+            "model": "florence_2",
+            "inference_time_ms": 1626.25,
+            "total_tags": 41
+          }
+        },
+        "total_discovery_time_ms": 1898.49
+      }
     }
   }
 }

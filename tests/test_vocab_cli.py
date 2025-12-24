@@ -157,3 +157,84 @@ class TestVocabCommandIntegration:
             result = cli.invoke(main, ["vocab", cmd, "--help"])
             # Each command should have a help message
             assert result.exit_code == 0 or "Error" not in result.output
+
+    def test_vocab_commands_have_app_option(self, cli):
+        """Test all vocab subcommands have --app option."""
+        from visual_buffet.cli import main
+
+        commands = ["stats", "search", "export", "import", "learn", "review"]
+
+        for cmd in commands:
+            result = cli.invoke(main, ["vocab", cmd, "--help"])
+            assert "--app" in result.output, f"Command {cmd} missing --app option"
+
+
+class TestAppConfig:
+    """Tests for app-specific configuration."""
+
+    def test_app_config_creates_paths(self):
+        """Test AppConfig generates correct paths."""
+        from vocablearn import AppConfig
+
+        config = AppConfig("test-app")
+        assert config.app_name == "test-app"
+        assert str(config.vocab_db).endswith(".test-app/data/vocabulary.db")
+        assert str(config.ocr_db).endswith(".test-app/data/ocr.db")
+
+    def test_app_config_custom_base(self):
+        """Test AppConfig with custom base directory."""
+        from vocablearn import AppConfig
+        from pathlib import Path
+
+        config = AppConfig("test-app", base_dir=Path("/tmp/custom"))
+        assert str(config.vocab_db) == "/tmp/custom/data/vocabulary.db"
+
+
+class TestOCRStorage:
+    """Tests for OCR vocabulary storage."""
+
+    def test_ocr_storage_record_and_retrieve(self):
+        """Test OCRStorage can record and retrieve detections."""
+        from vocablearn import OCRStorage
+        import tempfile
+        from pathlib import Path
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            db_path = Path(tmpdir) / "ocr.db"
+            ocr = OCRStorage(db_path)
+
+            # Record detection
+            det_id = ocr.record_detection(
+                image_id="test.jpg",
+                text="EXIT",
+                ocr_engine="tesseract",
+                confidence=0.95,
+                text_type="sign",
+            )
+            assert det_id == 1
+
+            # Retrieve
+            text = ocr.get_text("EXIT")
+            assert text is not None
+            assert text.text == "EXIT"
+            assert text.text_type == "sign"
+            assert text.total_occurrences == 1
+
+    def test_ocr_storage_statistics(self):
+        """Test OCRStorage statistics."""
+        from vocablearn import OCRStorage
+        import tempfile
+        from pathlib import Path
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            db_path = Path(tmpdir) / "ocr.db"
+            ocr = OCRStorage(db_path)
+
+            ocr.record_detection("a.jpg", "EXIT", "tesseract", 0.9, "sign")
+            ocr.record_detection("b.jpg", "DANGER", "tesseract", 0.8, "sign")
+            ocr.record_detection("c.jpg", "EXIT", "tesseract", 0.95, "sign")
+
+            stats = ocr.get_statistics()
+            assert stats["vocabulary_size"] == 2  # EXIT and DANGER
+            assert stats["total_detections"] == 3
+            assert stats["images_with_text"] == 3

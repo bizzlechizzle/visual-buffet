@@ -10,6 +10,7 @@ Features:
 - SigLIP-based scene classification
 - Tag co-occurrence analysis (PMI)
 - Image embedding similarity/duplicate detection
+- OCR vocabulary tracking (per-app isolated)
 
 Example:
     >>> from vocablearn import VocabLearn
@@ -17,11 +18,19 @@ Example:
     >>> vocab.record_tags("img001.jpg", [{"label": "bar", "confidence": 0.95}], "ram_plus")
     >>> vocab.record_feedback("img001.jpg", "bar", correct=True)
     >>> calibrated = vocab.get_calibrated_confidence("bar", 0.8, "ram_plus")
+
+Per-app isolation:
+    >>> from vocablearn import AppConfig
+    >>> config = AppConfig("abandoned-archive")
+    >>> vocab = VocabLearn(config.vocab_db)
+    >>> ocr = OCRStorage(config.ocr_db)
 """
 
-__version__ = "0.2.0"
+__version__ = "0.1.11"
 
 from vocablearn.api import VocabLearn
+from vocablearn.app_config import AppConfig
+from vocablearn.storage.ocr import OCRStorage, OCRText, OCRDetection
 from vocablearn.models import (
     CalibrationPoint,
     ConfidenceTier,
@@ -55,6 +64,10 @@ def get_embedding_index():
 
 __all__ = [
     "VocabLearn",
+    "AppConfig",
+    "OCRStorage",
+    "OCRText",
+    "OCRDetection",
     "Tag",
     "TagEvent",
     "TagSource",

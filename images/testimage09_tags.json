@@ -1,58 +1,600 @@
 {
   "file": "/Volumes/projects/visual-buffet/images/testimage09.jpg",
   "filename": "testimage09.jpg",
-  "tagged_at": "2025-12-24T16:05:23.050111+00:00",
-  "threshold": 0.5,
-  "size": "original",
-  "inference_time_ms": 841.94,
+  "tagged_at": "2025-12-24T19:13:00.808812+00:00",
   "results": {
-    "florence_2": {
-      "tags": [],
-      "model": "florence_2"
-    },
     "siglip": {
       "tags": [
         {
           "label": "abandoned_cars",
-          "confidence": 0.9795206785202026,
-          "plugin": "siglip"
+          "confidence": 0.9795206785202026
         },
         {
           "label": "junkyard",
-          "confidence": 0.6418482065200806,
-          "plugin": "siglip"
+          "confidence": 0.6418482065200806
         },
         {
           "label": "abandoned",
-          "confidence": 0.20351578295230865,
-          "plugin": "siglip"
+          "confidence": 0.20351578295230865
         },
         {
           "label": "cars",
-          "confidence": 0.09381014108657837,
-          "plugin": "siglip"
-        },
-        {
-          "label": "desolate",
-          "confidence": 0.04567901790142059,
-          "plugin": "siglip"
+          "confidence": 0.09381014108657837
         },
         {
           "label": "fallen_leaves",
-          "confidence": 0.028098972514271736,
-          "plugin": "siglip"
+          "confidence": 0.028098972514271736
         },
         {
           "label": "fall",
-          "confidence": 0.026641907170414925,
-          "plugin": "siglip"
+          "confidence": 0.026641907170414925
+        },
+        {
+          "label": "abandonment",
+          "confidence": 0.026094933971762657
         }
       ],
-      "model": "siglip"
-    },
-    "ram_plus": {
-      "tags": [],
-      "model": "ram_plus"
+      "model": "siglip",
+      "version": "1.0.0",
+      "size": "original",
+      "inference_time_ms": 851.26,
+      "metadata": {
+        "discovery_mode": true,
+        "discovery_sources": [
+          "ram_plus",
+          "florence_2"
+        ],
+        "vocabulary_size": 136,
+        "discovery_results": {
+          "ram_plus": {
+            "tags": [
+              {
+                "label": "car",
+                "confidence": 0.9999
+              },
+              {
+                "label": "park",
+                "confidence": 0.9617
+              },
+              {
+                "label": "tree",
+                "confidence": 0.9148
+              },
+              {
+                "label": "parking lot",
+                "confidence": 0.9136
+              },
+              {
+                "label": "wood",
+                "confidence": 0.9099
+              },
+              {
+                "label": "sit",
+                "confidence": 0.8433
+              },
+              {
+                "label": "floor",
+                "confidence": 0.8201
+              },
+              {
+                "label": "forest",
+                "confidence": 0.8174
+              },
+              {
+                "label": "group",
+                "confidence": 0.8111
+              },
+              {
+                "label": "vehicle",
+                "confidence": 0.8043
+              },
+              {
+                "label": "area",
+                "confidence": 0.7998
+              },
+              {
+                "label": "row",
+                "confidence": 0.7922
+              },
+              {
+                "label": "fill",
+                "confidence": 0.7829
+              },
+              {
+                "label": "blanket",
+                "confidence": 0.7827
+              },
+              {
+                "label": "line",
+                "confidence": 0.7754
+              },
+              {
+                "label": "number",
+                "confidence": 0.7417
+              },
+              {
+                "label": "autumn",
+                "confidence": 0.7255
+              },
+              {
+                "label": "fall",
+                "confidence": 0.7179
+              },
+              {
+                "label": "autumn leave",
+                "confidence": 0.7145
+              },
+              {
+                "label": "road",
+                "confidence": 0.7017
+              },
+              {
+                "label": "surround",
+                "confidence": 0.696
+              },
+              {
+                "label": "junkyard",
+                "confidence": 0.6872
+              },
+              {
+                "label": "blue",
+                "confidence": 0.6868
+              },
+              {
+                "label": "couple",
+                "confidence": 0.6678
+              },
+              {
+                "label": "side",
+                "confidence": 0.653
+              },
+              {
+                "label": "red",
+                "confidence": 0.6488
+              },
+              {
+                "label": "collection",
+                "confidence": 0.6373
+              },
+              {
+                "label": "field",
+                "confidence": 0.6357
+              },
+              {
+                "label": "leaf",
+                "confidence": 0.6348
+              },
+              {
+                "label": "display",
+                "confidence": 0.6317
+              },
+              {
+                "label": "stand",
+                "confidence": 0.6298
+              },
+              {
+                "label": "truck",
+                "confidence": 0.6297
+              },
+              {
+                "label": "rust",
+                "confidence": 0.6287
+              },
+              {
+                "label": "color",
+                "confidence": 0.6279
+              },
+              {
+                "label": "see",
+                "confidence": 0.6238
+              },
+              {
+                "label": "variety",
+                "confidence": 0.6218
+              },
+              {
+                "label": "break",
+                "confidence": 0.6216
+              },
+              {
+                "label": "yard",
+                "confidence": 0.6183
+              },
+              {
+                "label": "damage",
+                "confidence": 0.6178
+              },
+              {
+                "label": "house exterior",
+                "confidence": 0.6162
+              },
+              {
+                "label": "parking",
+                "confidence": 0.6107
+              },
+              {
+                "label": "sedan",
+                "confidence": 0.6026
+              },
+              {
+                "label": "daylight",
+                "confidence": 0.6014
+              },
+              {
+                "label": "garbage",
+                "confidence": 0.5981
+              },
+              {
+                "label": "photo",
+                "confidence": 0.5976
+              },
+              {
+                "label": "fleet",
+                "confidence": 0.5976
+              },
+              {
+                "label": "picture",
+                "confidence": 0.5958
+              },
+              {
+                "label": "type",
+                "confidence": 0.595
+              },
+              {
+                "label": "debris",
+                "confidence": 0.591
+              },
+              {
+                "label": "dirt",
+                "confidence": 0.5891
+              },
+              {
+                "label": "classic",
+                "confidence": 0.5863
+              },
+              {
+                "label": "place",
+                "confidence": 0.5827
+              },
+              {
+                "label": "car show",
+                "confidence": 0.5807
+              },
+              {
+                "label": "burn",
+                "confidence": 0.5799
+              },
+              {
+                "label": "image",
+                "confidence": 0.5791
+              },
+              {
+                "label": "destruction",
+                "confidence": 0.579
+              },
+              {
+                "label": "person",
+                "confidence": 0.5779
+              },
+              {
+                "label": "house",
+                "confidence": 0.5729
+              },
+              {
+                "label": "array",
+                "confidence": 0.5705
+              },
+              {
+                "label": "land",
+                "confidence": 0.5657
+              },
+              {
+                "label": "peak",
+                "confidence": 0.5633
+              },
+              {
+                "label": "set",
+                "confidence": 0.5616
+              },
+              {
+                "label": "antique",
+                "confidence": 0.5576
+              },
+              {
+                "label": "white",
+                "confidence": 0.5549
+              },
+              {
+                "label": "building",
+                "confidence": 0.5536
+              },
+              {
+                "label": "snow",
+                "confidence": 0.5503
+              },
+              {
+                "label": "grass",
+                "confidence": 0.5487
+              },
+              {
+                "label": "five",
+                "confidence": 0.5487
+              },
+              {
+                "label": "brown",
+                "confidence": 0.5487
+              },
+              {
+                "label": "toy car",
+                "confidence": 0.5444
+              },
+              {
+                "label": "collect",
+                "confidence": 0.5438
+              },
+              {
+                "label": "graveyard",
+                "confidence": 0.5431
+              },
+              {
+                "label": "draw",
+                "confidence": 0.5429
+              },
+              {
+                "label": "lay",
+                "confidence": 0.5405
+              },
+              {
+                "label": "open",
+                "confidence": 0.5388
+              },
+              {
+                "label": "walk",
+                "confidence": 0.5381
+              },
+              {
+                "label": "city",
+                "confidence": 0.5369
+              },
+              {
+                "label": "sun",
+                "confidence": 0.5364
+              },
+              {
+                "label": "show",
+                "confidence": 0.5363
+              },
+              {
+                "label": "lie",
+                "confidence": 0.5351
+              },
+              {
+                "label": "website",
+                "confidence": 0.5311
+              },
+              {
+                "label": "forest floor",
+                "confidence": 0.5311
+              },
+              {
+                "label": "dusk",
+                "confidence": 0.531
+              },
+              {
+                "label": "estate",
+                "confidence": 0.5304
+              },
+              {
+                "label": "body",
+                "confidence": 0.5303
+              },
+              {
+                "label": "town",
+                "confidence": 0.5294
+              },
+              {
+                "label": "formation",
+                "confidence": 0.5261
+              },
+              {
+                "label": "automobile model",
+                "confidence": 0.5196
+              },
+              {
+                "label": "go",
+                "confidence": 0.5195
+              },
+              {
+                "label": "miniskirt",
+                "confidence": 0.5165
+              },
+              {
+                "label": "race",
+                "confidence": 0.515
+              },
+              {
+                "label": "tree trunk",
+                "confidence": 0.5149
+              },
+              {
+                "label": "autumn forest",
+                "confidence": 0.5149
+              },
+              {
+                "label": "make",
+                "confidence": 0.5146
+              },
+              {
+                "label": "path",
+                "confidence": 0.514
+              },
+              {
+                "label": "back",
+                "confidence": 0.5135
+              },
+              {
+                "label": "city park",
+                "confidence": 0.5125
+              },
+              {
+                "label": "grove",
+                "confidence": 0.5118
+              },
+              {
+                "label": "sunset",
+                "confidence": 0.5108
+              },
+              {
+                "label": "sky",
+                "confidence": 0.5108
+              },
+              {
+                "label": "license plate",
+                "confidence": 0.5093
+              },
+              {
+                "label": "scene",
+                "confidence": 0.5089
+              },
+              {
+                "label": "thing",
+                "confidence": 0.5073
+              },
+              {
+                "label": "race car",
+                "confidence": 0.5071
+              },
+              {
+                "label": "remain",
+                "confidence": 0.506
+              },
+              {
+                "label": "hillside",
+                "confidence": 0.5056
+              },
+              {
+                "label": "hydrant",
+                "confidence": 0.5035
+              },
+              {
+                "label": "sale",
+                "confidence": 0.5022
+              },
+              {
+                "label": "outdoor",
+                "confidence": 0.5012
+              }
+            ],
+            "model": "ram_plus",
+            "inference_time_ms": 307.99,
+            "total_tags": 109
+          },
+          "florence_2": {
+            "tags": [
+              {
+                "label": "large_group"
+              },
+              {
+                "label": "abandoned_cars"
+              },
+              {
+                "label": "various_colors"
+              },
+              {
+                "label": "including_red"
+              },
+              {
+                "label": "fallen_leaves"
+              },
+              {
+                "label": "overall_mood"
+              },
+              {
+                "label": "large"
+              },
+              {
+                "label": "group"
+              },
+              {
+                "label": "old"
+              },
+              {
+                "label": "abandoned"
+              },
+              {
+                "label": "cars"
+              },
+              {
+                "label": "forest"
+              },
+              {
+                "label": "various"
+              },
+              {
+                "label": "colors"
+              },
+              {
+                "label": "models"
+              },
+              {
+                "label": "including"
+              },
+              {
+                "label": "red"
+              },
+              {
+                "label": "blue"
+              },
+              {
+                "label": "green"
+              },
+              {
+                "label": "ground"
+              },
+              {
+                "label": "covered"
+              },
+              {
+                "label": "fallen"
+              },
+              {
+                "label": "leaves"
+              },
+              {
+                "label": "trees"
+              },
+              {
+                "label": "background"
+              },
+              {
+                "label": "sky"
+              },
+              {
+                "label": "overcast"
+              },
+              {
+                "label": "overall"
+              },
+              {
+                "label": "mood"
+              },
+              {
+                "label": "one"
+              },
+              {
+                "label": "abandonment"
+              },
+              {
+                "label": "neglect"
+              }
+            ],
+            "model": "florence_2",
+            "inference_time_ms": 1145.56,
+            "total_tags": 32
+          }
+        },
+        "total_discovery_time_ms": 1453.55
+      }
     }
   }
 }

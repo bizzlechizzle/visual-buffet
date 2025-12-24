@@ -1,193 +1,956 @@
 {
   "file": "/Volumes/projects/visual-buffet/images/testimage04.jpg",
   "filename": "testimage04.jpg",
-  "tagged_at": "2025-12-24T16:05:22.018416+00:00",
-  "threshold": 0.5,
-  "size": "original",
-  "inference_time_ms": 1092.28,
+  "tagged_at": "2025-12-24T19:12:48.013256+00:00",
   "results": {
-    "florence_2": {
-      "tags": [],
-      "model": "florence_2"
-    },
     "siglip": {
       "tags": [
         {
+          "label": "disrepair",
+          "confidence": 0.9340924620628357
+        },
+        {
           "label": "abandoned_building",
-          "confidence": 0.8952341675758362,
-          "plugin": "siglip"
+          "confidence": 0.8952341675758362
         },
         {
           "label": "stairwell",
-          "confidence": 0.8141087889671326,
-          "plugin": "siglip"
-        },
-        {
-          "label": "stairs",
-          "confidence": 0.45139211416244507,
-          "plugin": "siglip"
+          "confidence": 0.8141087889671326
         },
         {
           "label": "jail cell",
-          "confidence": 0.44359052181243896,
-          "plugin": "siglip"
+          "confidence": 0.44359052181243896
         },
         {
           "label": "cage",
-          "confidence": 0.3882419466972351,
-          "plugin": "siglip"
+          "confidence": 0.3882419466972351
         },
         {
           "label": "metal_bars",
-          "confidence": 0.3863125145435333,
-          "plugin": "siglip"
+          "confidence": 0.3863125145435333
         },
         {
           "label": "scaffold",
-          "confidence": 0.34280139207839966,
-          "plugin": "siglip"
-        },
-        {
-          "label": "stairs_leading",
-          "confidence": 0.291384756565094,
-          "plugin": "siglip"
+          "confidence": 0.34280139207839966
         },
         {
           "label": "prison",
-          "confidence": 0.28737762570381165,
-          "plugin": "siglip"
+          "confidence": 0.28737762570381165
         },
         {
           "label": "abandoned",
-          "confidence": 0.26015976071357727,
-          "plugin": "siglip"
+          "confidence": 0.26015976071357727
         },
         {
           "label": "ladder",
-          "confidence": 0.2443726658821106,
-          "plugin": "siglip"
-        },
-        {
-          "label": "narrow_corridor",
-          "confidence": 0.13101167976856232,
-          "plugin": "siglip"
-        },
-        {
-          "label": "second_floor",
-          "confidence": 0.11960563063621521,
-          "plugin": "siglip"
+          "confidence": 0.2443726658821106
         },
         {
           "label": "bird cage",
-          "confidence": 0.1050988957285881,
-          "plugin": "siglip"
+          "confidence": 0.1050988957285881
         },
         {
           "label": "fire escape",
-          "confidence": 0.10329882800579071,
-          "plugin": "siglip"
+          "confidence": 0.10329882800579071
         },
         {
           "label": "hallway",
-          "confidence": 0.0969860628247261,
-          "plugin": "siglip"
+          "confidence": 0.0969860628247261
         },
         {
           "label": "decay",
-          "confidence": 0.08842375874519348,
-          "plugin": "siglip"
+          "confidence": 0.08842375874519348
+        },
+        {
+          "label": "hanging",
+          "confidence": 0.06225065886974335
         },
         {
           "label": "neglect",
-          "confidence": 0.05063004791736603,
-          "plugin": "siglip"
+          "confidence": 0.05063004791736603
         },
         {
           "label": "building",
-          "confidence": 0.048254579305648804,
-          "plugin": "siglip"
+          "confidence": 0.048254579305648804
         },
         {
           "label": "basement",
-          "confidence": 0.04227008298039436,
-          "plugin": "siglip"
+          "confidence": 0.04227008298039436
         },
         {
           "label": "walls",
-          "confidence": 0.04070870578289032,
-          "plugin": "siglip"
+          "confidence": 0.04070870578289032
         },
         {
-          "label": "corridor",
-          "confidence": 0.036863379180431366,
-          "plugin": "siglip"
+          "label": "broken",
+          "confidence": 0.03947644308209419
         },
         {
           "label": "dark",
-          "confidence": 0.035788796842098236,
-          "plugin": "siglip"
+          "confidence": 0.035788796842098236
         },
         {
           "label": "brick building",
-          "confidence": 0.030959244817495346,
-          "plugin": "siglip"
+          "confidence": 0.030959244817495346
         },
         {
           "label": "stair",
-          "confidence": 0.029641613364219666,
-          "plugin": "siglip"
+          "confidence": 0.029641613364219666
         },
         {
           "label": "ruins",
-          "confidence": 0.02746688202023506,
-          "plugin": "siglip"
+          "confidence": 0.02746688202023506
         },
         {
           "label": "structure",
-          "confidence": 0.02647511288523674,
-          "plugin": "siglip"
+          "confidence": 0.02647511288523674
         },
         {
           "label": "mezzanine",
-          "confidence": 0.025206616148352623,
-          "plugin": "siglip"
+          "confidence": 0.025206616148352623
         },
         {
           "label": "peeling_paint",
-          "confidence": 0.021561287343502045,
-          "plugin": "siglip"
+          "confidence": 0.021561287343502045
         },
         {
           "label": "high_ceiling",
-          "confidence": 0.018025534227490425,
-          "plugin": "siglip"
+          "confidence": 0.018025534227490425
         },
         {
           "label": "large_window",
-          "confidence": 0.01694040186703205,
-          "plugin": "siglip"
+          "confidence": 0.01694040186703205
         },
         {
           "label": "tower",
-          "confidence": 0.014851371757686138,
-          "plugin": "siglip"
+          "confidence": 0.014851371757686138
         },
         {
           "label": "metal",
-          "confidence": 0.012687096372246742,
-          "plugin": "siglip"
+          "confidence": 0.012687096372246742
         },
         {
           "label": "room",
-          "confidence": 0.011806659400463104,
-          "plugin": "siglip"
+          "confidence": 0.011806659400463104
         }
       ],
-      "model": "siglip"
-    },
-    "ram_plus": {
-      "tags": [],
-      "model": "ram_plus"
+      "model": "siglip",
+      "version": "1.0.0",
+      "size": "original",
+      "inference_time_ms": 1118.08,
+      "metadata": {
+        "discovery_mode": true,
+        "discovery_sources": [
+          "ram_plus",
+          "florence_2"
+        ],
+        "vocabulary_size": 199,
+        "discovery_results": {
+          "ram_plus": {
+            "tags": [
+              {
+                "label": "building",
+                "confidence": 1.0
+              },
+              {
+                "label": "room",
+                "confidence": 0.8985
+              },
+              {
+                "label": "cage",
+                "confidence": 0.8798
+              },
+              {
+                "label": "floor",
+                "confidence": 0.8441
+              },
+              {
+                "label": "debris",
+                "confidence": 0.8259
+              },
+              {
+                "label": "garbage",
+                "confidence": 0.8195
+              },
+              {
+                "label": "window",
+                "confidence": 0.804
+              },
+              {
+                "label": "prison",
+                "confidence": 0.7762
+              },
+              {
+                "label": "sit",
+                "confidence": 0.7418
+              },
+              {
+                "label": "house",
+                "confidence": 0.7394
+              },
+              {
+                "label": "stair",
+                "confidence": 0.7369
+              },
+              {
+                "label": "wall",
+                "confidence": 0.7353
+              },
+              {
+                "label": "person",
+                "confidence": 0.7173
+              },
+              {
+                "label": "fill",
+                "confidence": 0.7126
+              },
+              {
+                "label": "light",
+                "confidence": 0.7113
+              },
+              {
+                "label": "see",
+                "confidence": 0.7108
+              },
+              {
+                "label": "jail cell",
+                "confidence": 0.7041
+              },
+              {
+                "label": "warehouse",
+                "confidence": 0.7027
+              },
+              {
+                "label": "build",
+                "confidence": 0.6907
+              },
+              {
+                "label": "area",
+                "confidence": 0.6887
+              },
+              {
+                "label": "fence",
+                "confidence": 0.685
+              },
+              {
+                "label": "scaffold",
+                "confidence": 0.6823
+              },
+              {
+                "label": "rubble",
+                "confidence": 0.682
+              },
+              {
+                "label": "stand",
+                "confidence": 0.677
+              },
+              {
+                "label": "enclosure",
+                "confidence": 0.6768
+              },
+              {
+                "label": "roof",
+                "confidence": 0.6757
+              },
+              {
+                "label": "structure",
+                "confidence": 0.6719
+              },
+              {
+                "label": "photo",
+                "confidence": 0.6685
+              },
+              {
+                "label": "man",
+                "confidence": 0.6656
+              },
+              {
+                "label": "dark",
+                "confidence": 0.6652
+              },
+              {
+                "label": "picture",
+                "confidence": 0.6607
+              },
+              {
+                "label": "image",
+                "confidence": 0.6555
+              },
+              {
+                "label": "break",
+                "confidence": 0.6542
+              },
+              {
+                "label": "open",
+                "confidence": 0.6508
+              },
+              {
+                "label": "door",
+                "confidence": 0.6502
+              },
+              {
+                "label": "side",
+                "confidence": 0.647
+              },
+              {
+                "label": "waste",
+                "confidence": 0.6469
+              },
+              {
+                "label": "blue",
+                "confidence": 0.6395
+              },
+              {
+                "label": "peak",
+                "confidence": 0.6369
+              },
+              {
+                "label": "ruins",
+                "confidence": 0.6364
+              },
+              {
+                "label": "loft",
+                "confidence": 0.6362
+              },
+              {
+                "label": "metal",
+                "confidence": 0.6337
+              },
+              {
+                "label": "stairwell",
+                "confidence": 0.6328
+              },
+              {
+                "label": "surround",
+                "confidence": 0.6274
+              },
+              {
+                "label": "basement",
+                "confidence": 0.6218
+              },
+              {
+                "label": "bar",
+                "confidence": 0.6206
+              },
+              {
+                "label": "beam",
+                "confidence": 0.6173
+              },
+              {
+                "label": "blanket",
+                "confidence": 0.6153
+              },
+              {
+                "label": "remain",
+                "confidence": 0.6097
+              },
+              {
+                "label": "set",
+                "confidence": 0.6071
+              },
+              {
+                "label": "walk",
+                "confidence": 0.6061
+              },
+              {
+                "label": "spiral",
+                "confidence": 0.6009
+              },
+              {
+                "label": "clock",
+                "confidence": 0.5969
+              },
+              {
+                "label": "place",
+                "confidence": 0.5963
+              },
+              {
+                "label": "couple",
+                "confidence": 0.5952
+              },
+              {
+                "label": "bird cage",
+                "confidence": 0.5923
+              },
+              {
+                "label": "mess",
+                "confidence": 0.5885
+              },
+              {
+                "label": "go",
+                "confidence": 0.5855
+              },
+              {
+                "label": "ceiling",
+                "confidence": 0.5802
+              },
+              {
+                "label": "show",
+                "confidence": 0.5799
+              },
+              {
+                "label": "pillar",
+                "confidence": 0.579
+              },
+              {
+                "label": "sunshine",
+                "confidence": 0.5786
+              },
+              {
+                "label": "factory",
+                "confidence": 0.5778
+              },
+              {
+                "label": "lie",
+                "confidence": 0.5771
+              },
+              {
+                "label": "doodle",
+                "confidence": 0.5745
+              },
+              {
+                "label": "damage",
+                "confidence": 0.5737
+              },
+              {
+                "label": "barn",
+                "confidence": 0.573
+              },
+              {
+                "label": "home",
+                "confidence": 0.5728
+              },
+              {
+                "label": "window screen",
+                "confidence": 0.5722
+              },
+              {
+                "label": "burn",
+                "confidence": 0.572
+              },
+              {
+                "label": "hallway",
+                "confidence": 0.5705
+              },
+              {
+                "label": "rail",
+                "confidence": 0.5693
+              },
+              {
+                "label": "corner",
+                "confidence": 0.5687
+              },
+              {
+                "label": "contain",
+                "confidence": 0.5677
+              },
+              {
+                "label": "daylight",
+                "confidence": 0.5673
+              },
+              {
+                "label": "smartphone",
+                "confidence": 0.5663
+              },
+              {
+                "label": "website",
+                "confidence": 0.5651
+              },
+              {
+                "label": "group",
+                "confidence": 0.5647
+              },
+              {
+                "label": "stack",
+                "confidence": 0.5617
+              },
+              {
+                "label": "number",
+                "confidence": 0.5616
+              },
+              {
+                "label": "concrete",
+                "confidence": 0.5601
+              },
+              {
+                "label": "brown",
+                "confidence": 0.5581
+              },
+              {
+                "label": "lay",
+                "confidence": 0.5575
+              },
+              {
+                "label": "close-up",
+                "confidence": 0.5566
+              },
+              {
+                "label": "dirt",
+                "confidence": 0.5553
+              },
+              {
+                "label": "ladder",
+                "confidence": 0.5552
+              },
+              {
+                "label": "city",
+                "confidence": 0.5547
+              },
+              {
+                "label": "back",
+                "confidence": 0.5545
+              },
+              {
+                "label": "make",
+                "confidence": 0.5539
+              },
+              {
+                "label": "white",
+                "confidence": 0.5514
+              },
+              {
+                "label": "balcony",
+                "confidence": 0.5513
+              },
+              {
+                "label": "woman",
+                "confidence": 0.5494
+              },
+              {
+                "label": "apartment",
+                "confidence": 0.5491
+              },
+              {
+                "label": "use",
+                "confidence": 0.5483
+              },
+              {
+                "label": "wear",
+                "confidence": 0.5465
+              },
+              {
+                "label": "black",
+                "confidence": 0.5456
+              },
+              {
+                "label": "tunnel",
+                "confidence": 0.544
+              },
+              {
+                "label": "take",
+                "confidence": 0.5439
+              },
+              {
+                "label": "shine",
+                "confidence": 0.5438
+              },
+              {
+                "label": "type",
+                "confidence": 0.5413
+              },
+              {
+                "label": "shelf",
+                "confidence": 0.5407
+              },
+              {
+                "label": "cup",
+                "confidence": 0.5395
+              },
+              {
+                "label": "rust",
+                "confidence": 0.5389
+              },
+              {
+                "label": "wood",
+                "confidence": 0.5379
+              },
+              {
+                "label": "space",
+                "confidence": 0.5369
+              },
+              {
+                "label": "fire",
+                "confidence": 0.5354
+              },
+              {
+                "label": "fire escape",
+                "confidence": 0.5338
+              },
+              {
+                "label": "run",
+                "confidence": 0.5336
+              },
+              {
+                "label": "tear",
+                "confidence": 0.5324
+              },
+              {
+                "label": "chair",
+                "confidence": 0.5317
+              },
+              {
+                "label": "construction site",
+                "confidence": 0.5315
+              },
+              {
+                "label": "sun",
+                "confidence": 0.5314
+              },
+              {
+                "label": "destruction",
+                "confidence": 0.5302
+              },
+              {
+                "label": "lead",
+                "confidence": 0.5293
+              },
+              {
+                "label": "doorway",
+                "confidence": 0.5283
+              },
+              {
+                "label": "bin",
+                "confidence": 0.5279
+              },
+              {
+                "label": "animal",
+                "confidence": 0.5275
+              },
+              {
+                "label": "brick building",
+                "confidence": 0.5275
+              },
+              {
+                "label": "hydrant",
+                "confidence": 0.5273
+              },
+              {
+                "label": "wire",
+                "confidence": 0.5268
+              },
+              {
+                "label": "tower",
+                "confidence": 0.5261
+              },
+              {
+                "label": "rise",
+                "confidence": 0.5252
+              },
+              {
+                "label": "house exterior",
+                "confidence": 0.5248
+              },
+              {
+                "label": "cat",
+                "confidence": 0.5239
+              },
+              {
+                "label": "night",
+                "confidence": 0.5236
+              },
+              {
+                "label": "church",
+                "confidence": 0.5232
+              },
+              {
+                "label": "alley",
+                "confidence": 0.5229
+              },
+              {
+                "label": "thing",
+                "confidence": 0.5225
+              },
+              {
+                "label": "job",
+                "confidence": 0.5224
+              },
+              {
+                "label": "fall",
+                "confidence": 0.5208
+              },
+              {
+                "label": "estate",
+                "confidence": 0.5205
+              },
+              {
+                "label": "indoor",
+                "confidence": 0.52
+              },
+              {
+                "label": "line",
+                "confidence": 0.5199
+              },
+              {
+                "label": "hang",
+                "confidence": 0.5198
+              },
+              {
+                "label": "shirt",
+                "confidence": 0.5171
+              },
+              {
+                "label": "balustrade",
+                "confidence": 0.5167
+              },
+              {
+                "label": "live",
+                "confidence": 0.5158
+              },
+              {
+                "label": "stuff",
+                "confidence": 0.5149
+              },
+              {
+                "label": "miss",
+                "confidence": 0.5144
+              },
+              {
+                "label": "lead to",
+                "confidence": 0.5135
+              },
+              {
+                "label": "peel",
+                "confidence": 0.5134
+              },
+              {
+                "label": "bright",
+                "confidence": 0.5123
+              },
+              {
+                "label": "clothe",
+                "confidence": 0.5122
+              },
+              {
+                "label": "urban",
+                "confidence": 0.5108
+              },
+              {
+                "label": "appear",
+                "confidence": 0.5107
+              },
+              {
+                "label": "residence",
+                "confidence": 0.5098
+              },
+              {
+                "label": "pipe",
+                "confidence": 0.5097
+              },
+              {
+                "label": "green",
+                "confidence": 0.5093
+              },
+              {
+                "label": "catch",
+                "confidence": 0.5093
+              },
+              {
+                "label": "row",
+                "confidence": 0.5086
+              },
+              {
+                "label": "blow",
+                "confidence": 0.508
+              },
+              {
+                "label": "camera",
+                "confidence": 0.5078
+              },
+              {
+                "label": "mezzanine",
+                "confidence": 0.5074
+              },
+              {
+                "label": "repair",
+                "confidence": 0.5071
+              },
+              {
+                "label": "facility",
+                "confidence": 0.5044
+              },
+              {
+                "label": "suit",
+                "confidence": 0.5044
+              },
+              {
+                "label": "connect",
+                "confidence": 0.5041
+              },
+              {
+                "label": "bird",
+                "confidence": 0.503
+              },
+              {
+                "label": "paper",
+                "confidence": 0.5025
+              },
+              {
+                "label": "grow",
+                "confidence": 0.5024
+              },
+              {
+                "label": "demolition",
+                "confidence": 0.5018
+              },
+              {
+                "label": "dress",
+                "confidence": 0.5016
+              },
+              {
+                "label": "scene",
+                "confidence": 0.5016
+              },
+              {
+                "label": "hospital",
+                "confidence": 0.5012
+              }
+            ],
+            "model": "ram_plus",
+            "inference_time_ms": 252.31,
+            "total_tags": 164
+          },
+          "florence_2": {
+            "tags": [
+              {
+                "label": "abandoned_building"
+              },
+              {
+                "label": "high_ceiling"
+              },
+              {
+                "label": "large_window"
+              },
+              {
+                "label": "right_side"
+              },
+              {
+                "label": "peeling_paint"
+              },
+              {
+                "label": "several_metal"
+              },
+              {
+                "label": "metal_bars"
+              },
+              {
+                "label": "bars_hanging"
+              },
+              {
+                "label": "overall_atmosphere"
+              },
+              {
+                "label": "overall_mood"
+              },
+              {
+                "label": "interior"
+              },
+              {
+                "label": "abandoned"
+              },
+              {
+                "label": "building"
+              },
+              {
+                "label": "high"
+              },
+              {
+                "label": "ceiling"
+              },
+              {
+                "label": "large"
+              },
+              {
+                "label": "window"
+              },
+              {
+                "label": "right"
+              },
+              {
+                "label": "side"
+              },
+              {
+                "label": "walls"
+              },
+              {
+                "label": "covered"
+              },
+              {
+                "label": "peeling"
+              },
+              {
+                "label": "paint"
+              },
+              {
+                "label": "floor"
+              },
+              {
+                "label": "littered"
+              },
+              {
+                "label": "debris"
+              },
+              {
+                "label": "trash"
+              },
+              {
+                "label": "made"
+              },
+              {
+                "label": "concrete"
+              },
+              {
+                "label": "several"
+              },
+              {
+                "label": "metal"
+              },
+              {
+                "label": "bars"
+              },
+              {
+                "label": "hanging"
+              },
+              {
+                "label": "windows"
+              },
+              {
+                "label": "broken"
+              },
+              {
+                "label": "overall"
+              },
+              {
+                "label": "atmosphere"
+              },
+              {
+                "label": "one"
+              },
+              {
+                "label": "decay"
+              },
+              {
+                "label": "neglect"
+              },
+              {
+                "label": "mood"
+              },
+              {
+                "label": "state"
+              },
+              {
+                "label": "disrepair"
+              },
+              {
+                "label": "space"
+              }
+            ],
+            "model": "florence_2",
+            "inference_time_ms": 1587.09,
+            "total_tags": 44
+          }
+        },
+        "total_discovery_time_ms": 1839.4
+      }
     }
   }
 }

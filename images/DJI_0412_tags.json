@@ -1,0 +1,835 @@
+{
+  "file": "/Volumes/projects/visual-buffet/images/DJI_0412.DNG",
+  "filename": "DJI_0412.DNG",
+  "tagged_at": "2025-12-24T19:12:28.820470+00:00",
+  "results": {
+    "siglip": {
+      "tags": [
+        {
+          "label": "bell tower",
+          "confidence": 0.43653103709220886
+        },
+        {
+          "label": "dilapidated_building",
+          "confidence": 0.43115702271461487
+        },
+        {
+          "label": "dilapidated",
+          "confidence": 0.38698509335517883
+        },
+        {
+          "label": "turret",
+          "confidence": 0.3493451774120331
+        },
+        {
+          "label": "ivy",
+          "confidence": 0.15714266896247864
+        },
+        {
+          "label": "church tower",
+          "confidence": 0.13583926856517792
+        },
+        {
+          "label": "dome",
+          "confidence": 0.12157357484102249
+        },
+        {
+          "label": "chimneys",
+          "confidence": 0.11891345679759979
+        },
+        {
+          "label": "chapel",
+          "confidence": 0.0795178934931755
+        },
+        {
+          "label": "tower",
+          "confidence": 0.07677365839481354
+        },
+        {
+          "label": "chimney",
+          "confidence": 0.052298977971076965
+        },
+        {
+          "label": "stone house",
+          "confidence": 0.0519191212952137
+        },
+        {
+          "label": "eerie",
+          "confidence": 0.04062383621931076
+        },
+        {
+          "label": "brick building",
+          "confidence": 0.034548088908195496
+        },
+        {
+          "label": "castle",
+          "confidence": 0.029404792934656143
+        },
+        {
+          "label": "structure",
+          "confidence": 0.02739279717206955
+        },
+        {
+          "label": "abandoned",
+          "confidence": 0.0269577968865633
+        },
+        {
+          "label": "several_chimneys",
+          "confidence": 0.019467221572995186
+        },
+        {
+          "label": "hillside",
+          "confidence": 0.017752630636096
+        },
+        {
+          "label": "scenery",
+          "confidence": 0.014522716403007507
+        },
+        {
+          "label": "spire",
+          "confidence": 0.013537662103772163
+        },
+        {
+          "label": "home",
+          "confidence": 0.013505618087947369
+        },
+        {
+          "label": "house exterior",
+          "confidence": 0.012939605861902237
+        },
+        {
+          "label": "house",
+          "confidence": 0.0120541425421834
+        },
+        {
+          "label": "building",
+          "confidence": 0.011754466220736504
+        },
+        {
+          "label": "stone building",
+          "confidence": 0.011662092991173267
+        }
+      ],
+      "model": "siglip",
+      "version": "1.0.0",
+      "size": "original",
+      "inference_time_ms": 845.91,
+      "metadata": {
+        "discovery_mode": true,
+        "discovery_sources": [
+          "ram_plus",
+          "florence_2"
+        ],
+        "vocabulary_size": 174,
+        "discovery_results": {
+          "ram_plus": {
+            "tags": [
+              {
+                "label": "tree",
+                "confidence": 0.9999
+              },
+              {
+                "label": "building",
+                "confidence": 0.9191
+              },
+              {
+                "label": "surround",
+                "confidence": 0.9184
+              },
+              {
+                "label": "house",
+                "confidence": 0.9111
+              },
+              {
+                "label": "forest",
+                "confidence": 0.9102
+              },
+              {
+                "label": "tower",
+                "confidence": 0.8994
+              },
+              {
+                "label": "wood",
+                "confidence": 0.8249
+              },
+              {
+                "label": "bell tower",
+                "confidence": 0.821
+              },
+              {
+                "label": "gazebo",
+                "confidence": 0.8166
+              },
+              {
+                "label": "sit",
+                "confidence": 0.8087
+              },
+              {
+                "label": "pine",
+                "confidence": 0.8084
+              },
+              {
+                "label": "green",
+                "confidence": 0.7981
+              },
+              {
+                "label": "chimney",
+                "confidence": 0.7734
+              },
+              {
+                "label": "peak",
+                "confidence": 0.7724
+              },
+              {
+                "label": "area",
+                "confidence": 0.766
+              },
+              {
+                "label": "clock",
+                "confidence": 0.762
+              },
+              {
+                "label": "roof",
+                "confidence": 0.7565
+              },
+              {
+                "label": "blanket",
+                "confidence": 0.7512
+              },
+              {
+                "label": "lush",
+                "confidence": 0.7497
+              },
+              {
+                "label": "church",
+                "confidence": 0.7361
+              },
+              {
+                "label": "leaf",
+                "confidence": 0.736
+              },
+              {
+                "label": "structure",
+                "confidence": 0.7316
+              },
+              {
+                "label": "ivy",
+                "confidence": 0.7262
+              },
+              {
+                "label": "ruins",
+                "confidence": 0.7153
+              },
+              {
+                "label": "house exterior",
+                "confidence": 0.6955
+              },
+              {
+                "label": "see",
+                "confidence": 0.6841
+              },
+              {
+                "label": "tree house",
+                "confidence": 0.6835
+              },
+              {
+                "label": "water tower",
+                "confidence": 0.6782
+              },
+              {
+                "label": "hill",
+                "confidence": 0.6766
+              },
+              {
+                "label": "vine",
+                "confidence": 0.6744
+              },
+              {
+                "label": "stand",
+                "confidence": 0.6694
+              },
+              {
+                "label": "side",
+                "confidence": 0.6656
+              },
+              {
+                "label": "grow",
+                "confidence": 0.6638
+              },
+              {
+                "label": "picture",
+                "confidence": 0.6563
+              },
+              {
+                "label": "pavilion",
+                "confidence": 0.6559
+              },
+              {
+                "label": "bush",
+                "confidence": 0.651
+              },
+              {
+                "label": "fill",
+                "confidence": 0.6494
+              },
+              {
+                "label": "daylight",
+                "confidence": 0.6448
+              },
+              {
+                "label": "vegetation",
+                "confidence": 0.6427
+              },
+              {
+                "label": "hillside",
+                "confidence": 0.6382
+              },
+              {
+                "label": "castle",
+                "confidence": 0.6378
+              },
+              {
+                "label": "home",
+                "confidence": 0.636
+              },
+              {
+                "label": "pagoda",
+                "confidence": 0.6327
+              },
+              {
+                "label": "park",
+                "confidence": 0.6279
+              },
+              {
+                "label": "photo",
+                "confidence": 0.6263
+              },
+              {
+                "label": "image",
+                "confidence": 0.6144
+              },
+              {
+                "label": "jungle",
+                "confidence": 0.6098
+              },
+              {
+                "label": "build",
+                "confidence": 0.6083
+              },
+              {
+                "label": "field",
+                "confidence": 0.6038
+              },
+              {
+                "label": "window",
+                "confidence": 0.603
+              },
+              {
+                "label": "cabin",
+                "confidence": 0.6007
+              },
+              {
+                "label": "make",
+                "confidence": 0.5971
+              },
+              {
+                "label": "spire",
+                "confidence": 0.5942
+              },
+              {
+                "label": "white",
+                "confidence": 0.5909
+              },
+              {
+                "label": "mountain",
+                "confidence": 0.5901
+              },
+              {
+                "label": "greenery",
+                "confidence": 0.5873
+              },
+              {
+                "label": "plant",
+                "confidence": 0.5871
+              },
+              {
+                "label": "bridge",
+                "confidence": 0.5845
+              },
+              {
+                "label": "group",
+                "confidence": 0.584
+              },
+              {
+                "label": "observation tower",
+                "confidence": 0.5826
+              },
+              {
+                "label": "person",
+                "confidence": 0.5781
+              },
+              {
+                "label": "cloudy",
+                "confidence": 0.5781
+              },
+              {
+                "label": "floor",
+                "confidence": 0.5742
+              },
+              {
+                "label": "branch",
+                "confidence": 0.5735
+              },
+              {
+                "label": "city",
+                "confidence": 0.5729
+              },
+              {
+                "label": "place",
+                "confidence": 0.5726
+              },
+              {
+                "label": "set",
+                "confidence": 0.5701
+              },
+              {
+                "label": "tree branch",
+                "confidence": 0.5691
+              },
+              {
+                "label": "nature",
+                "confidence": 0.567
+              },
+              {
+                "label": "rustic",
+                "confidence": 0.5665
+              },
+              {
+                "label": "fall",
+                "confidence": 0.5654
+              },
+              {
+                "label": "estate",
+                "confidence": 0.5647
+              },
+              {
+                "label": "hide",
+                "confidence": 0.5639
+              },
+              {
+                "label": "show",
+                "confidence": 0.5633
+              },
+              {
+                "label": "bench",
+                "confidence": 0.563
+              },
+              {
+                "label": "cottage",
+                "confidence": 0.5621
+              },
+              {
+                "label": "body",
+                "confidence": 0.5619
+              },
+              {
+                "label": "couple",
+                "confidence": 0.5592
+              },
+              {
+                "label": "garden",
+                "confidence": 0.5589
+              },
+              {
+                "label": "gray",
+                "confidence": 0.5587
+              },
+              {
+                "label": "brick building",
+                "confidence": 0.5571
+              },
+              {
+                "label": "turret",
+                "confidence": 0.557
+              },
+              {
+                "label": "take",
+                "confidence": 0.5565
+              },
+              {
+                "label": "perch",
+                "confidence": 0.5535
+              },
+              {
+                "label": "mansion",
+                "confidence": 0.553
+              },
+              {
+                "label": "beautiful",
+                "confidence": 0.5529
+              },
+              {
+                "label": "moss",
+                "confidence": 0.5522
+              },
+              {
+                "label": "hut",
+                "confidence": 0.551
+              },
+              {
+                "label": "grove",
+                "confidence": 0.5509
+              },
+              {
+                "label": "stone building",
+                "confidence": 0.5499
+              },
+              {
+                "label": "stone house",
+                "confidence": 0.5498
+              },
+              {
+                "label": "dome",
+                "confidence": 0.5496
+              },
+              {
+                "label": "church tower",
+                "confidence": 0.5486
+              },
+              {
+                "label": "monument",
+                "confidence": 0.5477
+              },
+              {
+                "label": "line",
+                "confidence": 0.5462
+              },
+              {
+                "label": "walk",
+                "confidence": 0.5461
+              },
+              {
+                "label": "room",
+                "confidence": 0.5456
+              },
+              {
+                "label": "landscape",
+                "confidence": 0.5455
+              },
+              {
+                "label": "temple",
+                "confidence": 0.545
+              },
+              {
+                "label": "hang",
+                "confidence": 0.5448
+              },
+              {
+                "label": "back",
+                "confidence": 0.5428
+              },
+              {
+                "label": "barn",
+                "confidence": 0.5428
+              },
+              {
+                "label": "chapel",
+                "confidence": 0.5427
+              },
+              {
+                "label": "wall",
+                "confidence": 0.5419
+              },
+              {
+                "label": "sky",
+                "confidence": 0.5411
+              },
+              {
+                "label": "open",
+                "confidence": 0.5402
+              },
+              {
+                "label": "scenery",
+                "confidence": 0.5392
+              },
+              {
+                "label": "outdoor",
+                "confidence": 0.5387
+              },
+              {
+                "label": "bird house",
+                "confidence": 0.5381
+              },
+              {
+                "label": "break",
+                "confidence": 0.5378
+              },
+              {
+                "label": "website",
+                "confidence": 0.5357
+              },
+              {
+                "label": "pillar",
+                "confidence": 0.5351
+              },
+              {
+                "label": "road",
+                "confidence": 0.5349
+              },
+              {
+                "label": "scene",
+                "confidence": 0.5348
+              },
+              {
+                "label": "mill",
+                "confidence": 0.5345
+              },
+              {
+                "label": "grass",
+                "confidence": 0.5337
+              },
+              {
+                "label": "remain",
+                "confidence": 0.5333
+              },
+              {
+                "label": "wild",
+                "confidence": 0.5328
+              },
+              {
+                "label": "balcony",
+                "confidence": 0.5324
+              },
+              {
+                "label": "canopy",
+                "confidence": 0.5317
+              },
+              {
+                "label": "frame",
+                "confidence": 0.5315
+              },
+              {
+                "label": "historic",
+                "confidence": 0.5301
+              },
+              {
+                "label": "climb",
+                "confidence": 0.5298
+              },
+              {
+                "label": "corner",
+                "confidence": 0.5296
+              },
+              {
+                "label": "locate",
+                "confidence": 0.5292
+              },
+              {
+                "label": "go",
+                "confidence": 0.5287
+              },
+              {
+                "label": "brown",
+                "confidence": 0.5277
+              },
+              {
+                "label": "town",
+                "confidence": 0.5274
+              },
+              {
+                "label": "grassy",
+                "confidence": 0.5239
+              },
+              {
+                "label": "face",
+                "confidence": 0.5232
+              },
+              {
+                "label": "weed",
+                "confidence": 0.5213
+              },
+              {
+                "label": "number",
+                "confidence": 0.5185
+              },
+              {
+                "label": "lake",
+                "confidence": 0.5176
+              },
+              {
+                "label": "move",
+                "confidence": 0.5168
+              },
+              {
+                "label": "black",
+                "confidence": 0.5138
+              },
+              {
+                "label": "yard",
+                "confidence": 0.5133
+              },
+              {
+                "label": "countryside",
+                "confidence": 0.5128
+              },
+              {
+                "label": "rural",
+                "confidence": 0.5124
+              },
+              {
+                "label": "appear",
+                "confidence": 0.5119
+              },
+              {
+                "label": "river",
+                "confidence": 0.5118
+              },
+              {
+                "label": "stone",
+                "confidence": 0.5118
+              },
+              {
+                "label": "trail",
+                "confidence": 0.5114
+              },
+              {
+                "label": "close-up",
+                "confidence": 0.5103
+              },
+              {
+                "label": "land",
+                "confidence": 0.5101
+              },
+              {
+                "label": "water",
+                "confidence": 0.509
+              },
+              {
+                "label": "bank",
+                "confidence": 0.508
+              },
+              {
+                "label": "village",
+                "confidence": 0.5067
+              },
+              {
+                "label": "path",
+                "confidence": 0.5065
+              },
+              {
+                "label": "man",
+                "confidence": 0.5055
+              },
+              {
+                "label": "type",
+                "confidence": 0.5045
+              },
+              {
+                "label": "rise",
+                "confidence": 0.5016
+              }
+            ],
+            "model": "ram_plus",
+            "inference_time_ms": 149.69,
+            "total_tags": 151
+          },
+          "florence_2": {
+            "tags": [
+              {
+                "label": "dilapidated_building"
+              },
+              {
+                "label": "shaped_roof"
+              },
+              {
+                "label": "dense_forest"
+              },
+              {
+                "label": "several_chimneys"
+              },
+              {
+                "label": "overall_mood"
+              },
+              {
+                "label": "old"
+              },
+              {
+                "label": "dilapidated"
+              },
+              {
+                "label": "building"
+              },
+              {
+                "label": "dome"
+              },
+              {
+                "label": "shaped"
+              },
+              {
+                "label": "roof"
+              },
+              {
+                "label": "middle"
+              },
+              {
+                "label": "dense"
+              },
+              {
+                "label": "forest"
+              },
+              {
+                "label": "abandoned"
+              },
+              {
+                "label": "surrounded"
+              },
+              {
+                "label": "trees"
+              },
+              {
+                "label": "bushes"
+              },
+              {
+                "label": "covered"
+              },
+              {
+                "label": "ivy"
+              },
+              {
+                "label": "several"
+              },
+              {
+                "label": "chimneys"
+              },
+              {
+                "label": "windows"
+              },
+              {
+                "label": "sky"
+              },
+              {
+                "label": "overcast"
+              },
+              {
+                "label": "overall"
+              },
+              {
+                "label": "mood"
+              },
+              {
+                "label": "gloomy"
+              },
+              {
+                "label": "eerie"
+              }
+            ],
+            "model": "florence_2",
+            "inference_time_ms": 1064.37,
+            "total_tags": 29
+          }
+        },
+        "total_discovery_time_ms": 1214.06
+      }
+    }
+  }
+}

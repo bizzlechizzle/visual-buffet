@@ -1,0 +1,740 @@
+{
+  "file": "/Volumes/projects/visual-buffet/images/Buffalo State Hospital (57).NEF",
+  "filename": "Buffalo State Hospital (57).NEF",
+  "tagged_at": "2025-12-24T19:12:26.273698+00:00",
+  "results": {
+    "siglip": {
+      "tags": [
+        {
+          "label": "empty_room",
+          "confidence": 0.39201265573501587
+        },
+        {
+          "label": "darkness",
+          "confidence": 0.29292958974838257
+        },
+        {
+          "label": "room",
+          "confidence": 0.19360555708408356
+        },
+        {
+          "label": "chair",
+          "confidence": 0.1615004539489746
+        },
+        {
+          "label": "eerie",
+          "confidence": 0.07013026624917984
+        },
+        {
+          "label": "light",
+          "confidence": 0.0665360689163208
+        },
+        {
+          "label": "window",
+          "confidence": 0.056123729795217514
+        },
+        {
+          "label": "large_window",
+          "confidence": 0.04147300124168396
+        },
+        {
+          "label": "empty",
+          "confidence": 0.035202424973249435
+        },
+        {
+          "label": "daylight",
+          "confidence": 0.03501594439148903
+        },
+        {
+          "label": "dimly",
+          "confidence": 0.03251895308494568
+        },
+        {
+          "label": "window sill",
+          "confidence": 0.029088791459798813
+        },
+        {
+          "label": "jail cell",
+          "confidence": 0.026772351935505867
+        },
+        {
+          "label": "dark",
+          "confidence": 0.015371590852737427
+        },
+        {
+          "label": "hospital room",
+          "confidence": 0.013799932785332203
+        },
+        {
+          "label": "rocking chair",
+          "confidence": 0.0123852314427495
+        },
+        {
+          "label": "armchair",
+          "confidence": 0.012104467488825321
+        },
+        {
+          "label": "shadow",
+          "confidence": 0.011494813486933708
+        },
+        {
+          "label": "hallway",
+          "confidence": 0.010645437054336071
+        }
+      ],
+      "model": "siglip",
+      "version": "1.0.0",
+      "size": "original",
+      "inference_time_ms": 882.36,
+      "metadata": {
+        "discovery_mode": true,
+        "discovery_sources": [
+          "ram_plus",
+          "florence_2"
+        ],
+        "vocabulary_size": 156,
+        "discovery_results": {
+          "ram_plus": {
+            "tags": [
+              {
+                "label": "room",
+                "confidence": 1.0
+              },
+              {
+                "label": "window",
+                "confidence": 1.0
+              },
+              {
+                "label": "light",
+                "confidence": 0.9511
+              },
+              {
+                "label": "dark",
+                "confidence": 0.9343
+              },
+              {
+                "label": "chair",
+                "confidence": 0.9168
+              },
+              {
+                "label": "wall",
+                "confidence": 0.8731
+              },
+              {
+                "label": "building",
+                "confidence": 0.8696
+              },
+              {
+                "label": "sit",
+                "confidence": 0.8658
+              },
+              {
+                "label": "bench",
+                "confidence": 0.8517
+              },
+              {
+                "label": "shine",
+                "confidence": 0.8176
+              },
+              {
+                "label": "sunshine",
+                "confidence": 0.7737
+              },
+              {
+                "label": "floor",
+                "confidence": 0.7649
+              },
+              {
+                "label": "bright",
+                "confidence": 0.7347
+              },
+              {
+                "label": "bed",
+                "confidence": 0.7176
+              },
+              {
+                "label": "doodle",
+                "confidence": 0.7134
+              },
+              {
+                "label": "open",
+                "confidence": 0.7121
+              },
+              {
+                "label": "see",
+                "confidence": 0.7109
+              },
+              {
+                "label": "darkness",
+                "confidence": 0.6968
+              },
+              {
+                "label": "table",
+                "confidence": 0.6827
+              },
+              {
+                "label": "white",
+                "confidence": 0.6743
+              },
+              {
+                "label": "side",
+                "confidence": 0.6706
+              },
+              {
+                "label": "paper",
+                "confidence": 0.6661
+              },
+              {
+                "label": "break",
+                "confidence": 0.666
+              },
+              {
+                "label": "photo",
+                "confidence": 0.6629
+              },
+              {
+                "label": "corner",
+                "confidence": 0.6623
+              },
+              {
+                "label": "window screen",
+                "confidence": 0.6524
+              },
+              {
+                "label": "draw",
+                "confidence": 0.6517
+              },
+              {
+                "label": "book",
+                "confidence": 0.6514
+              },
+              {
+                "label": "black",
+                "confidence": 0.649
+              },
+              {
+                "label": "image",
+                "confidence": 0.6475
+              },
+              {
+                "label": "peel",
+                "confidence": 0.6471
+              },
+              {
+                "label": "area",
+                "confidence": 0.645
+              },
+              {
+                "label": "picture",
+                "confidence": 0.6437
+              },
+              {
+                "label": "fill",
+                "confidence": 0.6406
+              },
+              {
+                "label": "blanket",
+                "confidence": 0.6375
+              },
+              {
+                "label": "sun",
+                "confidence": 0.6325
+              },
+              {
+                "label": "person",
+                "confidence": 0.6296
+              },
+              {
+                "label": "concrete",
+                "confidence": 0.626
+              },
+              {
+                "label": "couch",
+                "confidence": 0.6252
+              },
+              {
+                "label": "bedroom",
+                "confidence": 0.6116
+              },
+              {
+                "label": "hospital",
+                "confidence": 0.6114
+              },
+              {
+                "label": "house",
+                "confidence": 0.6059
+              },
+              {
+                "label": "hospital room",
+                "confidence": 0.6047
+              },
+              {
+                "label": "night",
+                "confidence": 0.6008
+              },
+              {
+                "label": "stand",
+                "confidence": 0.6004
+              },
+              {
+                "label": "armchair",
+                "confidence": 0.6004
+              },
+              {
+                "label": "peak",
+                "confidence": 0.5995
+              },
+              {
+                "label": "seat",
+                "confidence": 0.5991
+              },
+              {
+                "label": "illuminate",
+                "confidence": 0.5983
+              },
+              {
+                "label": "shadow",
+                "confidence": 0.598
+              },
+              {
+                "label": "park bench",
+                "confidence": 0.5975
+              },
+              {
+                "label": "furniture",
+                "confidence": 0.5958
+              },
+              {
+                "label": "door",
+                "confidence": 0.5954
+              },
+              {
+                "label": "set",
+                "confidence": 0.5938
+              },
+              {
+                "label": "lighting",
+                "confidence": 0.5929
+              },
+              {
+                "label": "daybed",
+                "confidence": 0.5892
+              },
+              {
+                "label": "daylight",
+                "confidence": 0.5868
+              },
+              {
+                "label": "waiting room",
+                "confidence": 0.585
+              },
+              {
+                "label": "clock",
+                "confidence": 0.5834
+              },
+              {
+                "label": "out",
+                "confidence": 0.5833
+              },
+              {
+                "label": "glass window",
+                "confidence": 0.5829
+              },
+              {
+                "label": "place",
+                "confidence": 0.5821
+              },
+              {
+                "label": "show",
+                "confidence": 0.5775
+              },
+              {
+                "label": "couple",
+                "confidence": 0.574
+              },
+              {
+                "label": "face",
+                "confidence": 0.5735
+              },
+              {
+                "label": "lamp",
+                "confidence": 0.5714
+              },
+              {
+                "label": "back",
+                "confidence": 0.568
+              },
+              {
+                "label": "glow",
+                "confidence": 0.567
+              },
+              {
+                "label": "piano",
+                "confidence": 0.5669
+              },
+              {
+                "label": "blue",
+                "confidence": 0.5664
+              },
+              {
+                "label": "close-up",
+                "confidence": 0.566
+              },
+              {
+                "label": "space",
+                "confidence": 0.5631
+              },
+              {
+                "label": "hallway",
+                "confidence": 0.5627
+              },
+              {
+                "label": "hospital bed",
+                "confidence": 0.5615
+              },
+              {
+                "label": "window frame",
+                "confidence": 0.5581
+              },
+              {
+                "label": "miss",
+                "confidence": 0.5575
+              },
+              {
+                "label": "rocking chair",
+                "confidence": 0.5558
+              },
+              {
+                "label": "surround",
+                "confidence": 0.554
+              },
+              {
+                "label": "mattress",
+                "confidence": 0.5534
+              },
+              {
+                "label": "green",
+                "confidence": 0.5532
+              },
+              {
+                "label": "window sill",
+                "confidence": 0.552
+              },
+              {
+                "label": "take",
+                "confidence": 0.5469
+              },
+              {
+                "label": "beam",
+                "confidence": 0.5457
+              },
+              {
+                "label": "prison",
+                "confidence": 0.5416
+              },
+              {
+                "label": "contain",
+                "confidence": 0.5414
+              },
+              {
+                "label": "make",
+                "confidence": 0.5412
+              },
+              {
+                "label": "wall lamp",
+                "confidence": 0.5385
+              },
+              {
+                "label": "box",
+                "confidence": 0.5371
+              },
+              {
+                "label": "plaster bandage",
+                "confidence": 0.5353
+              },
+              {
+                "label": "doorway",
+                "confidence": 0.5333
+              },
+              {
+                "label": "office",
+                "confidence": 0.5307
+              },
+              {
+                "label": "lie",
+                "confidence": 0.5303
+              },
+              {
+                "label": "appear",
+                "confidence": 0.5303
+              },
+              {
+                "label": "apartment",
+                "confidence": 0.5293
+              },
+              {
+                "label": "sunny",
+                "confidence": 0.5288
+              },
+              {
+                "label": "gray",
+                "confidence": 0.5282
+              },
+              {
+                "label": "lay",
+                "confidence": 0.5281
+              },
+              {
+                "label": "shelf",
+                "confidence": 0.5279
+              },
+              {
+                "label": "cup",
+                "confidence": 0.5258
+              },
+              {
+                "label": "computer",
+                "confidence": 0.5234
+              },
+              {
+                "label": "dot",
+                "confidence": 0.5226
+              },
+              {
+                "label": "jail cell",
+                "confidence": 0.5217
+              },
+              {
+                "label": "living room",
+                "confidence": 0.5192
+              },
+              {
+                "label": "go",
+                "confidence": 0.5166
+              },
+              {
+                "label": "remain",
+                "confidence": 0.514
+              },
+              {
+                "label": "brown",
+                "confidence": 0.5137
+              },
+              {
+                "label": "stain",
+                "confidence": 0.5137
+              },
+              {
+                "label": "use",
+                "confidence": 0.5131
+              },
+              {
+                "label": "thing",
+                "confidence": 0.5123
+              },
+              {
+                "label": "number",
+                "confidence": 0.511
+              },
+              {
+                "label": "bathroom",
+                "confidence": 0.5099
+              },
+              {
+                "label": "smartphone",
+                "confidence": 0.5094
+              },
+              {
+                "label": "color",
+                "confidence": 0.509
+              },
+              {
+                "label": "drawing",
+                "confidence": 0.5088
+              },
+              {
+                "label": "highlight",
+                "confidence": 0.5076
+              },
+              {
+                "label": "basement",
+                "confidence": 0.5064
+              },
+              {
+                "label": "luggage",
+                "confidence": 0.5061
+              },
+              {
+                "label": "read",
+                "confidence": 0.5055
+              },
+              {
+                "label": "mountain",
+                "confidence": 0.5055
+              },
+              {
+                "label": "row",
+                "confidence": 0.5047
+              },
+              {
+                "label": "sheet",
+                "confidence": 0.5046
+              },
+              {
+                "label": "website",
+                "confidence": 0.5043
+              },
+              {
+                "label": "frame",
+                "confidence": 0.5039
+              },
+              {
+                "label": "man",
+                "confidence": 0.5034
+              },
+              {
+                "label": "monitor",
+                "confidence": 0.5025
+              },
+              {
+                "label": "folding chair",
+                "confidence": 0.5011
+              },
+              {
+                "label": "build",
+                "confidence": 0.5007
+              },
+              {
+                "label": "beautiful",
+                "confidence": 0.5006
+              },
+              {
+                "label": "plain",
+                "confidence": 0.5004
+              }
+            ],
+            "model": "ram_plus",
+            "inference_time_ms": 241.66,
+            "total_tags": 129
+          },
+          "florence_2": {
+            "tags": [
+              {
+                "label": "empty_room"
+              },
+              {
+                "label": "large_window"
+              },
+              {
+                "label": "peeling_paint"
+              },
+              {
+                "label": "dimly_lit"
+              },
+              {
+                "label": "casting_shadow"
+              },
+              {
+                "label": "natural_light"
+              },
+              {
+                "label": "overall_mood"
+              },
+              {
+                "label": "empty"
+              },
+              {
+                "label": "room"
+              },
+              {
+                "label": "large"
+              },
+              {
+                "label": "window"
+              },
+              {
+                "label": "center"
+              },
+              {
+                "label": "walls"
+              },
+              {
+                "label": "covered"
+              },
+              {
+                "label": "peeling"
+              },
+              {
+                "label": "paint"
+              },
+              {
+                "label": "floor"
+              },
+              {
+                "label": "dirt"
+              },
+              {
+                "label": "grime"
+              },
+              {
+                "label": "dimly"
+              },
+              {
+                "label": "lit"
+              },
+              {
+                "label": "casting"
+              },
+              {
+                "label": "shadow"
+              },
+              {
+                "label": "chair"
+              },
+              {
+                "label": "table"
+              },
+              {
+                "label": "made"
+              },
+              {
+                "label": "wood"
+              },
+              {
+                "label": "open"
+              },
+              {
+                "label": "letting"
+              },
+              {
+                "label": "natural"
+              },
+              {
+                "label": "light"
+              },
+              {
+                "label": "illuminates"
+              },
+              {
+                "label": "overall"
+              },
+              {
+                "label": "mood"
+              },
+              {
+                "label": "dark"
+              },
+              {
+                "label": "eerie"
+              }
+            ],
+            "model": "florence_2",
+            "inference_time_ms": 1462.64,
+            "total_tags": 36
+          }
+        },
+        "total_discovery_time_ms": 1704.3
+      }
+    }
+  }
+}

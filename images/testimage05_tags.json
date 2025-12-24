@@ -1,118 +1,899 @@
 {
   "file": "/Volumes/projects/visual-buffet/images/testimage05.jpg",
   "filename": "testimage05.jpg",
-  "tagged_at": "2025-12-24T16:05:22.228850+00:00",
-  "threshold": 0.5,
-  "size": "original",
-  "inference_time_ms": 1034.29,
+  "tagged_at": "2025-12-24T19:12:50.988218+00:00",
   "results": {
-    "florence_2": {
-      "tags": [],
-      "model": "florence_2"
-    },
     "siglip": {
       "tags": [
         {
           "label": "dilapidated_kitchen",
-          "confidence": 0.9990110397338867,
-          "plugin": "siglip"
+          "confidence": 0.9990110397338867
         },
         {
           "label": "dilapidated",
-          "confidence": 0.6379793286323547,
-          "plugin": "siglip"
+          "confidence": 0.6379793286323547
         },
         {
           "label": "cluttered",
-          "confidence": 0.44321537017822266,
-          "plugin": "siglip"
+          "confidence": 0.44321537017822266
         },
         {
           "label": "mess",
-          "confidence": 0.3547526001930237,
-          "plugin": "siglip"
+          "confidence": 0.3547526001930237
         },
         {
           "label": "kitchen",
-          "confidence": 0.18043503165245056,
-          "plugin": "siglip"
+          "confidence": 0.18043503165245056
         },
         {
           "label": "neglect",
-          "confidence": 0.14174601435661316,
-          "plugin": "siglip"
+          "confidence": 0.14174601435661316
         },
         {
           "label": "cabinets",
-          "confidence": 0.12697502970695496,
-          "plugin": "siglip"
+          "confidence": 0.12697502970695496
         },
         {
           "label": "kitchen table",
-          "confidence": 0.08579840511083603,
-          "plugin": "siglip"
+          "confidence": 0.08579840511083603
         },
         {
           "label": "trash",
-          "confidence": 0.07612328976392746,
-          "plugin": "siglip"
+          "confidence": 0.07612328976392746
         },
         {
           "label": "stove",
-          "confidence": 0.03371209278702736,
-          "plugin": "siglip"
+          "confidence": 0.03371209278702736
         },
         {
           "label": "garbage",
-          "confidence": 0.026908010244369507,
-          "plugin": "siglip"
+          "confidence": 0.026908010244369507
         },
         {
           "label": "including_trash",
-          "confidence": 0.0209099929779768,
-          "plugin": "siglip"
+          "confidence": 0.0209099929779768
         },
         {
           "label": "kitchen counter",
-          "confidence": 0.0193383377045393,
-          "plugin": "siglip"
+          "confidence": 0.0193383377045393
         },
         {
           "label": "house",
-          "confidence": 0.01657916232943535,
-          "plugin": "siglip"
+          "confidence": 0.01657916232943535
         },
         {
           "label": "home",
-          "confidence": 0.015149769373238087,
-          "plugin": "siglip"
+          "confidence": 0.015149769373238087
         },
         {
           "label": "waste",
-          "confidence": 0.01433529146015644,
-          "plugin": "siglip"
+          "confidence": 0.01433529146015644
         },
         {
           "label": "remodel",
-          "confidence": 0.013371783308684826,
-          "plugin": "siglip"
+          "confidence": 0.013371783308684826
         },
         {
           "label": "overall",
-          "confidence": 0.01089885737746954,
-          "plugin": "siglip"
+          "confidence": 0.01089885737746954
         },
         {
           "label": "brick",
-          "confidence": 0.010538529604673386,
-          "plugin": "siglip"
+          "confidence": 0.010538529604673386
         }
       ],
-      "model": "siglip"
-    },
-    "ram_plus": {
-      "tags": [],
-      "model": "ram_plus"
+      "model": "siglip",
+      "version": "1.0.0",
+      "size": "original",
+      "inference_time_ms": 1079.82,
+      "metadata": {
+        "discovery_mode": true,
+        "discovery_sources": [
+          "ram_plus",
+          "florence_2"
+        ],
+        "vocabulary_size": 195,
+        "discovery_results": {
+          "ram_plus": {
+            "tags": [
+              {
+                "label": "kitchen",
+                "confidence": 0.9999
+              },
+              {
+                "label": "house",
+                "confidence": 0.9592
+              },
+              {
+                "label": "room",
+                "confidence": 0.9124
+              },
+              {
+                "label": "fill",
+                "confidence": 0.8449
+              },
+              {
+                "label": "chair",
+                "confidence": 0.8411
+              },
+              {
+                "label": "garbage",
+                "confidence": 0.8192
+              },
+              {
+                "label": "cabinet",
+                "confidence": 0.7978
+              },
+              {
+                "label": "table",
+                "confidence": 0.7885
+              },
+              {
+                "label": "stool",
+                "confidence": 0.7855
+              },
+              {
+                "label": "furniture",
+                "confidence": 0.7848
+              },
+              {
+                "label": "debris",
+                "confidence": 0.7812
+              },
+              {
+                "label": "sit",
+                "confidence": 0.771
+              },
+              {
+                "label": "home",
+                "confidence": 0.7685
+              },
+              {
+                "label": "wall",
+                "confidence": 0.7599
+              },
+              {
+                "label": "floor",
+                "confidence": 0.7495
+              },
+              {
+                "label": "stove",
+                "confidence": 0.7492
+              },
+              {
+                "label": "appliance",
+                "confidence": 0.7361
+              },
+              {
+                "label": "home appliance",
+                "confidence": 0.7327
+              },
+              {
+                "label": "microwave",
+                "confidence": 0.7313
+              },
+              {
+                "label": "window",
+                "confidence": 0.7274
+              },
+              {
+                "label": "building",
+                "confidence": 0.7258
+              },
+              {
+                "label": "house exterior",
+                "confidence": 0.7192
+              },
+              {
+                "label": "bin",
+                "confidence": 0.701
+              },
+              {
+                "label": "box",
+                "confidence": 0.6973
+              },
+              {
+                "label": "mess",
+                "confidence": 0.6961
+              },
+              {
+                "label": "picture",
+                "confidence": 0.6956
+              },
+              {
+                "label": "fridge",
+                "confidence": 0.6879
+              },
+              {
+                "label": "sink",
+                "confidence": 0.6855
+              },
+              {
+                "label": "see",
+                "confidence": 0.6844
+              },
+              {
+                "label": "photo",
+                "confidence": 0.6713
+              },
+              {
+                "label": "ceiling",
+                "confidence": 0.671
+              },
+              {
+                "label": "living room",
+                "confidence": 0.668
+              },
+              {
+                "label": "area",
+                "confidence": 0.6606
+              },
+              {
+                "label": "closet",
+                "confidence": 0.6605
+              },
+              {
+                "label": "open",
+                "confidence": 0.6579
+              },
+              {
+                "label": "counter",
+                "confidence": 0.6518
+              },
+              {
+                "label": "waste",
+                "confidence": 0.6516
+              },
+              {
+                "label": "white",
+                "confidence": 0.648
+              },
+              {
+                "label": "burn",
+                "confidence": 0.6462
+              },
+              {
+                "label": "window screen",
+                "confidence": 0.645
+              },
+              {
+                "label": "corner",
+                "confidence": 0.6437
+              },
+              {
+                "label": "blanket",
+                "confidence": 0.6417
+              },
+              {
+                "label": "black",
+                "confidence": 0.6405
+              },
+              {
+                "label": "stand",
+                "confidence": 0.6358
+              },
+              {
+                "label": "green",
+                "confidence": 0.6324
+              },
+              {
+                "label": "wood",
+                "confidence": 0.6295
+              },
+              {
+                "label": "surround",
+                "confidence": 0.6293
+              },
+              {
+                "label": "exhaust hood",
+                "confidence": 0.6285
+              },
+              {
+                "label": "blue",
+                "confidence": 0.6258
+              },
+              {
+                "label": "light",
+                "confidence": 0.6231
+              },
+              {
+                "label": "brick",
+                "confidence": 0.6216
+              },
+              {
+                "label": "show",
+                "confidence": 0.6179
+              },
+              {
+                "label": "image",
+                "confidence": 0.6177
+              },
+              {
+                "label": "person",
+                "confidence": 0.6172
+              },
+              {
+                "label": "thing",
+                "confidence": 0.6172
+              },
+              {
+                "label": "dining room",
+                "confidence": 0.6118
+              },
+              {
+                "label": "side",
+                "confidence": 0.6117
+              },
+              {
+                "label": "antique",
+                "confidence": 0.6042
+              },
+              {
+                "label": "damage",
+                "confidence": 0.6028
+              },
+              {
+                "label": "break",
+                "confidence": 0.6024
+              },
+              {
+                "label": "stuff",
+                "confidence": 0.6016
+              },
+              {
+                "label": "peak",
+                "confidence": 0.6
+              },
+              {
+                "label": "remodel",
+                "confidence": 0.6
+              },
+              {
+                "label": "couple",
+                "confidence": 0.5999
+              },
+              {
+                "label": "stack",
+                "confidence": 0.5992
+              },
+              {
+                "label": "bureau",
+                "confidence": 0.5962
+              },
+              {
+                "label": "build",
+                "confidence": 0.5925
+              },
+              {
+                "label": "place",
+                "confidence": 0.5915
+              },
+              {
+                "label": "rubble",
+                "confidence": 0.5909
+              },
+              {
+                "label": "fire",
+                "confidence": 0.5889
+              },
+              {
+                "label": "set",
+                "confidence": 0.5874
+              },
+              {
+                "label": "contain",
+                "confidence": 0.5864
+              },
+              {
+                "label": "back",
+                "confidence": 0.5853
+              },
+              {
+                "label": "oven",
+                "confidence": 0.584
+              },
+              {
+                "label": "clean",
+                "confidence": 0.5809
+              },
+              {
+                "label": "door",
+                "confidence": 0.5781
+              },
+              {
+                "label": "hut",
+                "confidence": 0.5781
+              },
+              {
+                "label": "drawer",
+                "confidence": 0.5737
+              },
+              {
+                "label": "loft",
+                "confidence": 0.5737
+              },
+              {
+                "label": "apartment",
+                "confidence": 0.5737
+              },
+              {
+                "label": "dark",
+                "confidence": 0.5728
+              },
+              {
+                "label": "sunshine",
+                "confidence": 0.5727
+              },
+              {
+                "label": "skylight",
+                "confidence": 0.5706
+              },
+              {
+                "label": "rustic",
+                "confidence": 0.5679
+              },
+              {
+                "label": "tear",
+                "confidence": 0.5658
+              },
+              {
+                "label": "make",
+                "confidence": 0.5636
+              },
+              {
+                "label": "fireplace",
+                "confidence": 0.5613
+              },
+              {
+                "label": "barrel",
+                "confidence": 0.5609
+              },
+              {
+                "label": "shelf",
+                "confidence": 0.5604
+              },
+              {
+                "label": "remain",
+                "confidence": 0.5598
+              },
+              {
+                "label": "plastic",
+                "confidence": 0.5571
+              },
+              {
+                "label": "repair",
+                "confidence": 0.5536
+              },
+              {
+                "label": "draw",
+                "confidence": 0.5536
+              },
+              {
+                "label": "paper",
+                "confidence": 0.5535
+              },
+              {
+                "label": "miss",
+                "confidence": 0.5534
+              },
+              {
+                "label": "ceiling fan",
+                "confidence": 0.5533
+              },
+              {
+                "label": "scrap",
+                "confidence": 0.5521
+              },
+              {
+                "label": "type",
+                "confidence": 0.5517
+              },
+              {
+                "label": "panel",
+                "confidence": 0.5514
+              },
+              {
+                "label": "bar stool",
+                "confidence": 0.5483
+              },
+              {
+                "label": "dish washer",
+                "confidence": 0.5481
+              },
+              {
+                "label": "group",
+                "confidence": 0.547
+              },
+              {
+                "label": "stair",
+                "confidence": 0.5461
+              },
+              {
+                "label": "live",
+                "confidence": 0.5441
+              },
+              {
+                "label": "use",
+                "confidence": 0.544
+              },
+              {
+                "label": "brown",
+                "confidence": 0.5427
+              },
+              {
+                "label": "brick building",
+                "confidence": 0.5426
+              },
+              {
+                "label": "daylight",
+                "confidence": 0.5418
+              },
+              {
+                "label": "space",
+                "confidence": 0.5409
+              },
+              {
+                "label": "destruction",
+                "confidence": 0.5377
+              },
+              {
+                "label": "estate",
+                "confidence": 0.5338
+              },
+              {
+                "label": "container",
+                "confidence": 0.5337
+              },
+              {
+                "label": "beam",
+                "confidence": 0.5332
+              },
+              {
+                "label": "disaster",
+                "confidence": 0.5317
+              },
+              {
+                "label": "take",
+                "confidence": 0.531
+              },
+              {
+                "label": "modern",
+                "confidence": 0.5304
+              },
+              {
+                "label": "can",
+                "confidence": 0.5289
+              },
+              {
+                "label": "shine",
+                "confidence": 0.5267
+              },
+              {
+                "label": "number",
+                "confidence": 0.5263
+              },
+              {
+                "label": "blow",
+                "confidence": 0.5241
+              },
+              {
+                "label": "bag",
+                "confidence": 0.5219
+              },
+              {
+                "label": "material",
+                "confidence": 0.521
+              },
+              {
+                "label": "cabin",
+                "confidence": 0.52
+              },
+              {
+                "label": "job",
+                "confidence": 0.5199
+              },
+              {
+                "label": "kitchen table",
+                "confidence": 0.5193
+              },
+              {
+                "label": "gray",
+                "confidence": 0.5191
+              },
+              {
+                "label": "fall",
+                "confidence": 0.5182
+              },
+              {
+                "label": "lay",
+                "confidence": 0.5178
+              },
+              {
+                "label": "website",
+                "confidence": 0.5176
+              },
+              {
+                "label": "wood wall",
+                "confidence": 0.5173
+              },
+              {
+                "label": "peel",
+                "confidence": 0.5161
+              },
+              {
+                "label": "dirt",
+                "confidence": 0.5155
+              },
+              {
+                "label": "dinning table",
+                "confidence": 0.5151
+              },
+              {
+                "label": "collection",
+                "confidence": 0.5137
+              },
+              {
+                "label": "kitchen counter",
+                "confidence": 0.5129
+              },
+              {
+                "label": "couch",
+                "confidence": 0.5128
+              },
+              {
+                "label": "hang",
+                "confidence": 0.5125
+              },
+              {
+                "label": "sun",
+                "confidence": 0.5123
+              },
+              {
+                "label": "basement",
+                "confidence": 0.5116
+              },
+              {
+                "label": "chimney",
+                "confidence": 0.5116
+              },
+              {
+                "label": "go",
+                "confidence": 0.5112
+              },
+              {
+                "label": "equipment",
+                "confidence": 0.5106
+              },
+              {
+                "label": "lie",
+                "confidence": 0.5104
+              },
+              {
+                "label": "line",
+                "confidence": 0.509
+              },
+              {
+                "label": "scene",
+                "confidence": 0.5083
+              },
+              {
+                "label": "roof",
+                "confidence": 0.5068
+              },
+              {
+                "label": "food",
+                "confidence": 0.5061
+              },
+              {
+                "label": "doorway",
+                "confidence": 0.5061
+              },
+              {
+                "label": "close-up",
+                "confidence": 0.5048
+              },
+              {
+                "label": "wood floor",
+                "confidence": 0.504
+              },
+              {
+                "label": "teal",
+                "confidence": 0.5036
+              },
+              {
+                "label": "television",
+                "confidence": 0.5031
+              },
+              {
+                "label": "demolition",
+                "confidence": 0.5015
+              },
+              {
+                "label": "decorate",
+                "confidence": 0.5012
+              },
+              {
+                "label": "living space",
+                "confidence": 0.501
+              },
+              {
+                "label": "cardboard box",
+                "confidence": 0.5009
+              }
+            ],
+            "model": "ram_plus",
+            "inference_time_ms": 239.17,
+            "total_tags": 156
+          },
+          "florence_2": {
+            "tags": [
+              {
+                "label": "dilapidated_kitchen"
+              },
+              {
+                "label": "brick_wall"
+              },
+              {
+                "label": "right_side"
+              },
+              {
+                "label": "wooden_ceiling"
+              },
+              {
+                "label": "various_items"
+              },
+              {
+                "label": "items_such"
+              },
+              {
+                "label": "several_trash"
+              },
+              {
+                "label": "trash_cans"
+              },
+              {
+                "label": "debris_scattered"
+              },
+              {
+                "label": "scattered_around"
+              },
+              {
+                "label": "including_trash"
+              },
+              {
+                "label": "left_side"
+              },
+              {
+                "label": "natural_light"
+              },
+              {
+                "label": "overall_atmosphere"
+              },
+              {
+                "label": "old"
+              },
+              {
+                "label": "dilapidated"
+              },
+              {
+                "label": "kitchen"
+              },
+              {
+                "label": "brick"
+              },
+              {
+                "label": "wall"
+              },
+              {
+                "label": "right"
+              },
+              {
+                "label": "side"
+              },
+              {
+                "label": "wooden"
+              },
+              {
+                "label": "ceiling"
+              },
+              {
+                "label": "cluttered"
+              },
+              {
+                "label": "various"
+              },
+              {
+                "label": "items"
+              },
+              {
+                "label": "such"
+              },
+              {
+                "label": "sink"
+              },
+              {
+                "label": "stove"
+              },
+              {
+                "label": "oven"
+              },
+              {
+                "label": "cabinets"
+              },
+              {
+                "label": "several"
+              },
+              {
+                "label": "trash"
+              },
+              {
+                "label": "cans"
+              },
+              {
+                "label": "debris"
+              },
+              {
+                "label": "scattered"
+              },
+              {
+                "label": "around"
+              },
+              {
+                "label": "room"
+              },
+              {
+                "label": "including"
+              },
+              {
+                "label": "chair"
+              },
+              {
+                "label": "pile"
+              },
+              {
+                "label": "floor"
+              },
+              {
+                "label": "covered"
+              },
+              {
+                "label": "window"
+              },
+              {
+                "label": "left"
+              },
+              {
+                "label": "lets"
+              },
+              {
+                "label": "natural"
+              },
+              {
+                "label": "light"
+              },
+              {
+                "label": "overall"
+              },
+              {
+                "label": "atmosphere"
+              },
+              {
+                "label": "one"
+              },
+              {
+                "label": "neglect"
+              },
+              {
+                "label": "abandonment"
+              }
+            ],
+            "model": "florence_2",
+            "inference_time_ms": 1648.71,
+            "total_tags": 53
+          }
+        },
+        "total_discovery_time_ms": 1887.88
+      }
     }
   }
 }

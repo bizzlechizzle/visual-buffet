@@ -926,18 +926,43 @@ def gui(host: str, port: int, no_browser: bool) -> None:
 # ============================================================================
 
 
+def _resolve_vocab_db(app: str | None, db_path: str) -> str:
+    """Resolve vocabulary database path from --app or --db."""
+    if app:
+        from vocablearn import AppConfig
+        config = AppConfig(app)
+        return str(config.vocab_db)
+    return db_path
+
+
+def _resolve_ocr_db(app: str | None, db_path: str) -> str:
+    """Resolve OCR database path from --app or --db."""
+    if app:
+        from vocablearn import AppConfig
+        config = AppConfig(app)
+        return str(config.ocr_db)
+    return db_path
+
+
 @main.group()
 def vocab() -> None:
     """Vocabulary learning commands.
 
     Track and learn from tagging results over time.
+
+    Use --app to specify an app name for isolated database storage:
+
+        visual-buffet vocab stats --app abandoned-archive
+
+    This stores data in ~/.abandoned-archive/data/vocabulary.db
     """
     pass
 
 
 @vocab.command("stats")
+@click.option("--app", help="App name for isolated database (e.g., abandoned-archive)")
 @click.option("--db", "db_path", default="vocabulary.db", help="Vocabulary database path")
-def vocab_stats(db_path: str) -> None:
+def vocab_stats(app: str | None, db_path: str) -> None:
     """Show vocabulary statistics.
 
     Displays counts of tags, feedback, calibration data, and model agreement.
@@ -945,7 +970,8 @@ def vocab_stats(db_path: str) -> None:
     try:
         from visual_buffet.vocab_integration import VocabIntegration
 
-        vocab = VocabIntegration(db_path)
+        resolved_db = _resolve_vocab_db(app, db_path)
+        vocab = VocabIntegration(resolved_db)
         stats = vocab.get_statistics()
 
         table = Table(title="Vocabulary Statistics")
@@ -975,10 +1001,11 @@ def vocab_stats(db_path: str) -> None:
 
 @vocab.command("search")
 @click.argument("query", required=False)
+@click.option("--app", help="App name for isolated database (e.g., abandoned-archive)")
 @click.option("--db", "db_path", default="vocabulary.db", help="Vocabulary database path")
 @click.option("--min-count", default=1, help="Minimum occurrence count")
 @click.option("--limit", default=50, help="Maximum results")
-def vocab_search(query: str | None, db_path: str, min_count: int, limit: int) -> None:
+def vocab_search(query: str | None, app: str | None, db_path: str, min_count: int, limit: int) -> None:
     """Search vocabulary entries.
 
     QUERY is an optional prefix to search for.
@@ -986,7 +1013,8 @@ def vocab_search(query: str | None, db_path: str, min_count: int, limit: int) ->
     try:
         from visual_buffet.vocab_integration import VocabIntegration
 
-        vocab = VocabIntegration(db_path)
+        resolved_db = _resolve_vocab_db(app, db_path)
+        vocab = VocabIntegration(resolved_db)
         tags = vocab.vocab.search_vocabulary(
             query=query,
             min_occurrences=min_count,
@@ -1027,8 +1055,9 @@ def vocab_search(query: str | None, db_path: str, min_count: int, limit: int) ->
 
 @vocab.command("export")
 @click.argument("output", type=click.Path())
+@click.option("--app", help="App name for isolated database (e.g., abandoned-archive)")
 @click.option("--db", "db_path", default="vocabulary.db", help="Vocabulary database path")
-def vocab_export(output: str, db_path: str) -> None:
+def vocab_export(output: str, app: str | None, db_path: str) -> None:
     """Export vocabulary to JSON file.
 
     OUTPUT is the destination file path.
@@ -1036,7 +1065,8 @@ def vocab_export(output: str, db_path: str) -> None:
     try:
         from visual_buffet.vocab_integration import VocabIntegration
 
-        vocab = VocabIntegration(db_path)
+        resolved_db = _resolve_vocab_db(app, db_path)
+        vocab = VocabIntegration(resolved_db)
         vocab.export_vocabulary(output)
         console.print(f"[green]Vocabulary exported to {output}[/green]")
 
@@ -1050,9 +1080,10 @@ def vocab_export(output: str, db_path: str) -> None:
 
 @vocab.command("import")
 @click.argument("input_file", type=click.Path(exists=True))
+@click.option("--app", help="App name for isolated database (e.g., abandoned-archive)")
 @click.option("--db", "db_path", default="vocabulary.db", help="Vocabulary database path")
 @click.option("--merge/--replace", default=True, help="Merge with existing or replace")
-def vocab_import(input_file: str, db_path: str, merge: bool) -> None:
+def vocab_import(input_file: str, app: str | None, db_path: str, merge: bool) -> None:
     """Import vocabulary from JSON file.
 
     INPUT_FILE is the source vocabulary file.
@@ -1060,7 +1091,8 @@ def vocab_import(input_file: str, db_path: str, merge: bool) -> None:
     try:
         from visual_buffet.vocab_integration import VocabIntegration
 
-        vocab = VocabIntegration(db_path)
+        resolved_db = _resolve_vocab_db(app, db_path)
+        vocab = VocabIntegration(resolved_db)
         count = vocab.import_vocabulary(input_file, merge=merge)
         console.print(f"[green]Imported {count} tags[/green]")
 
@@ -1073,9 +1105,10 @@ def vocab_import(input_file: str, db_path: str, merge: bool) -> None:
 
 
 @vocab.command("learn")
+@click.option("--app", help="App name for isolated database (e.g., abandoned-archive)")
 @click.option("--db", "db_path", default="vocabulary.db", help="Vocabulary database path")
 @click.option("--min-samples", default=5, help="Minimum samples for prior updates")
-def vocab_learn(db_path: str, min_samples: int) -> None:
+def vocab_learn(app: str | None, db_path: str, min_samples: int) -> None:
     """Update priors and calibrators from feedback.
 
     Recalculates Bayesian priors and rebuilds isotonic regression
@@ -1084,7 +1117,8 @@ def vocab_learn(db_path: str, min_samples: int) -> None:
     try:
         from visual_buffet.vocab_integration import VocabIntegration
 
-        vocab = VocabIntegration(db_path)
+        resolved_db = _resolve_vocab_db(app, db_path)
+        vocab = VocabIntegration(resolved_db)
         result = vocab.update_learning(min_samples=min_samples)
 
         console.print(f"[green]Updated {result['priors_updated']} priors[/green]")
@@ -1099,6 +1133,7 @@ def vocab_learn(db_path: str, min_samples: int) -> None:
 
 
 @vocab.command("review")
+@click.option("--app", help="App name for isolated database (e.g., abandoned-archive)")
 @click.option("--db", "db_path", default="vocabulary.db", help="Vocabulary database path")
 @click.option("-n", "--count", default=10, help="Number of images to select")
 @click.option(
@@ -1107,7 +1142,7 @@ def vocab_learn(db_path: str, min_samples: int) -> None:
     default="uncertainty",
     help="Selection strategy",
 )
-def vocab_review(db_path: str, count: int, strategy: str) -> None:
+def vocab_review(app: str | None, db_path: str, count: int, strategy: str) -> None:
     """Select images for human review.
 
     Uses active learning to prioritize images that would
@@ -1121,7 +1156,8 @@ def vocab_review(db_path: str, count: int, strategy: str) -> None:
     try:
         from visual_buffet.vocab_integration import VocabIntegration
 
-        vocab = VocabIntegration(db_path)
+        resolved_db = _resolve_vocab_db(app, db_path)
+        vocab = VocabIntegration(resolved_db)
         candidates = vocab.select_for_review(n=count, strategy=strategy)
 
         if not candidates:

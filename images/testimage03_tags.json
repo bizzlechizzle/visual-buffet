@@ -1,98 +1,612 @@
 {
   "file": "/Volumes/projects/visual-buffet/images/testimage03.jpg",
   "filename": "testimage03.jpg",
-  "tagged_at": "2025-12-24T16:05:21.812322+00:00",
-  "threshold": 0.5,
-  "size": "original",
-  "inference_time_ms": 726.82,
+  "tagged_at": "2025-12-24T19:12:45.046563+00:00",
   "results": {
-    "florence_2": {
-      "tags": [],
-      "model": "florence_2"
-    },
     "siglip": {
       "tags": [
         {
           "label": "pews",
-          "confidence": 0.9812939763069153,
-          "plugin": "siglip"
+          "confidence": 0.9812939763069153
         },
         {
           "label": "wooden_pews",
-          "confidence": 0.9581219553947449,
-          "plugin": "siglip"
+          "confidence": 0.9581219553947449
         },
         {
           "label": "church bench",
-          "confidence": 0.8202000856399536,
-          "plugin": "siglip"
+          "confidence": 0.8202000856399536
         },
         {
           "label": "pulpit",
-          "confidence": 0.7742975354194641,
-          "plugin": "siglip"
+          "confidence": 0.7742975354194641
         },
         {
           "label": "chapel",
-          "confidence": 0.6588369011878967,
-          "plugin": "siglip"
+          "confidence": 0.6588369011878967
         },
         {
           "label": "church",
-          "confidence": 0.6585718989372253,
-          "plugin": "siglip"
+          "confidence": 0.6585718989372253
         },
         {
           "label": "cross",
-          "confidence": 0.32446736097335815,
-          "plugin": "siglip"
+          "confidence": 0.32446736097335815
         },
         {
           "label": "altar",
-          "confidence": 0.30695271492004395,
-          "plugin": "siglip"
+          "confidence": 0.30695271492004395
         },
         {
           "label": "religious",
-          "confidence": 0.238851398229599,
-          "plugin": "siglip"
+          "confidence": 0.238851398229599
         },
         {
           "label": "wooden_altar",
-          "confidence": 0.2196284830570221,
-          "plugin": "siglip"
+          "confidence": 0.2196284830570221
         },
         {
           "label": "religion",
-          "confidence": 0.1722506880760193,
-          "plugin": "siglip"
+          "confidence": 0.1722506880760193
         },
         {
           "label": "cross_hanging",
-          "confidence": 0.07217367738485336,
-          "plugin": "siglip"
+          "confidence": 0.07217367738485336
         },
         {
           "label": "empty",
-          "confidence": 0.050012510269880295,
-          "plugin": "siglip"
+          "confidence": 0.050012510269880295
         },
         {
           "label": "crucifix",
-          "confidence": 0.04696379601955414,
-          "plugin": "siglip"
+          "confidence": 0.04696379601955414
         },
         {
           "label": "neglect",
-          "confidence": 0.010091696865856647,
-          "plugin": "siglip"
+          "confidence": 0.010091696865856647
         }
       ],
-      "model": "siglip"
-    },
-    "ram_plus": {
-      "tags": [],
-      "model": "ram_plus"
+      "model": "siglip",
+      "version": "1.0.0",
+      "size": "original",
+      "inference_time_ms": 707.13,
+      "metadata": {
+        "discovery_mode": true,
+        "discovery_sources": [
+          "ram_plus",
+          "florence_2"
+        ],
+        "vocabulary_size": 128,
+        "discovery_results": {
+          "ram_plus": {
+            "tags": [
+              {
+                "label": "church",
+                "confidence": 1.0
+              },
+              {
+                "label": "cross",
+                "confidence": 0.993
+              },
+              {
+                "label": "church bench",
+                "confidence": 0.933
+              },
+              {
+                "label": "chapel",
+                "confidence": 0.89
+              },
+              {
+                "label": "row",
+                "confidence": 0.8531
+              },
+              {
+                "label": "chair",
+                "confidence": 0.8174
+              },
+              {
+                "label": "room",
+                "confidence": 0.8047
+              },
+              {
+                "label": "sit",
+                "confidence": 0.8018
+              },
+              {
+                "label": "floor",
+                "confidence": 0.7723
+              },
+              {
+                "label": "line",
+                "confidence": 0.7723
+              },
+              {
+                "label": "aisle",
+                "confidence": 0.7704
+              },
+              {
+                "label": "building",
+                "confidence": 0.7491
+              },
+              {
+                "label": "wall",
+                "confidence": 0.7479
+              },
+              {
+                "label": "bench",
+                "confidence": 0.7255
+              },
+              {
+                "label": "altar",
+                "confidence": 0.7219
+              },
+              {
+                "label": "group",
+                "confidence": 0.7202
+              },
+              {
+                "label": "green",
+                "confidence": 0.7141
+              },
+              {
+                "label": "side",
+                "confidence": 0.7084
+              },
+              {
+                "label": "light",
+                "confidence": 0.6944
+              },
+              {
+                "label": "fill",
+                "confidence": 0.6908
+              },
+              {
+                "label": "couple",
+                "confidence": 0.6907
+              },
+              {
+                "label": "table",
+                "confidence": 0.6783
+              },
+              {
+                "label": "place",
+                "confidence": 0.6745
+              },
+              {
+                "label": "person",
+                "confidence": 0.6664
+              },
+              {
+                "label": "white",
+                "confidence": 0.6633
+              },
+              {
+                "label": "photo",
+                "confidence": 0.6604
+              },
+              {
+                "label": "area",
+                "confidence": 0.659
+              },
+              {
+                "label": "see",
+                "confidence": 0.658
+              },
+              {
+                "label": "religious",
+                "confidence": 0.6558
+              },
+              {
+                "label": "back",
+                "confidence": 0.6551
+              },
+              {
+                "label": "garbage",
+                "confidence": 0.6532
+              },
+              {
+                "label": "debris",
+                "confidence": 0.6529
+              },
+              {
+                "label": "set",
+                "confidence": 0.6493
+              },
+              {
+                "label": "picture",
+                "confidence": 0.6486
+              },
+              {
+                "label": "stand",
+                "confidence": 0.644
+              },
+              {
+                "label": "seat",
+                "confidence": 0.6417
+              },
+              {
+                "label": "break",
+                "confidence": 0.6405
+              },
+              {
+                "label": "dark",
+                "confidence": 0.6392
+              },
+              {
+                "label": "image",
+                "confidence": 0.6386
+              },
+              {
+                "label": "carpet",
+                "confidence": 0.635
+              },
+              {
+                "label": "ceiling",
+                "confidence": 0.6306
+              },
+              {
+                "label": "pillar",
+                "confidence": 0.628
+              },
+              {
+                "label": "black",
+                "confidence": 0.6247
+              },
+              {
+                "label": "crucifix",
+                "confidence": 0.6243
+              },
+              {
+                "label": "sunshine",
+                "confidence": 0.6228
+              },
+              {
+                "label": "surround",
+                "confidence": 0.619
+              },
+              {
+                "label": "close-up",
+                "confidence": 0.6182
+              },
+              {
+                "label": "blanket",
+                "confidence": 0.6172
+              },
+              {
+                "label": "wood",
+                "confidence": 0.6141
+              },
+              {
+                "label": "number",
+                "confidence": 0.61
+              },
+              {
+                "label": "stain",
+                "confidence": 0.6063
+              },
+              {
+                "label": "make",
+                "confidence": 0.6061
+              },
+              {
+                "label": "open",
+                "confidence": 0.6056
+              },
+              {
+                "label": "door",
+                "confidence": 0.6042
+              },
+              {
+                "label": "brown",
+                "confidence": 0.6
+              },
+              {
+                "label": "grass",
+                "confidence": 0.5924
+              },
+              {
+                "label": "lay",
+                "confidence": 0.5904
+              },
+              {
+                "label": "lie",
+                "confidence": 0.5874
+              },
+              {
+                "label": "shine",
+                "confidence": 0.5863
+              },
+              {
+                "label": "hang",
+                "confidence": 0.5831
+              },
+              {
+                "label": "peak",
+                "confidence": 0.5821
+              },
+              {
+                "label": "worship",
+                "confidence": 0.5794
+              },
+              {
+                "label": "window",
+                "confidence": 0.5792
+              },
+              {
+                "label": "beam",
+                "confidence": 0.5706
+              },
+              {
+                "label": "five",
+                "confidence": 0.5703
+              },
+              {
+                "label": "clock",
+                "confidence": 0.5661
+              },
+              {
+                "label": "show",
+                "confidence": 0.5613
+              },
+              {
+                "label": "corner",
+                "confidence": 0.5601
+              },
+              {
+                "label": "daylight",
+                "confidence": 0.5568
+              },
+              {
+                "label": "walk",
+                "confidence": 0.5508
+              },
+              {
+                "label": "website",
+                "confidence": 0.5505
+              },
+              {
+                "label": "lead",
+                "confidence": 0.55
+              },
+              {
+                "label": "take",
+                "confidence": 0.5483
+              },
+              {
+                "label": "choir",
+                "confidence": 0.5479
+              },
+              {
+                "label": "scene",
+                "confidence": 0.5423
+              },
+              {
+                "label": "type",
+                "confidence": 0.5389
+              },
+              {
+                "label": "mountain",
+                "confidence": 0.5385
+              },
+              {
+                "label": "dirt",
+                "confidence": 0.5383
+              },
+              {
+                "label": "bright",
+                "confidence": 0.5375
+              },
+              {
+                "label": "face",
+                "confidence": 0.5344
+              },
+              {
+                "label": "pulpit",
+                "confidence": 0.532
+              },
+              {
+                "label": "house",
+                "confidence": 0.5302
+              },
+              {
+                "label": "contain",
+                "confidence": 0.5295
+              },
+              {
+                "label": "religion",
+                "confidence": 0.5288
+              },
+              {
+                "label": "structure",
+                "confidence": 0.5261
+              },
+              {
+                "label": "use",
+                "confidence": 0.5258
+              },
+              {
+                "label": "blue",
+                "confidence": 0.5248
+              },
+              {
+                "label": "beautiful",
+                "confidence": 0.5247
+              },
+              {
+                "label": "build",
+                "confidence": 0.5211
+              },
+              {
+                "label": "draw",
+                "confidence": 0.5203
+              },
+              {
+                "label": "service",
+                "confidence": 0.5196
+              },
+              {
+                "label": "display",
+                "confidence": 0.519
+              },
+              {
+                "label": "lead to",
+                "confidence": 0.5175
+              },
+              {
+                "label": "color",
+                "confidence": 0.5152
+              },
+              {
+                "label": "stair",
+                "confidence": 0.515
+              },
+              {
+                "label": "gray",
+                "confidence": 0.5147
+              },
+              {
+                "label": "shelf",
+                "confidence": 0.5144
+              },
+              {
+                "label": "path",
+                "confidence": 0.5128
+              },
+              {
+                "label": "mark",
+                "confidence": 0.5107
+              },
+              {
+                "label": "shadow",
+                "confidence": 0.5079
+              },
+              {
+                "label": "ceremony",
+                "confidence": 0.5073
+              },
+              {
+                "label": "concrete",
+                "confidence": 0.5047
+              },
+              {
+                "label": "man",
+                "confidence": 0.5032
+              },
+              {
+                "label": "window screen",
+                "confidence": 0.5015
+              }
+            ],
+            "model": "ram_plus",
+            "inference_time_ms": 166.99,
+            "total_tags": 104
+          },
+          "florence_2": {
+            "tags": [
+              {
+                "label": "wooden_pews"
+              },
+              {
+                "label": "wooden_altar"
+              },
+              {
+                "label": "cross_hanging"
+              },
+              {
+                "label": "painted_white"
+              },
+              {
+                "label": "two_chandeliers"
+              },
+              {
+                "label": "chandeliers_hanging"
+              },
+              {
+                "label": "overall_atmosphere"
+              },
+              {
+                "label": "interior"
+              },
+              {
+                "label": "church"
+              },
+              {
+                "label": "rows"
+              },
+              {
+                "label": "wooden"
+              },
+              {
+                "label": "pews"
+              },
+              {
+                "label": "side"
+              },
+              {
+                "label": "empty"
+              },
+              {
+                "label": "floor"
+              },
+              {
+                "label": "covered"
+              },
+              {
+                "label": "debris"
+              },
+              {
+                "label": "center"
+              },
+              {
+                "label": "altar"
+              },
+              {
+                "label": "cross"
+              },
+              {
+                "label": "hanging"
+              },
+              {
+                "label": "walls"
+              },
+              {
+                "label": "painted"
+              },
+              {
+                "label": "white"
+              },
+              {
+                "label": "two"
+              },
+              {
+                "label": "chandeliers"
+              },
+              {
+                "label": "ceiling"
+              },
+              {
+                "label": "overall"
+              },
+              {
+                "label": "atmosphere"
+              },
+              {
+                "label": "one"
+              },
+              {
+                "label": "decay"
+              },
+              {
+                "label": "neglect"
+              }
+            ],
+            "model": "florence_2",
+            "inference_time_ms": 1144.99,
+            "total_tags": 32
+          }
+        },
+        "total_discovery_time_ms": 1311.98
+      }
     }
   }
 }

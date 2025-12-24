@@ -1,0 +1,834 @@
+{
+  "threshold": 0.3,
+  "images_dir": "/Volumes/projects/visual-buffet/images",
+  "results": [
+    {
+      "image_path": "/Volumes/projects/visual-buffet/images/16195360_1469198399779947_1598506099658570170_n.jpg",
+      "image_name": "16195360_1469198399779947_1598506099658570170_n.jpg",
+      "has_text": false,
+      "results": {
+        "PaddleOCR": {
+          "engine": "PaddleOCR",
+          "texts": [],
+          "confidences": [],
+          "inference_time_ms": 0,
+          "error": "unsupported operand type(s) for |: 'type' and 'NoneType'"
+        },
+        "EasyOCR": {
+          "engine": "EasyOCR",
+          "texts": [],
+          "confidences": [],
+          "inference_time_ms": 0,
+          "error": "unsupported operand type(s) for |: 'type' and 'NoneType'"
+        },
+        "docTR": {
+          "engine": "docTR",
+          "texts": [],
+          "confidences": [],
+          "inference_time_ms": 0,
+          "error": "unsupported operand type(s) for |: 'type' and 'NoneType'"
+        },
+        "Florence-2": {
+          "engine": "Florence-2",
+          "texts": [],
+          "confidences": [],
+          "inference_time_ms": 0,
+          "error": "unsupported operand type(s) for |: 'type' and 'NoneType'"
+        }
+      },
+      "unique_findings": {}
+    },
+    {
+      "image_path": "/Volumes/projects/visual-buffet/images/5c80a25be26b6.image.jpeg",
+      "image_name": "5c80a25be26b6.image.jpeg",
+      "has_text": false,
+      "results": {
+        "PaddleOCR": {
+          "engine": "PaddleOCR",
+          "texts": [],
+          "confidences": [],
+          "inference_time_ms": 0,
+          "error": "unsupported operand type(s) for |: 'type' and 'NoneType'"
+        },
+        "EasyOCR": {
+          "engine": "EasyOCR",
+          "texts": [],
+          "confidences": [],
+          "inference_time_ms": 0,
+          "error": "unsupported operand type(s) for |: 'type' and 'NoneType'"
+        },
+        "docTR": {
+          "engine": "docTR",
+          "texts": [],
+          "confidences": [],
+          "inference_time_ms": 0,
+          "error": "unsupported operand type(s) for |: 'type' and 'NoneType'"
+        },
+        "Florence-2": {
+          "engine": "Florence-2",
+          "texts": [],
+          "confidences": [],
+          "inference_time_ms": 0,
+          "error": "unsupported operand type(s) for |: 'type' and 'NoneType'"
+        }
+      },
+      "unique_findings": {}
+    },
+    {
+      "image_path": "/Volumes/projects/visual-buffet/images/5c80a6e942b29.image.jpeg",
+      "image_name": "5c80a6e942b29.image.jpeg",
+      "has_text": false,
+      "results": {
+        "PaddleOCR": {
+          "engine": "PaddleOCR",
+          "texts": [],
+          "confidences": [],
+          "inference_time_ms": 0,
+          "error": "unsupported operand type(s) for |: 'type' and 'NoneType'"
+        },
+        "EasyOCR": {
+          "engine": "EasyOCR",
+          "texts": [],
+          "confidences": [],
+          "inference_time_ms": 0,
+          "error": "unsupported operand type(s) for |: 'type' and 'NoneType'"
+        },
+        "docTR": {
+          "engine": "docTR",
+          "texts": [],
+          "confidences": [],
+          "inference_time_ms": 0,
+          "error": "unsupported operand type(s) for |: 'type' and 'NoneType'"
+        },
+        "Florence-2": {
+          "engine": "Florence-2",
+          "texts": [],
+          "confidences": [],
+          "inference_time_ms": 0,
+          "error": "unsupported operand type(s) for |: 'type' and 'NoneType'"
+        }
+      },
+      "unique_findings": {}
+    },
+    {
+      "image_path": "/Volumes/projects/visual-buffet/images/Bus Mechanic House (2).jpg",
+      "image_name": "Bus Mechanic House (2).jpg",
+      "has_text": false,
+      "results": {
+        "PaddleOCR": {
+          "engine": "PaddleOCR",
+          "texts": [],
+          "confidences": [],
+          "inference_time_ms": 0,
+          "error": "unsupported operand type(s) for |: 'type' and 'NoneType'"
+        },
+        "EasyOCR": {
+          "engine": "EasyOCR",
+          "texts": [],
+          "confidences": [],
+          "inference_time_ms": 0,
+          "error": "unsupported operand type(s) for |: 'type' and 'NoneType'"
+        },
+        "docTR": {
+          "engine": "docTR",
+          "texts": [],
+          "confidences": [],
+          "inference_time_ms": 0,
+          "error": "unsupported operand type(s) for |: 'type' and 'NoneType'"
+        },
+        "Florence-2": {
+          "engine": "Florence-2",
+          "texts": [],
+          "confidences": [],
+          "inference_time_ms": 0,
+          "error": "unsupported operand type(s) for |: 'type' and 'NoneType'"
+        }
+      },
+      "unique_findings": {}
+    },
+    {
+      "image_path": "/Volumes/projects/visual-buffet/images/Bus Mechanic House (23).jpg",
+      "image_name": "Bus Mechanic House (23).jpg",
+      "has_text": false,
+      "results": {
+        "PaddleOCR": {
+          "engine": "PaddleOCR",
+          "texts": [],
+          "confidences": [],
+          "inference_time_ms": 0,
+          "error": "unsupported operand type(s) for |: 'type' and 'NoneType'"
+        },
+        "EasyOCR": {
+          "engine": "EasyOCR",
+          "texts": [],
+          "confidences": [],
+          "inference_time_ms": 0,
+          "error": "unsupported operand type(s) for |: 'type' and 'NoneType'"
+        },
+        "docTR": {
+          "engine": "docTR",
+          "texts": [],
+          "confidences": [],
+          "inference_time_ms": 0,
+          "error": "unsupported operand type(s) for |: 'type' and 'NoneType'"
+        },
+        "Florence-2": {
+          "engine": "Florence-2",
+          "texts": [],
+          "confidences": [],
+          "inference_time_ms": 0,
+          "error": "unsupported operand type(s) for |: 'type' and 'NoneType'"
+        }
+      },
+      "unique_findings": {}
+    },
+    {
+      "image_path": "/Volumes/projects/visual-buffet/images/Bus Mechanic House (5).jpg",
+      "image_name": "Bus Mechanic House (5).jpg",
+      "has_text": false,
+      "results": {
+        "PaddleOCR": {
+          "engine": "PaddleOCR",
+          "texts": [],
+          "confidences": [],
+          "inference_time_ms": 0,
+          "error": "unsupported operand type(s) for |: 'type' and 'NoneType'"
+        },
+        "EasyOCR": {
+          "engine": "EasyOCR",
+          "texts": [],
+          "confidences": [],
+          "inference_time_ms": 0,
+          "error": "unsupported operand type(s) for |: 'type' and 'NoneType'"
+        },
+        "docTR": {
+          "engine": "docTR",
+          "texts": [],
+          "confidences": [],
+          "inference_time_ms": 0,
+          "error": "unsupported operand type(s) for |: 'type' and 'NoneType'"
+        },
+        "Florence-2": {
+          "engine": "Florence-2",
+          "texts": [],
+          "confidences": [],
+          "inference_time_ms": 0,
+          "error": "unsupported operand type(s) for |: 'type' and 'NoneType'"
+        }
+      },
+      "unique_findings": {}
+    },
+    {
+      "image_path": "/Volumes/projects/visual-buffet/images/Bus Mechanic House (6).jpg",
+      "image_name": "Bus Mechanic House (6).jpg",
+      "has_text": false,
+      "results": {
+        "PaddleOCR": {
+          "engine": "PaddleOCR",
+          "texts": [],
+          "confidences": [],
+          "inference_time_ms": 0,
+          "error": "unsupported operand type(s) for |: 'type' and 'NoneType'"
+        },
+        "EasyOCR": {
+          "engine": "EasyOCR",
+          "texts": [],
+          "confidences": [],
+          "inference_time_ms": 0,
+          "error": "unsupported operand type(s) for |: 'type' and 'NoneType'"
+        },
+        "docTR": {
+          "engine": "docTR",
+          "texts": [],
+          "confidences": [],
+          "inference_time_ms": 0,
+          "error": "unsupported operand type(s) for |: 'type' and 'NoneType'"
+        },
+        "Florence-2": {
+          "engine": "Florence-2",
+          "texts": [],
+          "confidences": [],
+          "inference_time_ms": 0,
+          "error": "unsupported operand type(s) for |: 'type' and 'NoneType'"
+        }
+      },
+      "unique_findings": {}
+    },
+    {
+      "image_path": "/Volumes/projects/visual-buffet/images/_DSC0036.jpg",
+      "image_name": "_DSC0036.jpg",
+      "has_text": false,
+      "results": {
+        "PaddleOCR": {
+          "engine": "PaddleOCR",
+          "texts": [],
+          "confidences": [],
+          "inference_time_ms": 0,
+          "error": "unsupported operand type(s) for |: 'type' and 'NoneType'"
+        },
+        "EasyOCR": {
+          "engine": "EasyOCR",
+          "texts": [],
+          "confidences": [],
+          "inference_time_ms": 0,
+          "error": "unsupported operand type(s) for |: 'type' and 'NoneType'"
+        },
+        "docTR": {
+          "engine": "docTR",
+          "texts": [],
+          "confidences": [],
+          "inference_time_ms": 0,
+          "error": "unsupported operand type(s) for |: 'type' and 'NoneType'"
+        },
+        "Florence-2": {
+          "engine": "Florence-2",
+          "texts": [],
+          "confidences": [],
+          "inference_time_ms": 0,
+          "error": "unsupported operand type(s) for |: 'type' and 'NoneType'"
+        }
+      },
+      "unique_findings": {}
+    },
+    {
+      "image_path": "/Volumes/projects/visual-buffet/images/_DSC1047.jpg",
+      "image_name": "_DSC1047.jpg",
+      "has_text": false,
+      "results": {
+        "PaddleOCR": {
+          "engine": "PaddleOCR",
+          "texts": [],
+          "confidences": [],
+          "inference_time_ms": 0,
+          "error": "unsupported operand type(s) for |: 'type' and 'NoneType'"
+        },
+        "EasyOCR": {
+          "engine": "EasyOCR",
+          "texts": [],
+          "confidences": [],
+          "inference_time_ms": 0,
+          "error": "unsupported operand type(s) for |: 'type' and 'NoneType'"
+        },
+        "docTR": {
+          "engine": "docTR",
+          "texts": [],
+          "confidences": [],
+          "inference_time_ms": 0,
+          "error": "unsupported operand type(s) for |: 'type' and 'NoneType'"
+        },
+        "Florence-2": {
+          "engine": "Florence-2",
+          "texts": [],
+          "confidences": [],
+          "inference_time_ms": 0,
+          "error": "unsupported operand type(s) for |: 'type' and 'NoneType'"
+        }
+      },
+      "unique_findings": {}
+    },
+    {
+      "image_path": "/Volumes/projects/visual-buffet/images/img012.tif",
+      "image_name": "img012.tif",
+      "has_text": false,
+      "results": {
+        "PaddleOCR": {
+          "engine": "PaddleOCR",
+          "texts": [],
+          "confidences": [],
+          "inference_time_ms": 0,
+          "error": "unsupported operand type(s) for |: 'type' and 'NoneType'"
+        },
+        "EasyOCR": {
+          "engine": "EasyOCR",
+          "texts": [],
+          "confidences": [],
+          "inference_time_ms": 0,
+          "error": "unsupported operand type(s) for |: 'type' and 'NoneType'"
+        },
+        "docTR": {
+          "engine": "docTR",
+          "texts": [],
+          "confidences": [],
+          "inference_time_ms": 0,
+          "error": "unsupported operand type(s) for |: 'type' and 'NoneType'"
+        },
+        "Florence-2": {
+          "engine": "Florence-2",
+          "texts": [],
+          "confidences": [],
+          "inference_time_ms": 0,
+          "error": "unsupported operand type(s) for |: 'type' and 'NoneType'"
+        }
+      },
+      "unique_findings": {}
+    },
+    {
+      "image_path": "/Volumes/projects/visual-buffet/images/img017 copy.jpg",
+      "image_name": "img017 copy.jpg",
+      "has_text": false,
+      "results": {
+        "PaddleOCR": {
+          "engine": "PaddleOCR",
+          "texts": [],
+          "confidences": [],
+          "inference_time_ms": 0,
+          "error": "unsupported operand type(s) for |: 'type' and 'NoneType'"
+        },
+        "EasyOCR": {
+          "engine": "EasyOCR",
+          "texts": [],
+          "confidences": [],
+          "inference_time_ms": 0,
+          "error": "unsupported operand type(s) for |: 'type' and 'NoneType'"
+        },
+        "docTR": {
+          "engine": "docTR",
+          "texts": [],
+          "confidences": [],
+          "inference_time_ms": 0,
+          "error": "unsupported operand type(s) for |: 'type' and 'NoneType'"
+        },
+        "Florence-2": {
+          "engine": "Florence-2",
+          "texts": [],
+          "confidences": [],
+          "inference_time_ms": 0,
+          "error": "unsupported operand type(s) for |: 'type' and 'NoneType'"
+        }
+      },
+      "unique_findings": {}
+    },
+    {
+      "image_path": "/Volumes/projects/visual-buffet/images/testimage01.jpg",
+      "image_name": "testimage01.jpg",
+      "has_text": false,
+      "results": {
+        "PaddleOCR": {
+          "engine": "PaddleOCR",
+          "texts": [],
+          "confidences": [],
+          "inference_time_ms": 0,
+          "error": "unsupported operand type(s) for |: 'type' and 'NoneType'"
+        },
+        "EasyOCR": {
+          "engine": "EasyOCR",
+          "texts": [],
+          "confidences": [],
+          "inference_time_ms": 0,
+          "error": "unsupported operand type(s) for |: 'type' and 'NoneType'"
+        },
+        "docTR": {
+          "engine": "docTR",
+          "texts": [],
+          "confidences": [],
+          "inference_time_ms": 0,
+          "error": "unsupported operand type(s) for |: 'type' and 'NoneType'"
+        },
+        "Florence-2": {
+          "engine": "Florence-2",
+          "texts": [],
+          "confidences": [],
+          "inference_time_ms": 0,
+          "error": "unsupported operand type(s) for |: 'type' and 'NoneType'"
+        }
+      },
+      "unique_findings": {}
+    },
+    {
+      "image_path": "/Volumes/projects/visual-buffet/images/testimage02.jpg",
+      "image_name": "testimage02.jpg",
+      "has_text": false,
+      "results": {
+        "PaddleOCR": {
+          "engine": "PaddleOCR",
+          "texts": [],
+          "confidences": [],
+          "inference_time_ms": 0,
+          "error": "unsupported operand type(s) for |: 'type' and 'NoneType'"
+        },
+        "EasyOCR": {
+          "engine": "EasyOCR",
+          "texts": [],
+          "confidences": [],
+          "inference_time_ms": 0,
+          "error": "unsupported operand type(s) for |: 'type' and 'NoneType'"
+        },
+        "docTR": {
+          "engine": "docTR",
+          "texts": [],
+          "confidences": [],
+          "inference_time_ms": 0,
+          "error": "unsupported operand type(s) for |: 'type' and 'NoneType'"
+        },
+        "Florence-2": {
+          "engine": "Florence-2",
+          "texts": [],
+          "confidences": [],
+          "inference_time_ms": 0,
+          "error": "unsupported operand type(s) for |: 'type' and 'NoneType'"
+        }
+      },
+      "unique_findings": {}
+    },
+    {
+      "image_path": "/Volumes/projects/visual-buffet/images/testimage03.jpg",
+      "image_name": "testimage03.jpg",
+      "has_text": false,
+      "results": {
+        "PaddleOCR": {
+          "engine": "PaddleOCR",
+          "texts": [],
+          "confidences": [],
+          "inference_time_ms": 0,
+          "error": "unsupported operand type(s) for |: 'type' and 'NoneType'"
+        },
+        "EasyOCR": {
+          "engine": "EasyOCR",
+          "texts": [],
+          "confidences": [],
+          "inference_time_ms": 0,
+          "error": "unsupported operand type(s) for |: 'type' and 'NoneType'"
+        },
+        "docTR": {
+          "engine": "docTR",
+          "texts": [],
+          "confidences": [],
+          "inference_time_ms": 0,
+          "error": "unsupported operand type(s) for |: 'type' and 'NoneType'"
+        },
+        "Florence-2": {
+          "engine": "Florence-2",
+          "texts": [],
+          "confidences": [],
+          "inference_time_ms": 0,
+          "error": "unsupported operand type(s) for |: 'type' and 'NoneType'"
+        }
+      },
+      "unique_findings": {}
+    },
+    {
+      "image_path": "/Volumes/projects/visual-buffet/images/testimage04.jpg",
+      "image_name": "testimage04.jpg",
+      "has_text": false,
+      "results": {
+        "PaddleOCR": {
+          "engine": "PaddleOCR",
+          "texts": [],
+          "confidences": [],
+          "inference_time_ms": 0,
+          "error": "unsupported operand type(s) for |: 'type' and 'NoneType'"
+        },
+        "EasyOCR": {
+          "engine": "EasyOCR",
+          "texts": [],
+          "confidences": [],
+          "inference_time_ms": 0,
+          "error": "unsupported operand type(s) for |: 'type' and 'NoneType'"
+        },
+        "docTR": {
+          "engine": "docTR",
+          "texts": [],
+          "confidences": [],
+          "inference_time_ms": 0,
+          "error": "unsupported operand type(s) for |: 'type' and 'NoneType'"
+        },
+        "Florence-2": {
+          "engine": "Florence-2",
+          "texts": [],
+          "confidences": [],
+          "inference_time_ms": 0,
+          "error": "unsupported operand type(s) for |: 'type' and 'NoneType'"
+        }
+      },
+      "unique_findings": {}
+    },
+    {
+      "image_path": "/Volumes/projects/visual-buffet/images/testimage05.jpg",
+      "image_name": "testimage05.jpg",
+      "has_text": false,
+      "results": {
+        "PaddleOCR": {
+          "engine": "PaddleOCR",
+          "texts": [],
+          "confidences": [],
+          "inference_time_ms": 0,
+          "error": "unsupported operand type(s) for |: 'type' and 'NoneType'"
+        },
+        "EasyOCR": {
+          "engine": "EasyOCR",
+          "texts": [],
+          "confidences": [],
+          "inference_time_ms": 0,
+          "error": "unsupported operand type(s) for |: 'type' and 'NoneType'"
+        },
+        "docTR": {
+          "engine": "docTR",
+          "texts": [],
+          "confidences": [],
+          "inference_time_ms": 0,
+          "error": "unsupported operand type(s) for |: 'type' and 'NoneType'"
+        },
+        "Florence-2": {
+          "engine": "Florence-2",
+          "texts": [],
+          "confidences": [],
+          "inference_time_ms": 0,
+          "error": "unsupported operand type(s) for |: 'type' and 'NoneType'"
+        }
+      },
+      "unique_findings": {}
+    },
+    {
+      "image_path": "/Volumes/projects/visual-buffet/images/testimage06.jpg",
+      "image_name": "testimage06.jpg",
+      "has_text": false,
+      "results": {
+        "PaddleOCR": {
+          "engine": "PaddleOCR",
+          "texts": [],
+          "confidences": [],
+          "inference_time_ms": 0,
+          "error": "unsupported operand type(s) for |: 'type' and 'NoneType'"
+        },
+        "EasyOCR": {
+          "engine": "EasyOCR",
+          "texts": [],
+          "confidences": [],
+          "inference_time_ms": 0,
+          "error": "unsupported operand type(s) for |: 'type' and 'NoneType'"
+        },
+        "docTR": {
+          "engine": "docTR",
+          "texts": [],
+          "confidences": [],
+          "inference_time_ms": 0,
+          "error": "unsupported operand type(s) for |: 'type' and 'NoneType'"
+        },
+        "Florence-2": {
+          "engine": "Florence-2",
+          "texts": [],
+          "confidences": [],
+          "inference_time_ms": 0,
+          "error": "unsupported operand type(s) for |: 'type' and 'NoneType'"
+        }
+      },
+      "unique_findings": {}
+    },
+    {
+      "image_path": "/Volumes/projects/visual-buffet/images/testimage07.jpg",
+      "image_name": "testimage07.jpg",
+      "has_text": false,
+      "results": {
+        "PaddleOCR": {
+          "engine": "PaddleOCR",
+          "texts": [],
+          "confidences": [],
+          "inference_time_ms": 0,
+          "error": "unsupported operand type(s) for |: 'type' and 'NoneType'"
+        },
+        "EasyOCR": {
+          "engine": "EasyOCR",
+          "texts": [],
+          "confidences": [],
+          "inference_time_ms": 0,
+          "error": "unsupported operand type(s) for |: 'type' and 'NoneType'"
+        },
+        "docTR": {
+          "engine": "docTR",
+          "texts": [],
+          "confidences": [],
+          "inference_time_ms": 0,
+          "error": "unsupported operand type(s) for |: 'type' and 'NoneType'"
+        },
+        "Florence-2": {
+          "engine": "Florence-2",
+          "texts": [],
+          "confidences": [],
+          "inference_time_ms": 0,
+          "error": "unsupported operand type(s) for |: 'type' and 'NoneType'"
+        }
+      },
+      "unique_findings": {}
+    },
+    {
+      "image_path": "/Volumes/projects/visual-buffet/images/testimage08.jpg",
+      "image_name": "testimage08.jpg",
+      "has_text": false,
+      "results": {
+        "PaddleOCR": {
+          "engine": "PaddleOCR",
+          "texts": [],
+          "confidences": [],
+          "inference_time_ms": 0,
+          "error": "unsupported operand type(s) for |: 'type' and 'NoneType'"
+        },
+        "EasyOCR": {
+          "engine": "EasyOCR",
+          "texts": [],
+          "confidences": [],
+          "inference_time_ms": 0,
+          "error": "unsupported operand type(s) for |: 'type' and 'NoneType'"
+        },
+        "docTR": {
+          "engine": "docTR",
+          "texts": [],
+          "confidences": [],
+          "inference_time_ms": 0,
+          "error": "unsupported operand type(s) for |: 'type' and 'NoneType'"
+        },
+        "Florence-2": {
+          "engine": "Florence-2",
+          "texts": [],
+          "confidences": [],
+          "inference_time_ms": 0,
+          "error": "unsupported operand type(s) for |: 'type' and 'NoneType'"
+        }
+      },
+      "unique_findings": {}
+    },
+    {
+      "image_path": "/Volumes/projects/visual-buffet/images/testimage09.jpg",
+      "image_name": "testimage09.jpg",
+      "has_text": false,
+      "results": {
+        "PaddleOCR": {
+          "engine": "PaddleOCR",
+          "texts": [],
+          "confidences": [],
+          "inference_time_ms": 0,
+          "error": "unsupported operand type(s) for |: 'type' and 'NoneType'"
+        },
+        "EasyOCR": {
+          "engine": "EasyOCR",
+          "texts": [],
+          "confidences": [],
+          "inference_time_ms": 0,
+          "error": "unsupported operand type(s) for |: 'type' and 'NoneType'"
+        },
+        "docTR": {
+          "engine": "docTR",
+          "texts": [],
+          "confidences": [],
+          "inference_time_ms": 0,
+          "error": "unsupported operand type(s) for |: 'type' and 'NoneType'"
+        },
+        "Florence-2": {
+          "engine": "Florence-2",
+          "texts": [],
+          "confidences": [],
+          "inference_time_ms": 0,
+          "error": "unsupported operand type(s) for |: 'type' and 'NoneType'"
+        }
+      },
+      "unique_findings": {}
+    },
+    {
+      "image_path": "/Volumes/projects/visual-buffet/images/testimage10.jpg",
+      "image_name": "testimage10.jpg",
+      "has_text": false,
+      "results": {
+        "PaddleOCR": {
+          "engine": "PaddleOCR",
+          "texts": [],
+          "confidences": [],
+          "inference_time_ms": 0,
+          "error": "unsupported operand type(s) for |: 'type' and 'NoneType'"
+        },
+        "EasyOCR": {
+          "engine": "EasyOCR",
+          "texts": [],
+          "confidences": [],
+          "inference_time_ms": 0,
+          "error": "unsupported operand type(s) for |: 'type' and 'NoneType'"
+        },
+        "docTR": {
+          "engine": "docTR",
+          "texts": [],
+          "confidences": [],
+          "inference_time_ms": 0,
+          "error": "unsupported operand type(s) for |: 'type' and 'NoneType'"
+        },
+        "Florence-2": {
+          "engine": "Florence-2",
+          "texts": [],
+          "confidences": [],
+          "inference_time_ms": 0,
+          "error": "unsupported operand type(s) for |: 'type' and 'NoneType'"
+        }
+      },
+      "unique_findings": {}
+    },
+    {
+      "image_path": "/Volumes/projects/visual-buffet/images/the-coliseum-interior-roller-blade-wheels.jpg",
+      "image_name": "the-coliseum-interior-roller-blade-wheels.jpg",
+      "has_text": false,
+      "results": {
+        "PaddleOCR": {
+          "engine": "PaddleOCR",
+          "texts": [],
+          "confidences": [],
+          "inference_time_ms": 0,
+          "error": "unsupported operand type(s) for |: 'type' and 'NoneType'"
+        },
+        "EasyOCR": {
+          "engine": "EasyOCR",
+          "texts": [],
+          "confidences": [],
+          "inference_time_ms": 0,
+          "error": "unsupported operand type(s) for |: 'type' and 'NoneType'"
+        },
+        "docTR": {
+          "engine": "docTR",
+          "texts": [],
+          "confidences": [],
+          "inference_time_ms": 0,
+          "error": "unsupported operand type(s) for |: 'type' and 'NoneType'"
+        },
+        "Florence-2": {
+          "engine": "Florence-2",
+          "texts": [],
+          "confidences": [],
+          "inference_time_ms": 0,
+          "error": "unsupported operand type(s) for |: 'type' and 'NoneType'"
+        }
+      },
+      "unique_findings": {}
+    },
+    {
+      "image_path": "/Volumes/projects/visual-buffet/images/the-coliseum-interior-sign.jpg",
+      "image_name": "the-coliseum-interior-sign.jpg",
+      "has_text": false,
+      "results": {
+        "PaddleOCR": {
+          "engine": "PaddleOCR",
+          "texts": [],
+          "confidences": [],
+          "inference_time_ms": 0,
+          "error": "unsupported operand type(s) for |: 'type' and 'NoneType'"
+        },
+        "EasyOCR": {
+          "engine": "EasyOCR",
+          "texts": [],
+          "confidences": [],
+          "inference_time_ms": 0,
+          "error": "unsupported operand type(s) for |: 'type' and 'NoneType'"
+        },
+        "docTR": {
+          "engine": "docTR",
+          "texts": [],
+          "confidences": [],
+          "inference_time_ms": 0,
+          "error": "unsupported operand type(s) for |: 'type' and 'NoneType'"
+        },
+        "Florence-2": {
+          "engine": "Florence-2",
+          "texts": [],
+          "confidences": [],
+          "inference_time_ms": 0,
+          "error": "unsupported operand type(s) for |: 'type' and 'NoneType'"
+        }
+      },
+      "unique_findings": {}
+    }
+  ]
+}

@@ -1,133 +1,842 @@
 {
   "file": "/Volumes/projects/visual-buffet/images/testimage10.jpg",
   "filename": "testimage10.jpg",
-  "tagged_at": "2025-12-24T16:05:23.256351+00:00",
-  "threshold": 0.5,
-  "size": "original",
-  "inference_time_ms": 967.42,
+  "tagged_at": "2025-12-24T19:13:03.511318+00:00",
   "results": {
-    "florence_2": {
-      "tags": [],
-      "model": "florence_2"
-    },
     "siglip": {
       "tags": [
         {
           "label": "power station",
-          "confidence": 0.5781369805335999,
-          "plugin": "siglip"
+          "confidence": 0.5781369805335999
         },
         {
           "label": "smokestack",
-          "confidence": 0.5236230492591858,
-          "plugin": "siglip"
+          "confidence": 0.5236230492591858
         },
         {
           "label": "mill",
-          "confidence": 0.37197884917259216,
-          "plugin": "siglip"
+          "confidence": 0.37197884917259216
         },
         {
           "label": "large_smokestack",
-          "confidence": 0.33342647552490234,
-          "plugin": "siglip"
+          "confidence": 0.33342647552490234
         },
         {
           "label": "chimney",
-          "confidence": 0.3321743607521057,
-          "plugin": "siglip"
+          "confidence": 0.3321743607521057
         },
         {
           "label": "dilapidated",
-          "confidence": 0.29774725437164307,
-          "plugin": "siglip"
+          "confidence": 0.29774725437164307
         },
         {
           "label": "brick building",
-          "confidence": 0.18412496149539948,
-          "plugin": "siglip"
+          "confidence": 0.18412496149539948
         },
         {
           "label": "tall_chimney",
-          "confidence": 0.17646901309490204,
-          "plugin": "siglip"
+          "confidence": 0.17646901309490204
         },
         {
           "label": "industrial_structure",
-          "confidence": 0.17574037611484528,
-          "plugin": "siglip"
+          "confidence": 0.17574037611484528
         },
         {
           "label": "large_industrial",
-          "confidence": 0.1642996221780777,
-          "plugin": "siglip"
+          "confidence": 0.1642996221780777
         },
         {
           "label": "factory",
-          "confidence": 0.15907281637191772,
-          "plugin": "siglip"
+          "confidence": 0.15907281637191772
         },
         {
           "label": "brick_factory",
-          "confidence": 0.1402921825647354,
-          "plugin": "siglip"
+          "confidence": 0.1402921825647354
         },
         {
           "label": "structure",
-          "confidence": 0.13312913477420807,
-          "plugin": "siglip"
+          "confidence": 0.13312913477420807
         },
         {
           "label": "pond",
-          "confidence": 0.09199820458889008,
-          "plugin": "siglip"
+          "confidence": 0.09199820458889008
         },
         {
           "label": "industry",
-          "confidence": 0.06153926998376846,
-          "plugin": "siglip"
+          "confidence": 0.06153926998376846
         },
         {
           "label": "industrial",
-          "confidence": 0.037400152534246445,
-          "plugin": "siglip"
+          "confidence": 0.037400152534246445
         },
         {
           "label": "building",
-          "confidence": 0.028890272602438927,
-          "plugin": "siglip"
+          "confidence": 0.028890272602438927
         },
         {
           "label": "water",
-          "confidence": 0.020249713212251663,
-          "plugin": "siglip"
+          "confidence": 0.020249713212251663
         },
         {
           "label": "pollution",
-          "confidence": 0.01595200225710869,
-          "plugin": "siglip"
+          "confidence": 0.01595200225710869
         },
         {
           "label": "lake",
-          "confidence": 0.015512609854340553,
-          "plugin": "siglip"
+          "confidence": 0.015512609854340553
         },
         {
           "label": "abandoned",
-          "confidence": 0.015193742699921131,
-          "plugin": "siglip"
+          "confidence": 0.015193742699921131
         },
         {
           "label": "silo",
-          "confidence": 0.013886758126318455,
-          "plugin": "siglip"
+          "confidence": 0.013886758126318455
         }
       ],
-      "model": "siglip"
-    },
-    "ram_plus": {
-      "tags": [],
-      "model": "ram_plus"
+      "model": "siglip",
+      "version": "1.0.0",
+      "size": "original",
+      "inference_time_ms": 982.76,
+      "metadata": {
+        "discovery_mode": true,
+        "discovery_sources": [
+          "ram_plus",
+          "florence_2"
+        ],
+        "vocabulary_size": 178,
+        "discovery_results": {
+          "ram_plus": {
+            "tags": [
+              {
+                "label": "building",
+                "confidence": 1.0
+              },
+              {
+                "label": "factory",
+                "confidence": 0.9671
+              },
+              {
+                "label": "river",
+                "confidence": 0.9323
+              },
+              {
+                "label": "water",
+                "confidence": 0.9287
+              },
+              {
+                "label": "chimney",
+                "confidence": 0.8771
+              },
+              {
+                "label": "body",
+                "confidence": 0.8416
+              },
+              {
+                "label": "sky",
+                "confidence": 0.8352
+              },
+              {
+                "label": "brick building",
+                "confidence": 0.8272
+              },
+              {
+                "label": "plant",
+                "confidence": 0.8191
+              },
+              {
+                "label": "power station",
+                "confidence": 0.8142
+              },
+              {
+                "label": "cloudy",
+                "confidence": 0.7797
+              },
+              {
+                "label": "sit",
+                "confidence": 0.7672
+              },
+              {
+                "label": "tower",
+                "confidence": 0.7421
+              },
+              {
+                "label": "pond",
+                "confidence": 0.7419
+              },
+              {
+                "label": "canal",
+                "confidence": 0.734
+              },
+              {
+                "label": "tree",
+                "confidence": 0.7321
+              },
+              {
+                "label": "side",
+                "confidence": 0.7199
+              },
+              {
+                "label": "stream",
+                "confidence": 0.7187
+              },
+              {
+                "label": "surround",
+                "confidence": 0.7152
+              },
+              {
+                "label": "warehouse",
+                "confidence": 0.715
+              },
+              {
+                "label": "lake",
+                "confidence": 0.7136
+              },
+              {
+                "label": "blue",
+                "confidence": 0.7111
+              },
+              {
+                "label": "cloud",
+                "confidence": 0.7091
+              },
+              {
+                "label": "waterway",
+                "confidence": 0.7008
+              },
+              {
+                "label": "daylight",
+                "confidence": 0.6923
+              },
+              {
+                "label": "mill",
+                "confidence": 0.6901
+              },
+              {
+                "label": "area",
+                "confidence": 0.689
+              },
+              {
+                "label": "grass",
+                "confidence": 0.6838
+              },
+              {
+                "label": "bank",
+                "confidence": 0.6727
+              },
+              {
+                "label": "city",
+                "confidence": 0.672
+              },
+              {
+                "label": "house",
+                "confidence": 0.6691
+              },
+              {
+                "label": "picture",
+                "confidence": 0.6667
+              },
+              {
+                "label": "fill",
+                "confidence": 0.6621
+              },
+              {
+                "label": "white",
+                "confidence": 0.6558
+              },
+              {
+                "label": "red",
+                "confidence": 0.655
+              },
+              {
+                "label": "see",
+                "confidence": 0.6525
+              },
+              {
+                "label": "image",
+                "confidence": 0.6485
+              },
+              {
+                "label": "grow",
+                "confidence": 0.6484
+              },
+              {
+                "label": "stand",
+                "confidence": 0.64
+              },
+              {
+                "label": "photo",
+                "confidence": 0.6392
+              },
+              {
+                "label": "industry",
+                "confidence": 0.6385
+              },
+              {
+                "label": "structure",
+                "confidence": 0.638
+              },
+              {
+                "label": "creek",
+                "confidence": 0.635
+              },
+              {
+                "label": "river bank",
+                "confidence": 0.6346
+              },
+              {
+                "label": "pipe",
+                "confidence": 0.6304
+              },
+              {
+                "label": "church",
+                "confidence": 0.6234
+              },
+              {
+                "label": "person",
+                "confidence": 0.616
+              },
+              {
+                "label": "green",
+                "confidence": 0.615
+              },
+              {
+                "label": "vegetation",
+                "confidence": 0.6118
+              },
+              {
+                "label": "bush",
+                "confidence": 0.6108
+              },
+              {
+                "label": "brick",
+                "confidence": 0.6063
+              },
+              {
+                "label": "smoke",
+                "confidence": 0.6062
+              },
+              {
+                "label": "brown",
+                "confidence": 0.6022
+              },
+              {
+                "label": "sunny",
+                "confidence": 0.5996
+              },
+              {
+                "label": "forest",
+                "confidence": 0.5994
+              },
+              {
+                "label": "weed",
+                "confidence": 0.5956
+              },
+              {
+                "label": "landscape",
+                "confidence": 0.5946
+              },
+              {
+                "label": "gray",
+                "confidence": 0.5914
+              },
+              {
+                "label": "go",
+                "confidence": 0.5871
+              },
+              {
+                "label": "flow",
+                "confidence": 0.5854
+              },
+              {
+                "label": "show",
+                "confidence": 0.5839
+              },
+              {
+                "label": "couple",
+                "confidence": 0.5821
+              },
+              {
+                "label": "ruins",
+                "confidence": 0.5815
+              },
+              {
+                "label": "stack",
+                "confidence": 0.5808
+              },
+              {
+                "label": "land",
+                "confidence": 0.5806
+              },
+              {
+                "label": "row",
+                "confidence": 0.5765
+              },
+              {
+                "label": "build",
+                "confidence": 0.5745
+              },
+              {
+                "label": "leaf",
+                "confidence": 0.5734
+              },
+              {
+                "label": "field",
+                "confidence": 0.5722
+              },
+              {
+                "label": "bridge",
+                "confidence": 0.5717
+              },
+              {
+                "label": "line",
+                "confidence": 0.5708
+              },
+              {
+                "label": "urban",
+                "confidence": 0.5695
+              },
+              {
+                "label": "website",
+                "confidence": 0.5693
+              },
+              {
+                "label": "walk",
+                "confidence": 0.5677
+              },
+              {
+                "label": "town",
+                "confidence": 0.5673
+              },
+              {
+                "label": "flood",
+                "confidence": 0.5672
+              },
+              {
+                "label": "clear",
+                "confidence": 0.5671
+              },
+              {
+                "label": "business",
+                "confidence": 0.5664
+              },
+              {
+                "label": "pollution",
+                "confidence": 0.5644
+              },
+              {
+                "label": "group",
+                "confidence": 0.5631
+              },
+              {
+                "label": "reflection",
+                "confidence": 0.5623
+              },
+              {
+                "label": "rise",
+                "confidence": 0.5621
+              },
+              {
+                "label": "lush",
+                "confidence": 0.5573
+              },
+              {
+                "label": "dark",
+                "confidence": 0.5566
+              },
+              {
+                "label": "blanket",
+                "confidence": 0.5562
+              },
+              {
+                "label": "pillar",
+                "confidence": 0.5561
+              },
+              {
+                "label": "peak",
+                "confidence": 0.5524
+              },
+              {
+                "label": "move",
+                "confidence": 0.552
+              },
+              {
+                "label": "back",
+                "confidence": 0.5457
+              },
+              {
+                "label": "number",
+                "confidence": 0.5451
+              },
+              {
+                "label": "scene",
+                "confidence": 0.545
+              },
+              {
+                "label": "set",
+                "confidence": 0.5439
+              },
+              {
+                "label": "house exterior",
+                "confidence": 0.5436
+              },
+              {
+                "label": "modern",
+                "confidence": 0.541
+              },
+              {
+                "label": "make",
+                "confidence": 0.5394
+              },
+              {
+                "label": "park",
+                "confidence": 0.5392
+              },
+              {
+                "label": "pass",
+                "confidence": 0.538
+              },
+              {
+                "label": "shore",
+                "confidence": 0.5356
+              },
+              {
+                "label": "loom",
+                "confidence": 0.5351
+              },
+              {
+                "label": "close-up",
+                "confidence": 0.5349
+              },
+              {
+                "label": "beautiful",
+                "confidence": 0.5346
+              },
+              {
+                "label": "historic",
+                "confidence": 0.5336
+              },
+              {
+                "label": "run",
+                "confidence": 0.5318
+              },
+              {
+                "label": "floor",
+                "confidence": 0.5307
+              },
+              {
+                "label": "open",
+                "confidence": 0.5305
+              },
+              {
+                "label": "silo",
+                "confidence": 0.5264
+              },
+              {
+                "label": "home",
+                "confidence": 0.5262
+              },
+              {
+                "label": "architecture",
+                "confidence": 0.5261
+              },
+              {
+                "label": "apartment",
+                "confidence": 0.5257
+              },
+              {
+                "label": "reflect",
+                "confidence": 0.525
+              },
+              {
+                "label": "take",
+                "confidence": 0.5248
+              },
+              {
+                "label": "nature",
+                "confidence": 0.5247
+              },
+              {
+                "label": "estate",
+                "confidence": 0.5243
+              },
+              {
+                "label": "bright",
+                "confidence": 0.5232
+              },
+              {
+                "label": "road",
+                "confidence": 0.5229
+              },
+              {
+                "label": "narrow",
+                "confidence": 0.5229
+              },
+              {
+                "label": "water tower",
+                "confidence": 0.5215
+              },
+              {
+                "label": "corner",
+                "confidence": 0.5201
+              },
+              {
+                "label": "facility",
+                "confidence": 0.5196
+              },
+              {
+                "label": "use",
+                "confidence": 0.519
+              },
+              {
+                "label": "clock",
+                "confidence": 0.5185
+              },
+              {
+                "label": "swamp",
+                "confidence": 0.5183
+              },
+              {
+                "label": "type",
+                "confidence": 0.5168
+              },
+              {
+                "label": "countryside",
+                "confidence": 0.5162
+              },
+              {
+                "label": "place",
+                "confidence": 0.5157
+              },
+              {
+                "label": "hill",
+                "confidence": 0.5139
+              },
+              {
+                "label": "calm",
+                "confidence": 0.5139
+              },
+              {
+                "label": "float",
+                "confidence": 0.5136
+              },
+              {
+                "label": "rural",
+                "confidence": 0.5129
+              },
+              {
+                "label": "travel",
+                "confidence": 0.5127
+              },
+              {
+                "label": "man",
+                "confidence": 0.512
+              },
+              {
+                "label": "greenery",
+                "confidence": 0.5112
+              },
+              {
+                "label": "outdoor",
+                "confidence": 0.5107
+              },
+              {
+                "label": "concrete",
+                "confidence": 0.509
+              },
+              {
+                "label": "theater",
+                "confidence": 0.5083
+              },
+              {
+                "label": "dock",
+                "confidence": 0.506
+              },
+              {
+                "label": "black",
+                "confidence": 0.5056
+              },
+              {
+                "label": "bell tower",
+                "confidence": 0.5044
+              },
+              {
+                "label": "sun",
+                "confidence": 0.5028
+              },
+              {
+                "label": "locate",
+                "confidence": 0.5025
+              },
+              {
+                "label": "cool",
+                "confidence": 0.5015
+              }
+            ],
+            "model": "ram_plus",
+            "inference_time_ms": 228.93,
+            "total_tags": 141
+          },
+          "florence_2": {
+            "tags": [
+              {
+                "label": "old_brick"
+              },
+              {
+                "label": "brick_factory"
+              },
+              {
+                "label": "tall_chimney"
+              },
+              {
+                "label": "right_side"
+              },
+              {
+                "label": "located_next"
+              },
+              {
+                "label": "overall_mood"
+              },
+              {
+                "label": "red_bricks"
+              },
+              {
+                "label": "several_windows"
+              },
+              {
+                "label": "bushes_surrounding"
+              },
+              {
+                "label": "left_side"
+              },
+              {
+                "label": "large_industrial"
+              },
+              {
+                "label": "industrial_structure"
+              },
+              {
+                "label": "large_smokestack"
+              },
+              {
+                "label": "overall_appearance"
+              },
+              {
+                "label": "old"
+              },
+              {
+                "label": "brick"
+              },
+              {
+                "label": "factory"
+              },
+              {
+                "label": "tall"
+              },
+              {
+                "label": "chimney"
+              },
+              {
+                "label": "right"
+              },
+              {
+                "label": "side"
+              },
+              {
+                "label": "located"
+              },
+              {
+                "label": "next"
+              },
+              {
+                "label": "body"
+              },
+              {
+                "label": "water"
+              },
+              {
+                "label": "pond"
+              },
+              {
+                "label": "lake"
+              },
+              {
+                "label": "sky"
+              },
+              {
+                "label": "cloudy"
+              },
+              {
+                "label": "overall"
+              },
+              {
+                "label": "mood"
+              },
+              {
+                "label": "gloomy"
+              },
+              {
+                "label": "building"
+              },
+              {
+                "label": "made"
+              },
+              {
+                "label": "red"
+              },
+              {
+                "label": "bricks"
+              },
+              {
+                "label": "several"
+              },
+              {
+                "label": "windows"
+              },
+              {
+                "label": "doors"
+              },
+              {
+                "label": "trees"
+              },
+              {
+                "label": "bushes"
+              },
+              {
+                "label": "surrounding"
+              },
+              {
+                "label": "left"
+              },
+              {
+                "label": "large"
+              },
+              {
+                "label": "industrial"
+              },
+              {
+                "label": "structure"
+              },
+              {
+                "label": "smokestack"
+              },
+              {
+                "label": "appearance"
+              },
+              {
+                "label": "abandoned"
+              },
+              {
+                "label": "dilapidated"
+              }
+            ],
+            "model": "florence_2",
+            "inference_time_ms": 1481.6,
+            "total_tags": 50
+          }
+        },
+        "total_discovery_time_ms": 1710.53
+      }
     }
   }
 }

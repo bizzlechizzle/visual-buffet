@@ -1,93 +1,713 @@
 {
   "file": "/Volumes/projects/visual-buffet/images/testimage08.jpg",
   "filename": "testimage08.jpg",
-  "tagged_at": "2025-12-24T16:05:22.846481+00:00",
-  "threshold": 0.5,
-  "size": "original",
-  "inference_time_ms": 821.06,
+  "tagged_at": "2025-12-24T19:12:58.494429+00:00",
   "results": {
-    "florence_2": {
-      "tags": [],
-      "model": "florence_2"
-    },
     "siglip": {
       "tags": [
         {
           "label": "church",
-          "confidence": 0.5703594088554382,
-          "plugin": "siglip"
+          "confidence": 0.5703594088554382
         },
         {
           "label": "white_church",
-          "confidence": 0.444148451089859,
-          "plugin": "siglip"
+          "confidence": 0.444148451089859
         },
         {
           "label": "chapel",
-          "confidence": 0.24381312727928162,
-          "plugin": "siglip"
+          "confidence": 0.24381312727928162
         },
         {
           "label": "dilapidated_white",
-          "confidence": 0.22736844420433044,
-          "plugin": "siglip"
+          "confidence": 0.22736844420433044
         },
         {
           "label": "steep_steeple",
-          "confidence": 0.1997794508934021,
-          "plugin": "siglip"
+          "confidence": 0.1997794508934021
         },
         {
           "label": "dilapidated",
-          "confidence": 0.1937956064939499,
-          "plugin": "siglip"
+          "confidence": 0.1937956064939499
         },
         {
           "label": "steeple",
-          "confidence": 0.15124644339084625,
-          "plugin": "siglip"
+          "confidence": 0.15124644339084625
         },
         {
           "label": "rural",
-          "confidence": 0.058286767452955246,
-          "plugin": "siglip"
+          "confidence": 0.058286767452955246
         },
         {
           "label": "historic",
-          "confidence": 0.03436846658587456,
-          "plugin": "siglip"
+          "confidence": 0.03436846658587456
         },
         {
           "label": "old",
-          "confidence": 0.03228147327899933,
-          "plugin": "siglip"
+          "confidence": 0.03228147327899933
         },
         {
           "label": "structure",
-          "confidence": 0.0304576363414526,
-          "plugin": "siglip"
+          "confidence": 0.0304576363414526
         },
         {
           "label": "church tower",
-          "confidence": 0.022113392129540443,
-          "plugin": "siglip"
+          "confidence": 0.022113392129540443
         },
         {
           "label": "religious",
-          "confidence": 0.017222588881850243,
-          "plugin": "siglip"
+          "confidence": 0.017222588881850243
         },
         {
           "label": "fall",
-          "confidence": 0.011054380796849728,
-          "plugin": "siglip"
+          "confidence": 0.011054380796849728
         }
       ],
-      "model": "siglip"
-    },
-    "ram_plus": {
-      "tags": [],
-      "model": "ram_plus"
+      "model": "siglip",
+      "version": "1.0.0",
+      "size": "original",
+      "inference_time_ms": 826.53,
+      "metadata": {
+        "discovery_mode": true,
+        "discovery_sources": [
+          "ram_plus",
+          "florence_2"
+        ],
+        "vocabulary_size": 156,
+        "discovery_results": {
+          "ram_plus": {
+            "tags": [
+              {
+                "label": "church",
+                "confidence": 1.0
+              },
+              {
+                "label": "sit",
+                "confidence": 0.9217
+              },
+              {
+                "label": "field",
+                "confidence": 0.9194
+              },
+              {
+                "label": "spire",
+                "confidence": 0.9135
+              },
+              {
+                "label": "white",
+                "confidence": 0.9129
+              },
+              {
+                "label": "building",
+                "confidence": 0.872
+              },
+              {
+                "label": "house",
+                "confidence": 0.8137
+              },
+              {
+                "label": "grass",
+                "confidence": 0.7965
+              },
+              {
+                "label": "surround",
+                "confidence": 0.7922
+              },
+              {
+                "label": "grassy",
+                "confidence": 0.7821
+              },
+              {
+                "label": "clock",
+                "confidence": 0.7697
+              },
+              {
+                "label": "sky",
+                "confidence": 0.7596
+              },
+              {
+                "label": "hill",
+                "confidence": 0.7498
+              },
+              {
+                "label": "tree",
+                "confidence": 0.7476
+              },
+              {
+                "label": "road",
+                "confidence": 0.7474
+              },
+              {
+                "label": "chapel",
+                "confidence": 0.7463
+              },
+              {
+                "label": "tower",
+                "confidence": 0.7396
+              },
+              {
+                "label": "autumn",
+                "confidence": 0.7313
+              },
+              {
+                "label": "peak",
+                "confidence": 0.725
+              },
+              {
+                "label": "stand",
+                "confidence": 0.7139
+              },
+              {
+                "label": "bush",
+                "confidence": 0.7131
+              },
+              {
+                "label": "blue",
+                "confidence": 0.7103
+              },
+              {
+                "label": "area",
+                "confidence": 0.7066
+              },
+              {
+                "label": "weed",
+                "confidence": 0.703
+              },
+              {
+                "label": "rural",
+                "confidence": 0.7025
+              },
+              {
+                "label": "dirt road",
+                "confidence": 0.7021
+              },
+              {
+                "label": "daylight",
+                "confidence": 0.6936
+              },
+              {
+                "label": "house exterior",
+                "confidence": 0.6931
+              },
+              {
+                "label": "fall",
+                "confidence": 0.6901
+              },
+              {
+                "label": "sunny",
+                "confidence": 0.6871
+              },
+              {
+                "label": "cloudy",
+                "confidence": 0.6707
+              },
+              {
+                "label": "side",
+                "confidence": 0.6694
+              },
+              {
+                "label": "open",
+                "confidence": 0.653
+              },
+              {
+                "label": "grassland",
+                "confidence": 0.6521
+              },
+              {
+                "label": "blanket",
+                "confidence": 0.6483
+              },
+              {
+                "label": "bell tower",
+                "confidence": 0.6469
+              },
+              {
+                "label": "fill",
+                "confidence": 0.6464
+              },
+              {
+                "label": "hillside",
+                "confidence": 0.6451
+              },
+              {
+                "label": "leaf",
+                "confidence": 0.6449
+              },
+              {
+                "label": "picture",
+                "confidence": 0.6438
+              },
+              {
+                "label": "lush",
+                "confidence": 0.6424
+              },
+              {
+                "label": "green",
+                "confidence": 0.6402
+              },
+              {
+                "label": "see",
+                "confidence": 0.6376
+              },
+              {
+                "label": "brush",
+                "confidence": 0.6332
+              },
+              {
+                "label": "photo",
+                "confidence": 0.6302
+              },
+              {
+                "label": "countryside",
+                "confidence": 0.6275
+              },
+              {
+                "label": "grow",
+                "confidence": 0.6272
+              },
+              {
+                "label": "person",
+                "confidence": 0.6253
+              },
+              {
+                "label": "forest",
+                "confidence": 0.6245
+              },
+              {
+                "label": "vegetation",
+                "confidence": 0.6233
+              },
+              {
+                "label": "cross",
+                "confidence": 0.6208
+              },
+              {
+                "label": "beautiful",
+                "confidence": 0.6196
+              },
+              {
+                "label": "image",
+                "confidence": 0.6128
+              },
+              {
+                "label": "wood",
+                "confidence": 0.6124
+              },
+              {
+                "label": "cloud",
+                "confidence": 0.6075
+              },
+              {
+                "label": "clear",
+                "confidence": 0.602
+              },
+              {
+                "label": "landscape",
+                "confidence": 0.5875
+              },
+              {
+                "label": "path",
+                "confidence": 0.5835
+              },
+              {
+                "label": "floor",
+                "confidence": 0.5821
+              },
+              {
+                "label": "home",
+                "confidence": 0.5812
+              },
+              {
+                "label": "walk",
+                "confidence": 0.5792
+              },
+              {
+                "label": "break",
+                "confidence": 0.5791
+              },
+              {
+                "label": "bright",
+                "confidence": 0.5766
+              },
+              {
+                "label": "place",
+                "confidence": 0.575
+              },
+              {
+                "label": "historic",
+                "confidence": 0.5744
+              },
+              {
+                "label": "land",
+                "confidence": 0.5689
+              },
+              {
+                "label": "dry",
+                "confidence": 0.5681
+              },
+              {
+                "label": "worship",
+                "confidence": 0.563
+              },
+              {
+                "label": "corner",
+                "confidence": 0.5622
+              },
+              {
+                "label": "color",
+                "confidence": 0.5589
+              },
+              {
+                "label": "website",
+                "confidence": 0.5588
+              },
+              {
+                "label": "wild",
+                "confidence": 0.5581
+              },
+              {
+                "label": "couple",
+                "confidence": 0.558
+              },
+              {
+                "label": "plant",
+                "confidence": 0.5547
+              },
+              {
+                "label": "structure",
+                "confidence": 0.5546
+              },
+              {
+                "label": "window",
+                "confidence": 0.5544
+              },
+              {
+                "label": "autumn leave",
+                "confidence": 0.5536
+              },
+              {
+                "label": "rise",
+                "confidence": 0.5535
+              },
+              {
+                "label": "shrub",
+                "confidence": 0.5523
+              },
+              {
+                "label": "lean",
+                "confidence": 0.5512
+              },
+              {
+                "label": "trail",
+                "confidence": 0.5498
+              },
+              {
+                "label": "yellow",
+                "confidence": 0.5489
+              },
+              {
+                "label": "build",
+                "confidence": 0.5482
+              },
+              {
+                "label": "brown",
+                "confidence": 0.5481
+              },
+              {
+                "label": "mountain",
+                "confidence": 0.5476
+              },
+              {
+                "label": "show",
+                "confidence": 0.5469
+              },
+              {
+                "label": "go",
+                "confidence": 0.5435
+              },
+              {
+                "label": "pasture",
+                "confidence": 0.5435
+              },
+              {
+                "label": "town",
+                "confidence": 0.5413
+              },
+              {
+                "label": "religious",
+                "confidence": 0.5399
+              },
+              {
+                "label": "set",
+                "confidence": 0.5377
+              },
+              {
+                "label": "back",
+                "confidence": 0.5377
+              },
+              {
+                "label": "locate",
+                "confidence": 0.5355
+              },
+              {
+                "label": "church tower",
+                "confidence": 0.535
+              },
+              {
+                "label": "city",
+                "confidence": 0.5341
+              },
+              {
+                "label": "fence",
+                "confidence": 0.5326
+              },
+              {
+                "label": "black",
+                "confidence": 0.5311
+              },
+              {
+                "label": "barn",
+                "confidence": 0.5291
+              },
+              {
+                "label": "religion",
+                "confidence": 0.5284
+              },
+              {
+                "label": "red",
+                "confidence": 0.5213
+              },
+              {
+                "label": "flower",
+                "confidence": 0.5209
+              },
+              {
+                "label": "take",
+                "confidence": 0.518
+              },
+              {
+                "label": "plain",
+                "confidence": 0.517
+              },
+              {
+                "label": "graze",
+                "confidence": 0.516
+              },
+              {
+                "label": "roof",
+                "confidence": 0.5155
+              },
+              {
+                "label": "remain",
+                "confidence": 0.5154
+              },
+              {
+                "label": "estate",
+                "confidence": 0.5125
+              },
+              {
+                "label": "scenery",
+                "confidence": 0.5106
+              },
+              {
+                "label": "group",
+                "confidence": 0.5105
+              },
+              {
+                "label": "door",
+                "confidence": 0.5099
+              },
+              {
+                "label": "pass",
+                "confidence": 0.5077
+              },
+              {
+                "label": "crop",
+                "confidence": 0.5072
+              },
+              {
+                "label": "make",
+                "confidence": 0.5068
+              },
+              {
+                "label": "loom",
+                "confidence": 0.5064
+              },
+              {
+                "label": "type",
+                "confidence": 0.5061
+              },
+              {
+                "label": "white house",
+                "confidence": 0.5054
+              },
+              {
+                "label": "run",
+                "confidence": 0.5047
+              },
+              {
+                "label": "travel",
+                "confidence": 0.5038
+              },
+              {
+                "label": "park",
+                "confidence": 0.503
+              },
+              {
+                "label": "move",
+                "confidence": 0.5021
+              },
+              {
+                "label": "close-up",
+                "confidence": 0.502
+              },
+              {
+                "label": "up",
+                "confidence": 0.5007
+              }
+            ],
+            "model": "ram_plus",
+            "inference_time_ms": 182.94,
+            "total_tags": 122
+          },
+          "florence_2": {
+            "tags": [
+              {
+                "label": "dilapidated_white"
+              },
+              {
+                "label": "white_church"
+              },
+              {
+                "label": "steep_steeple"
+              },
+              {
+                "label": "clock_tower"
+              },
+              {
+                "label": "tall_grass"
+              },
+              {
+                "label": "shrubs_surrounding"
+              },
+              {
+                "label": "few_scattered"
+              },
+              {
+                "label": "scattered_clouds"
+              },
+              {
+                "label": "shining_brightly"
+              },
+              {
+                "label": "casting_warm"
+              },
+              {
+                "label": "warm_glow"
+              },
+              {
+                "label": "surrounding_landscape"
+              },
+              {
+                "label": "overall_mood"
+              },
+              {
+                "label": "old"
+              },
+              {
+                "label": "dilapidated"
+              },
+              {
+                "label": "white"
+              },
+              {
+                "label": "church"
+              },
+              {
+                "label": "steep"
+              },
+              {
+                "label": "steeple"
+              },
+              {
+                "label": "clock"
+              },
+              {
+                "label": "tower"
+              },
+              {
+                "label": "located"
+              },
+              {
+                "label": "field"
+              },
+              {
+                "label": "tall"
+              },
+              {
+                "label": "grass"
+              },
+              {
+                "label": "shrubs"
+              },
+              {
+                "label": "surrounding"
+              },
+              {
+                "label": "sky"
+              },
+              {
+                "label": "blue"
+              },
+              {
+                "label": "few"
+              },
+              {
+                "label": "scattered"
+              },
+              {
+                "label": "clouds"
+              },
+              {
+                "label": "sun"
+              },
+              {
+                "label": "shining"
+              },
+              {
+                "label": "brightly"
+              },
+              {
+                "label": "casting"
+              },
+              {
+                "label": "warm"
+              },
+              {
+                "label": "glow"
+              },
+              {
+                "label": "landscape"
+              },
+              {
+                "label": "overall"
+              },
+              {
+                "label": "mood"
+              },
+              {
+                "label": "peaceful"
+              },
+              {
+                "label": "serene"
+              }
+            ],
+            "model": "florence_2",
+            "inference_time_ms": 1140.05,
+            "total_tags": 43
+          }
+        },
+        "total_discovery_time_ms": 1322.99
+      }
     }
   }
 }

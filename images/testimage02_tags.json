@@ -1,163 +1,944 @@
 {
   "file": "/Volumes/projects/visual-buffet/images/testimage02.jpg",
   "filename": "testimage02.jpg",
-  "tagged_at": "2025-12-24T16:05:21.601856+00:00",
-  "threshold": 0.5,
-  "size": "original",
-  "inference_time_ms": 1057.28,
+  "tagged_at": "2025-12-24T19:12:43.018872+00:00",
   "results": {
-    "florence_2": {
-      "tags": [],
-      "model": "florence_2"
-    },
     "siglip": {
       "tags": [
         {
           "label": "clothes_hanging",
-          "confidence": 0.9449314475059509,
-          "plugin": "siglip"
+          "confidence": 0.9449314475059509
         },
         {
           "label": "abandoned_clothing",
-          "confidence": 0.8274401426315308,
-          "plugin": "siglip"
+          "confidence": 0.8274401426315308
         },
         {
           "label": "storage room",
-          "confidence": 0.719745397567749,
-          "plugin": "siglip"
+          "confidence": 0.719745397567749
         },
         {
           "label": "hanger",
-          "confidence": 0.5898884534835815,
-          "plugin": "siglip"
+          "confidence": 0.5898884534835815
         },
         {
           "label": "laundry",
-          "confidence": 0.5612152814865112,
-          "plugin": "siglip"
+          "confidence": 0.5612152814865112
         },
         {
           "label": "clothes",
-          "confidence": 0.55884850025177,
-          "plugin": "siglip"
+          "confidence": 0.55884850025177
         },
         {
           "label": "dressing room",
-          "confidence": 0.4949570894241333,
-          "plugin": "siglip"
+          "confidence": 0.4949570894241333
         },
         {
           "label": "racks",
-          "confidence": 0.33326199650764465,
-          "plugin": "siglip"
+          "confidence": 0.33326199650764465
         },
         {
           "label": "abandoned_condition",
-          "confidence": 0.29868412017822266,
-          "plugin": "siglip"
+          "confidence": 0.29868412017822266
         },
         {
           "label": "clothing",
-          "confidence": 0.24304892122745514,
-          "plugin": "siglip"
+          "confidence": 0.24304892122745514
         },
         {
           "label": "dilapidated",
-          "confidence": 0.19967105984687805,
-          "plugin": "siglip"
+          "confidence": 0.19967105984687805
         },
         {
           "label": "clothesline",
-          "confidence": 0.19004341959953308,
-          "plugin": "siglip"
+          "confidence": 0.19004341959953308
         },
         {
           "label": "hanging",
-          "confidence": 0.1756851226091385,
-          "plugin": "siglip"
+          "confidence": 0.1756851226091385
         },
         {
           "label": "clothing_store",
-          "confidence": 0.17231829464435577,
-          "plugin": "siglip"
+          "confidence": 0.17231829464435577
         },
         {
           "label": "suit",
-          "confidence": 0.11670314520597458,
-          "plugin": "siglip"
+          "confidence": 0.11670314520597458
         },
         {
           "label": "clothing store",
-          "confidence": 0.11431464552879333,
-          "plugin": "siglip"
+          "confidence": 0.11431464552879333
         },
         {
           "label": "room",
-          "confidence": 0.10150887072086334,
-          "plugin": "siglip"
+          "confidence": 0.10150887072086334
         },
         {
           "label": "clothe",
-          "confidence": 0.09784799814224243,
-          "plugin": "siglip"
+          "confidence": 0.09784799814224243
         },
         {
           "label": "mess",
-          "confidence": 0.09521423280239105,
-          "plugin": "siglip"
+          "confidence": 0.09521423280239105
         },
         {
           "label": "basement",
-          "confidence": 0.07647157460451126,
-          "plugin": "siglip"
+          "confidence": 0.07647157460451126
         },
         {
           "label": "garment",
-          "confidence": 0.07291354984045029,
-          "plugin": "siglip"
+          "confidence": 0.07291354984045029
         },
         {
           "label": "coat",
-          "confidence": 0.027124503627419472,
-          "plugin": "siglip"
+          "confidence": 0.027124503627419472
         },
         {
           "label": "hang",
-          "confidence": 0.019721616059541702,
-          "plugin": "siglip"
+          "confidence": 0.019721616059541702
         },
         {
           "label": "neglect",
-          "confidence": 0.013422735035419464,
-          "plugin": "siglip"
+          "confidence": 0.013422735035419464
         },
         {
           "label": "cloth",
-          "confidence": 0.013191861100494862,
-          "plugin": "siglip"
+          "confidence": 0.013191861100494862
         },
         {
           "label": "furniture",
-          "confidence": 0.012858225964009762,
-          "plugin": "siglip"
-        },
-        {
-          "label": "neglected",
-          "confidence": 0.012053790502250195,
-          "plugin": "siglip"
+          "confidence": 0.012858225964009762
         },
         {
           "label": "overall",
-          "confidence": 0.011952625587582588,
-          "plugin": "siglip"
+          "confidence": 0.011952625587582588
         }
       ],
-      "model": "siglip"
-    },
-    "ram_plus": {
-      "tags": [],
-      "model": "ram_plus"
+      "model": "siglip",
+      "version": "1.0.0",
+      "size": "original",
+      "inference_time_ms": 1082.91,
+      "metadata": {
+        "discovery_mode": true,
+        "discovery_sources": [
+          "ram_plus",
+          "florence_2"
+        ],
+        "vocabulary_size": 202,
+        "discovery_results": {
+          "ram_plus": {
+            "tags": [
+              {
+                "label": "room",
+                "confidence": 0.9953
+              },
+              {
+                "label": "clothe",
+                "confidence": 0.9642
+              },
+              {
+                "label": "clothing",
+                "confidence": 0.9004
+              },
+              {
+                "label": "shelf",
+                "confidence": 0.8954
+              },
+              {
+                "label": "closet",
+                "confidence": 0.893
+              },
+              {
+                "label": "fill",
+                "confidence": 0.8657
+              },
+              {
+                "label": "hang",
+                "confidence": 0.8328
+              },
+              {
+                "label": "store",
+                "confidence": 0.8227
+              },
+              {
+                "label": "floor",
+                "confidence": 0.8201
+              },
+              {
+                "label": "yellow",
+                "confidence": 0.7954
+              },
+              {
+                "label": "wall",
+                "confidence": 0.7779
+              },
+              {
+                "label": "debris",
+                "confidence": 0.7765
+              },
+              {
+                "label": "building",
+                "confidence": 0.7629
+              },
+              {
+                "label": "garbage",
+                "confidence": 0.7289
+              },
+              {
+                "label": "ceiling",
+                "confidence": 0.7129
+              },
+              {
+                "label": "furniture",
+                "confidence": 0.7054
+              },
+              {
+                "label": "clothing store",
+                "confidence": 0.7017
+              },
+              {
+                "label": "dress",
+                "confidence": 0.7013
+              },
+              {
+                "label": "sit",
+                "confidence": 0.7009
+              },
+              {
+                "label": "see",
+                "confidence": 0.6999
+              },
+              {
+                "label": "stand",
+                "confidence": 0.6964
+              },
+              {
+                "label": "light",
+                "confidence": 0.6898
+              },
+              {
+                "label": "person",
+                "confidence": 0.6853
+              },
+              {
+                "label": "mess",
+                "confidence": 0.6793
+              },
+              {
+                "label": "window",
+                "confidence": 0.6739
+              },
+              {
+                "label": "boutique",
+                "confidence": 0.6727
+              },
+              {
+                "label": "bedroom",
+                "confidence": 0.6704
+              },
+              {
+                "label": "area",
+                "confidence": 0.6699
+              },
+              {
+                "label": "line",
+                "confidence": 0.6696
+              },
+              {
+                "label": "walk",
+                "confidence": 0.6677
+              },
+              {
+                "label": "hanger",
+                "confidence": 0.6662
+              },
+              {
+                "label": "picture",
+                "confidence": 0.659
+              },
+              {
+                "label": "dark",
+                "confidence": 0.6536
+              },
+              {
+                "label": "image",
+                "confidence": 0.6474
+              },
+              {
+                "label": "blanket",
+                "confidence": 0.6463
+              },
+              {
+                "label": "shelve",
+                "confidence": 0.6461
+              },
+              {
+                "label": "coat",
+                "confidence": 0.6426
+              },
+              {
+                "label": "display",
+                "confidence": 0.6426
+              },
+              {
+                "label": "stuff",
+                "confidence": 0.642
+              },
+              {
+                "label": "photo",
+                "confidence": 0.6384
+              },
+              {
+                "label": "shirt",
+                "confidence": 0.6364
+              },
+              {
+                "label": "stack",
+                "confidence": 0.6364
+              },
+              {
+                "label": "garment",
+                "confidence": 0.6357
+              },
+              {
+                "label": "dry",
+                "confidence": 0.6347
+              },
+              {
+                "label": "open",
+                "confidence": 0.6331
+              },
+              {
+                "label": "wear",
+                "confidence": 0.6315
+              },
+              {
+                "label": "group",
+                "confidence": 0.6285
+              },
+              {
+                "label": "laundry",
+                "confidence": 0.6283
+              },
+              {
+                "label": "black",
+                "confidence": 0.628
+              },
+              {
+                "label": "pant",
+                "confidence": 0.6275
+              },
+              {
+                "label": "jeans",
+                "confidence": 0.627
+              },
+              {
+                "label": "jacket",
+                "confidence": 0.6264
+              },
+              {
+                "label": "row",
+                "confidence": 0.6168
+              },
+              {
+                "label": "box",
+                "confidence": 0.6141
+              },
+              {
+                "label": "table",
+                "confidence": 0.6133
+              },
+              {
+                "label": "white",
+                "confidence": 0.6124
+              },
+              {
+                "label": "house",
+                "confidence": 0.609
+              },
+              {
+                "label": "space",
+                "confidence": 0.6079
+              },
+              {
+                "label": "thing",
+                "confidence": 0.6075
+              },
+              {
+                "label": "collection",
+                "confidence": 0.604
+              },
+              {
+                "label": "basement",
+                "confidence": 0.6013
+              },
+              {
+                "label": "surround",
+                "confidence": 0.5988
+              },
+              {
+                "label": "man",
+                "confidence": 0.5978
+              },
+              {
+                "label": "type",
+                "confidence": 0.5976
+              },
+              {
+                "label": "home",
+                "confidence": 0.5957
+              },
+              {
+                "label": "contain",
+                "confidence": 0.5938
+              },
+              {
+                "label": "suit",
+                "confidence": 0.5926
+              },
+              {
+                "label": "peak",
+                "confidence": 0.5918
+              },
+              {
+                "label": "number",
+                "confidence": 0.5907
+              },
+              {
+                "label": "rubble",
+                "confidence": 0.5905
+              },
+              {
+                "label": "side",
+                "confidence": 0.5903
+              },
+              {
+                "label": "place",
+                "confidence": 0.5893
+              },
+              {
+                "label": "warehouse",
+                "confidence": 0.5871
+              },
+              {
+                "label": "set",
+                "confidence": 0.587
+              },
+              {
+                "label": "corner",
+                "confidence": 0.5858
+              },
+              {
+                "label": "storage room",
+                "confidence": 0.5839
+              },
+              {
+                "label": "shoe",
+                "confidence": 0.5834
+              },
+              {
+                "label": "show",
+                "confidence": 0.5832
+              },
+              {
+                "label": "plastic",
+                "confidence": 0.5829
+              },
+              {
+                "label": "draw",
+                "confidence": 0.5822
+              },
+              {
+                "label": "waste",
+                "confidence": 0.5797
+              },
+              {
+                "label": "chair",
+                "confidence": 0.5795
+              },
+              {
+                "label": "bed",
+                "confidence": 0.5785
+              },
+              {
+                "label": "apartment",
+                "confidence": 0.5773
+              },
+              {
+                "label": "clothesline",
+                "confidence": 0.576
+              },
+              {
+                "label": "mannequin",
+                "confidence": 0.5711
+              },
+              {
+                "label": "sunshine",
+                "confidence": 0.5699
+              },
+              {
+                "label": "dressing room",
+                "confidence": 0.5681
+              },
+              {
+                "label": "damage",
+                "confidence": 0.5651
+              },
+              {
+                "label": "paper",
+                "confidence": 0.5649
+              },
+              {
+                "label": "clean",
+                "confidence": 0.5594
+              },
+              {
+                "label": "couple",
+                "confidence": 0.5586
+              },
+              {
+                "label": "make",
+                "confidence": 0.5568
+              },
+              {
+                "label": "fashion",
+                "confidence": 0.5562
+              },
+              {
+                "label": "use",
+                "confidence": 0.5559
+              },
+              {
+                "label": "living room",
+                "confidence": 0.5558
+              },
+              {
+                "label": "break",
+                "confidence": 0.5557
+              },
+              {
+                "label": "curtain",
+                "confidence": 0.5511
+              },
+              {
+                "label": "television",
+                "confidence": 0.5504
+              },
+              {
+                "label": "sweater",
+                "confidence": 0.5499
+              },
+              {
+                "label": "fabric",
+                "confidence": 0.5488
+              },
+              {
+                "label": "bright",
+                "confidence": 0.5487
+              },
+              {
+                "label": "material",
+                "confidence": 0.5464
+              },
+              {
+                "label": "retail",
+                "confidence": 0.5458
+              },
+              {
+                "label": "job",
+                "confidence": 0.5458
+              },
+              {
+                "label": "woman",
+                "confidence": 0.5451
+              },
+              {
+                "label": "close-up",
+                "confidence": 0.5451
+              },
+              {
+                "label": "variety",
+                "confidence": 0.5435
+              },
+              {
+                "label": "dust",
+                "confidence": 0.5434
+              },
+              {
+                "label": "cloth",
+                "confidence": 0.5419
+              },
+              {
+                "label": "gray",
+                "confidence": 0.5414
+              },
+              {
+                "label": "back",
+                "confidence": 0.5388
+              },
+              {
+                "label": "crowded",
+                "confidence": 0.5348
+              },
+              {
+                "label": "bag",
+                "confidence": 0.5346
+              },
+              {
+                "label": "lie",
+                "confidence": 0.5335
+              },
+              {
+                "label": "bureau",
+                "confidence": 0.5334
+              },
+              {
+                "label": "office",
+                "confidence": 0.5322
+              },
+              {
+                "label": "brown",
+                "confidence": 0.5316
+              },
+              {
+                "label": "tear",
+                "confidence": 0.5312
+              },
+              {
+                "label": "beam",
+                "confidence": 0.5305
+              },
+              {
+                "label": "mattress",
+                "confidence": 0.5301
+              },
+              {
+                "label": "build",
+                "confidence": 0.53
+              },
+              {
+                "label": "dirt",
+                "confidence": 0.5289
+              },
+              {
+                "label": "scene",
+                "confidence": 0.5278
+              },
+              {
+                "label": "take",
+                "confidence": 0.5276
+              },
+              {
+                "label": "color",
+                "confidence": 0.5273
+              },
+              {
+                "label": "door",
+                "confidence": 0.5266
+              },
+              {
+                "label": "window screen",
+                "confidence": 0.5253
+              },
+              {
+                "label": "daylight",
+                "confidence": 0.525
+              },
+              {
+                "label": "business",
+                "confidence": 0.5245
+              },
+              {
+                "label": "kitchen",
+                "confidence": 0.5218
+              },
+              {
+                "label": "linen",
+                "confidence": 0.5216
+              },
+              {
+                "label": "destruction",
+                "confidence": 0.5209
+              },
+              {
+                "label": "loft",
+                "confidence": 0.5204
+              },
+              {
+                "label": "lighting",
+                "confidence": 0.5195
+              },
+              {
+                "label": "website",
+                "confidence": 0.5179
+              },
+              {
+                "label": "carpet",
+                "confidence": 0.5178
+              },
+              {
+                "label": "shine",
+                "confidence": 0.5163
+              },
+              {
+                "label": "couch",
+                "confidence": 0.5157
+              },
+              {
+                "label": "counter",
+                "confidence": 0.5153
+              },
+              {
+                "label": "drawer",
+                "confidence": 0.5139
+              },
+              {
+                "label": "lay",
+                "confidence": 0.5134
+              },
+              {
+                "label": "blow",
+                "confidence": 0.5134
+              },
+              {
+                "label": "pack",
+                "confidence": 0.5123
+              },
+              {
+                "label": "stove",
+                "confidence": 0.5099
+              },
+              {
+                "label": "equipment",
+                "confidence": 0.5077
+              },
+              {
+                "label": "sale",
+                "confidence": 0.5075
+              },
+              {
+                "label": "remain",
+                "confidence": 0.507
+              },
+              {
+                "label": "doorway",
+                "confidence": 0.5067
+              },
+              {
+                "label": "studio",
+                "confidence": 0.5061
+              },
+              {
+                "label": "move",
+                "confidence": 0.5057
+              },
+              {
+                "label": "bin",
+                "confidence": 0.5055
+              },
+              {
+                "label": "wide",
+                "confidence": 0.5049
+              },
+              {
+                "label": "fall",
+                "confidence": 0.5035
+              },
+              {
+                "label": "concrete",
+                "confidence": 0.5025
+              },
+              {
+                "label": "live",
+                "confidence": 0.5022
+              },
+              {
+                "label": "wet",
+                "confidence": 0.502
+              },
+              {
+                "label": "sheet",
+                "confidence": 0.5015
+              },
+              {
+                "label": "decorate",
+                "confidence": 0.5011
+              },
+              {
+                "label": "go",
+                "confidence": 0.5008
+              }
+            ],
+            "model": "ram_plus",
+            "inference_time_ms": 236.68,
+            "total_tags": 160
+          },
+          "florence_2": {
+            "tags": [
+              {
+                "label": "abandoned_clothing"
+              },
+              {
+                "label": "clothing_store"
+              },
+              {
+                "label": "clothes_hanging"
+              },
+              {
+                "label": "abandoned_condition"
+              },
+              {
+                "label": "peeling_paint"
+              },
+              {
+                "label": "debris_scattered"
+              },
+              {
+                "label": "plastic_bags"
+              },
+              {
+                "label": "other_debris"
+              },
+              {
+                "label": "several_pieces"
+              },
+              {
+                "label": "other_items"
+              },
+              {
+                "label": "items_scattered"
+              },
+              {
+                "label": "scattered_around"
+              },
+              {
+                "label": "large_window"
+              },
+              {
+                "label": "right_side"
+              },
+              {
+                "label": "natural_light"
+              },
+              {
+                "label": "overall_atmosphere"
+              },
+              {
+                "label": "abandoned"
+              },
+              {
+                "label": "clothing"
+              },
+              {
+                "label": "store"
+              },
+              {
+                "label": "clothes"
+              },
+              {
+                "label": "hanging"
+              },
+              {
+                "label": "racks"
+              },
+              {
+                "label": "dilapidated"
+              },
+              {
+                "label": "condition"
+              },
+              {
+                "label": "peeling"
+              },
+              {
+                "label": "paint"
+              },
+              {
+                "label": "debris"
+              },
+              {
+                "label": "scattered"
+              },
+              {
+                "label": "floor"
+              },
+              {
+                "label": "walls"
+              },
+              {
+                "label": "covered"
+              },
+              {
+                "label": "plastic"
+              },
+              {
+                "label": "bags"
+              },
+              {
+                "label": "other"
+              },
+              {
+                "label": "several"
+              },
+              {
+                "label": "pieces"
+              },
+              {
+                "label": "items"
+              },
+              {
+                "label": "around"
+              },
+              {
+                "label": "room"
+              },
+              {
+                "label": "ceiling"
+              },
+              {
+                "label": "large"
+              },
+              {
+                "label": "window"
+              },
+              {
+                "label": "right"
+              },
+              {
+                "label": "side"
+              },
+              {
+                "label": "letting"
+              },
+              {
+                "label": "natural"
+              },
+              {
+                "label": "light"
+              },
+              {
+                "label": "overall"
+              },
+              {
+                "label": "atmosphere"
+              },
+              {
+                "label": "one"
+              },
+              {
+                "label": "neglect"
+              },
+              {
+                "label": "abandonment"
+              }
+            ],
+            "model": "florence_2",
+            "inference_time_ms": 1420.15,
+            "total_tags": 52
+          }
+        },
+        "total_discovery_time_ms": 1656.83
+      }
     }
   }
 }
