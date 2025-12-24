@@ -1,5 +1,142 @@
 # Florence-2 Subject Matter Expert Guide
 
+## TLDR - Key Differences from RAM++
+
+**Critical Differences:**
+
+| Feature | Florence-2 | RAM++ |
+|---------|------------|-------|
+| **Configuration** | TASK-BASED | THRESHOLD-BASED |
+| **Confidence Scores** | **NO** - tags have no confidence values | YES - per-tag confidence |
+| **Output Format** | Parsed from captions/descriptions | Direct tag list |
+| **Compound Phrases** | Built-in slugification (`white_house`, `abandoned_building`) | Single-word tags only |
+
+**Florence-2 does NOT provide confidence scores.** All tags are equal weight. Use RAM++ (threshold 0.5) if you need confidence-based filtering.
+
+## Empirical Benchmark Results (2024-12-23)
+
+All 31 possible task combinations were tested on 10 diverse images (abandoned interiors, exteriors, vehicles, industrial). Results ranked by ground truth coverage.
+
+### Top 3 Recommendations for Archival/Database Building
+
+#### 🥇 #1 BEST VALUE: `<DETAILED_CAPTION>` + `<MORE_DETAILED_CAPTION>` + `<DENSE_REGION_CAPTION>`
+
+| Metric | Value |
+|--------|-------|
+| **Must-Have Coverage** | **76.1%** |
+| **False Positives** | 6 total (across 10 images) |
+| **Avg Tags/Image** | 77 |
+| **Avg Time** | 2915ms |
+
+**Why:** Highest coverage. Skips `<CAPTION>` (redundant) and `<OD>` (useless). Combines the three most productive tasks.
+
+```bash
+# Run all three tasks and combine results
+visual-buffet tag photo.jpg --plugin florence_2 --task "<DETAILED_CAPTION>"
+visual-buffet tag photo.jpg --plugin florence_2 --task "<MORE_DETAILED_CAPTION>"
+visual-buffet tag photo.jpg --plugin florence_2 --task "<DENSE_REGION_CAPTION>"
+```
+
+---
+
+#### 🥈 #2 BEST EFFICIENCY: `<MORE_DETAILED_CAPTION>` + `<DENSE_REGION_CAPTION>`
+
+| Metric | Value |
+|--------|-------|
+| **Must-Have Coverage** | **73.4%** |
+| **False Positives** | **3 total** (lowest!) |
+| **Avg Tags/Image** | 65 |
+| **Avg Time** | **2141ms** |
+
+**Why:** Only 2.7% less coverage than #1, but **HALF the false positives** and 27% faster. Best balance of accuracy and speed.
+
+```bash
+# RECOMMENDED for most use cases
+visual-buffet tag photo.jpg --plugin florence_2 --task "<MORE_DETAILED_CAPTION>"
+visual-buffet tag photo.jpg --plugin florence_2 --task "<DENSE_REGION_CAPTION>"
+```
+
+---
+
+#### 🥉 #3 SINGLE TASK CHAMPION: `<MORE_DETAILED_CAPTION>` only
+
+| Metric | Value |
+|--------|-------|
+| **Must-Have Coverage** | **70.5%** |
+| **False Positives** | **1 total** (best!) |
+| **Avg Tags/Image** | 46 |
+| **Avg Time** | **1212ms** (fastest) |
+
+**Why:** If speed matters or you want minimal false positives, this single task achieves 70% coverage with virtually no hallucinations.
+
+```bash
+# Fast and accurate
+visual-buffet tag photo.jpg --plugin florence_2 --task "<MORE_DETAILED_CAPTION>"
+```
+
+---
+
+### Key Findings from Benchmark
+
+1. **`<OD>` is WORTHLESS for tagging** - Only 14.9% coverage, 3 tags avg. Adding it to any combination provides 0% improvement.
+
+2. **More tasks ≠ better results** - Diminishing returns after 3 tasks. The 5-task "all" profile has same 76.1% coverage as 3-task #1.
+
+3. **False positive pattern** - Florence-2 occasionally hallucinates "person" in empty abandoned scenes. Simpler profiles have fewer hallucinations.
+
+4. **`<CAPTION>` is redundant** - Its content is subsumed by `<DETAILED_CAPTION>`. Skip it.
+
+### Full Benchmark Rankings
+
+| Rank | Combination | Must% | FP | Tags | Time |
+|------|-------------|-------|-----|------|------|
+| 1 | DET+MOR+DEN | 76.1% | 6 | 77 | 2915ms |
+| 2 | CAP+DET+MOR+DEN | 76.1% | 6 | 79 | 3405ms |
+| 3 | DET+MOR+OD+DEN | 76.1% | 6 | 78 | 3655ms |
+| 4 | ALL (5 tasks) | 76.1% | 6 | 80 | 4133ms |
+| 5 | **MOR+DEN** | **73.4%** | **3** | 65 | 2141ms |
+| 6 | CAP+MOR+DEN | 73.4% | 3 | 68 | 2583ms |
+| 7 | MOR+OD+DEN | 73.4% | 3 | 66 | 2838ms |
+| 13 | **MOR** | **70.5%** | **1** | 46 | 1212ms |
+| 23 | DET | 56.6% | 5 | 22 | 772ms |
+| 30 | CAP | 28.0% | 0 | 7 | 443ms |
+| 31 | OD | 14.9% | 0 | 3 | 620ms |
+
+*DET=DETAILED_CAPTION, MOR=MORE_DETAILED_CAPTION, DEN=DENSE_REGION_CAPTION, CAP=CAPTION, OD=Object Detection*
+
+## Built-in Slugification
+
+Florence-2 automatically extracts compound phrases as slugified tags:
+
+```
+Caption: "A white house with an abandoned building in the background"
+↓
+Tags: ["white_house", "abandoned_building", "white", "house", "abandoned", "building", "background"]
+```
+
+Compound phrases (bigrams of meaningful words) are joined with underscores and appear BEFORE individual words. This preserves semantic relationships like "swimming_pool" vs just "swimming" and "pool".
+
+## Suggested CLI Commands
+
+```bash
+# 🥇 BEST - Maximum coverage (76.1%), 3 tasks
+visual-buffet tag photo.jpg --plugin florence_2 --task "<DETAILED_CAPTION>"
+visual-buffet tag photo.jpg --plugin florence_2 --task "<MORE_DETAILED_CAPTION>"
+visual-buffet tag photo.jpg --plugin florence_2 --task "<DENSE_REGION_CAPTION>"
+
+# 🥈 RECOMMENDED - Best efficiency (73.4%), lowest false positives
+visual-buffet tag photo.jpg --plugin florence_2 --task "<MORE_DETAILED_CAPTION>"
+visual-buffet tag photo.jpg --plugin florence_2 --task "<DENSE_REGION_CAPTION>"
+
+# 🥉 FAST - Single task champion (70.5%), minimal hallucinations
+visual-buffet tag photo.jpg --plugin florence_2 --task "<MORE_DETAILED_CAPTION>"
+
+# Quick preview only
+visual-buffet tag photo.jpg --plugin florence_2 --task "<CAPTION>"
+```
+
+---
+
 ## Overview
 
 Florence-2 is a vision foundation model developed by Microsoft Research, released in June 2024. It uses a unified, prompt-based approach to handle multiple vision and vision-language tasks including captioning, object detection, OCR, and segmentation. Despite its compact size (0.23B-0.77B parameters), it achieves state-of-the-art performance on many benchmarks.
@@ -72,11 +209,19 @@ The `-ft` (fine-tuned) variants are trained on additional downstream tasks and g
 
 ### Known Weaknesses
 
-1. **No Predefined Tag List**: Unlike RAM++, outputs free-form text requiring parsing
-2. **Variable Output Format**: Caption tasks return sentences, not tags
-3. **Detection Vocabulary**: OD task has limited label set compared to specialized taggers
-4. **Confidence Scores**: Not natively provided; must be derived from generation scores
+1. **NO CONFIDENCE SCORES**: Florence-2 does not provide per-tag confidence. Tags are returned without confidence values. This is fundamentally different from RAM++ which provides calibrated confidence scores per tag.
+2. **No Predefined Tag List**: Unlike RAM++, outputs free-form text requiring parsing
+3. **Variable Output Format**: Caption tasks return sentences, not tags
+4. **Detection Vocabulary**: OD task has limited label set compared to specialized taggers (only 2-5 labels!)
 5. **Requires Parsing**: Raw output needs post-processing to extract tags
+
+### When to Use RAM++ Instead
+
+Use RAM++ (threshold 0.5) when you need:
+- Confidence-based filtering
+- Consistent tag vocabulary
+- Per-tag confidence scores for ranking
+- Threshold-based control over output volume
 
 ### Edge Cases
 
@@ -186,6 +331,8 @@ processor = AutoProcessor.from_pretrained(
 
 Florence-2 outputs vary by task and require normalization to Visual Buffet format.
 
+**IMPORTANT:** Florence-2 does NOT provide confidence scores. Tags are returned without confidence values.
+
 ### Object Detection (`<OD>`)
 
 ```python
@@ -197,43 +344,46 @@ Florence-2 outputs vary by task and require normalization to Visual Buffet forma
     }
 }
 
-# Normalized to Visual Buffet format
+# Normalized to Visual Buffet format (NO confidence)
 {
     "tags": [
-        {"label": "cat", "confidence": 0.95},
-        {"label": "dog", "confidence": 0.90},
-        {"label": "person", "confidence": 0.85}
+        {"label": "cat"},
+        {"label": "dog"},
+        {"label": "person"}
     ]
 }
 ```
 
-Note: Confidence scores derived from generation beam scores or assigned positionally.
-
-### Caption Tasks
+### Caption Tasks (with Slugification)
 
 ```python
 # Florence-2 raw output
 "A black cat sitting on a wooden table next to a window"
 
-# Normalized to Visual Buffet format (extract nouns/phrases)
+# Normalized to Visual Buffet format with compound phrases
 {
     "tags": [
-        {"label": "cat", "confidence": 0.90},
-        {"label": "table", "confidence": 0.85},
-        {"label": "window", "confidence": 0.80},
-        {"label": "black", "confidence": 0.75},
-        {"label": "wooden", "confidence": 0.70}
+        {"label": "black_cat"},      # Compound phrase first
+        {"label": "wooden_table"},   # Compound phrase
+        {"label": "black"},          # Then individual words
+        {"label": "cat"},
+        {"label": "sitting"},
+        {"label": "wooden"},
+        {"label": "table"},
+        {"label": "window"}
     ]
 }
 ```
 
-### Confidence Score Strategy
+### No Confidence Scores
 
-Since Florence-2 doesn't provide native confidence scores:
+Florence-2 cannot provide meaningful confidence scores:
 
-1. **For OD/Detection**: Use generation beam scores if available, else assign by position
-2. **For Captions**: Parse nouns/adjectives, assign decreasing confidence by order
-3. **Alternative**: Use `output_scores=True` in generation to get token probabilities
+- **Caption tasks**: Free-form text generation has no per-word confidence
+- **Detection tasks**: Labels are extracted from generated text, not detection logits
+- **Current implementation**: Tags have no confidence value
+
+**If you need confidence-based filtering**, use RAM++ with threshold 0.5 instead.
 
 ## Usage Tips
 
@@ -247,16 +397,30 @@ Since Florence-2 doesn't provide native confidence scores:
 
 ### Task Selection Guide
 
-| Goal | Recommended Task | Expected Tags |
-|------|------------------|---------------|
-| **Maximum tags (DEFAULT)** | `<MORE_DETAILED_CAPTION>` | 25-50 tags |
-| Rich descriptive tags | `<DETAILED_CAPTION>` | 15-25 tags |
-| Region-specific tags | `<DENSE_REGION_CAPTION>` | 15-30 tags |
-| Object detection only | `<OD>` | 2-5 tags (limited!) |
-| Brief description | `<CAPTION>` | 5-10 tags |
-| Text in images | `<OCR>` | Text content |
+| Goal | Recommended Task | Expected Tags | Notes |
+|------|------------------|---------------|-------|
+| **Database building** | `<DETAILED_CAPTION>` | 15-25 tags | **RECOMMENDED default** |
+| Maximum coverage | `<MORE_DETAILED_CAPTION>` | 25-50 tags | Comprehensive |
+| Quick preview | `<CAPTION>` | 5-10 tags | Fast |
+| Region-specific | `<DENSE_REGION_CAPTION>` | 15-30 tags | Good for complex scenes |
+| Object labels | `<OD>` | 2-5 tags | **NOT recommended** - very limited! |
+| Text extraction | `<OCR>` | Text content | Use for documents/signs |
 
-**Important**: The `<OD>` (Object Detection) task has a very limited vocabulary and typically returns only 2-5 object labels. For comprehensive tagging, use `<MORE_DETAILED_CAPTION>` which generates rich descriptions that are parsed into 25-50 meaningful tags.
+### WARNING: Do Not Use `<OD>` for Tagging
+
+The `<OD>` (Object Detection) task has a **very limited vocabulary** and typically returns only **2-5 object labels**. This is a common mistake!
+
+**Wrong approach:**
+```bash
+visual-buffet tag photo.jpg --task "<OD>"  # Only returns 2-5 labels!
+```
+
+**Correct approach:**
+```bash
+visual-buffet tag photo.jpg --task "<DETAILED_CAPTION>"  # Returns 15-25 rich tags
+```
+
+For comprehensive tagging, use `<MORE_DETAILED_CAPTION>` which generates rich descriptions that are parsed into 25-50 meaningful tags.
 
 ## Troubleshooting
 

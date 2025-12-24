@@ -109,11 +109,75 @@ visual-buffet gui --no-browser
 
 ### Image Tagging
 
-| Plugin | Description | Tags |
-|--------|-------------|------|
-| **RAM++** | Recognize Anything Plus Plus - general purpose tagging | ~4585 |
-| **SigLIP** | Google's zero-shot classifier with discovery mode | Custom vocabulary |
-| **Florence-2** | Microsoft vision foundation model | Captioning + tags |
+| Plugin | Description | Tags | Recommended Setting |
+|--------|-------------|------|---------------------|
+| **RAM++** | Recognize Anything Plus Plus - general purpose tagging | ~4585 | `--threshold 0.5` |
+| **SigLIP** | Google's zero-shot classifier with discovery mode | Custom vocabulary | `--threshold 0.01` |
+| **Florence-2** | Microsoft vision foundation model | Captioning + tags | `--task "<DETAILED_CAPTION>"` |
+
+### RAM++ Threshold Recommendation
+
+**Use `--threshold 0.5` for RAM++** (not 0.6 or 0.8).
+
+Empirical testing revealed that contextual tags (debris, damage, rust, antique, historic) have confidence scores in the 0.50-0.70 range. These tags are **accurate** but would be filtered out at higher thresholds.
+
+| Threshold | What You Get | What You Lose |
+|-----------|--------------|---------------|
+| 0.8 | Primary objects only | All contextual tags |
+| 0.6 | Primary + some context | rust, antique, some contextual |
+| **0.5** | **All accurate tags** | **Only noise** |
+
+```bash
+# Recommended for database building
+visual-buffet tag photo.jpg --threshold 0.5
+
+# For display/UI (cleaner, fewer tags)
+visual-buffet tag photo.jpg --threshold 0.6
+```
+
+See [RAM++ SME Guide](docs/sme/ram_plus.sme.md) for complete analysis.
+
+### Florence-2 Task Recommendation
+
+Florence-2 is **task-based, not threshold-based** and provides **no confidence scores**. Tags are extracted from captions via NLP parsing with built-in slugification (e.g., `white_house`, `abandoned_building`).
+
+> **Critical Finding**: `<OD>` (Object Detection) only achieves 14.9% coverage vs 70%+ for caption tasks. Do NOT use `<OD>` alone!
+
+#### Top 3 Configurations (Benchmarked on 10 Images)
+
+| Rank | Profile | Tasks | Coverage | FP | Tags | Time |
+|------|---------|-------|----------|----|----- |------|
+| #1 | **Maximum** | `<DETAILED_CAPTION>` + `<MORE_DETAILED_CAPTION>` + `<DENSE_REGION_CAPTION>` | 76.1% | 6 | 77 | 2915ms |
+| #2 | **Balanced** ⭐ | `<MORE_DETAILED_CAPTION>` + `<DENSE_REGION_CAPTION>` | 73.4% | 3 | 65 | 2141ms |
+| #3 | **Fast** | `<MORE_DETAILED_CAPTION>` only | 70.5% | 1 | 46 | 1212ms |
+
+#### When to Use Each
+
+**#1 Maximum Coverage** - Archives, museums, digital asset management where completeness matters more than speed.
+
+**#2 Balanced (Recommended)** - Best for most archival work. Removes `<DETAILED_CAPTION>` (redundant with MORE_DETAILED) for 27% faster processing with minimal coverage loss.
+
+**#3 Fast** - High-volume processing, previews, or when you need quick results. Single task = simplest pipeline.
+
+```bash
+# Balanced (recommended for database building)
+visual-buffet tag photo.jpg --plugin florence_2 --profile balanced
+
+# Maximum coverage
+visual-buffet tag photo.jpg --plugin florence_2 --profile maximum
+
+# Fast processing
+visual-buffet tag photo.jpg --plugin florence_2 --profile fast
+```
+
+#### Key Benchmark Findings
+
+- **Caption stacking works**: Combining caption tasks yields 73-76% coverage
+- **`<OD>` is worthless alone**: Only 14.9% coverage, 3 tags avg, 5 false positives
+- **`<DENSE_REGION_CAPTION>` adds regional context**: Boosts coverage 3-6%
+- **`<CAPTION>` is redundant**: Adds minimal value when other captions present
+
+See [Florence-2 SME Guide](docs/sme/florence_2.sme.md) for complete benchmark data and all 31 combinations tested.
 
 ### Object Detection
 
