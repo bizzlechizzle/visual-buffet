@@ -119,6 +119,11 @@ def main(ctx: click.Context, debug: bool) -> None:
     type=click.Path(),
     help="Record tags to vocabulary database for learning",
 )
+@click.option(
+    "--vocab-db",
+    type=click.Path(exists=True),
+    help="Use vocabulary from database for SigLIP (enables discovery mode)",
+)
 @click.pass_context
 def tag(
     ctx: click.Context,
@@ -133,6 +138,7 @@ def tag(
     xmp: bool,
     dry_run: bool,
     vocab: str | None,
+    vocab_db: str | None,
 ) -> None:
     """Tag image(s) using configured plugins.
 
@@ -211,9 +217,40 @@ def tag(
         # Build plugin configs
         plugin_configs = {}
 
+        # Auto-enable discovery mode when multi-model with SigLIP
+        # Discovery is enabled when: SigLIP + (RAM++ or Florence-2) are available
+        if not discover and not vocab_db:
+            plugins_to_check = plugin_names if plugin_names else available
+            has_siglip = "siglip" in plugins_to_check
+            has_discovery_source = any(
+                p in plugins_to_check for p in ["ram_plus", "florence_2"]
+            )
+            if has_siglip and has_discovery_source:
+                discover = True
+                console.print(
+                    "[dim]Auto-enabling discovery mode (SigLIP + discovery sources)[/dim]"
+                )
+
+        # Handle vocabulary from database (vocab-db)
+        vocab_labels = None
+        if vocab_db:
+            try:
+                from vocablearn import VocabLearn
+                vl = VocabLearn(vocab_db)
+                vocab_labels = vl.get_vocabulary_labels(min_occurrences=1)
+                console.print(f"[bold]Vocabulary mode:[/bold] {len(vocab_labels)} tags from {vocab_db}")
+                discover = True  # Auto-enable discovery with vocab-db
+            except ImportError:
+                console.print("[yellow]Warning: vocablearn not available[/yellow]")
+            except Exception as e:
+                console.print(f"[yellow]Warning: Could not load vocabulary: {e}[/yellow]")
+
         # Handle discovery mode
         if discover:
-            console.print("[bold]Discovery mode:[/bold] SigLIP with RAM++/Florence-2 vocabulary")
+            if vocab_labels:
+                console.print("[bold]Discovery mode:[/bold] SigLIP with vocabulary database")
+            else:
+                console.print("[bold]Discovery mode:[/bold] SigLIP with RAM++/Florence-2 vocabulary")
             console.print(f"[dim]Threshold: {threshold}[/dim]")
             console.print()
 
@@ -226,8 +263,9 @@ def tag(
             # Configure SigLIP for discovery
             plugin_configs["siglip"] = {
                 "discovery_mode": True,
-                "use_ram_plus": True,
-                "use_florence_2": True,
+                "use_ram_plus": not vocab_labels,  # Use RAM++ if no vocab-db
+                "use_florence_2": not vocab_labels,  # Use Florence-2 if no vocab-db
+                "custom_vocabulary": vocab_labels,  # Use vocab-db labels if available
             }
         else:
             console.print(f"[dim]Using plugins: {', '.join(available)}[/dim]")
@@ -257,8 +295,9 @@ def tag(
             if not file_path.exists():
                 continue
 
-            # Collect all tags from all plugins
-            all_tags = []
+            # Collect all tags from all plugins with deduplication
+            # Track unique labels with highest confidence and source plugins
+            tag_map: dict[str, dict] = {}  # normalized_label -> {label, confidence, plugins}
             total_inference_ms = 0.0
 
             for plugin_name, plugin_result in result.get("results", {}).items():
@@ -269,11 +308,39 @@ def tag(
                 total_inference_ms += inference_ms
 
                 for tag in plugin_result.get("tags", []):
-                    all_tags.append({
-                        "label": tag.get("label", ""),
-                        "confidence": tag.get("confidence"),
-                        "plugin": plugin_name,
-                    })
+                    label = tag.get("label", "").strip()
+                    if not label:
+                        continue
+
+                    normalized = label.lower()
+                    confidence = tag.get("confidence")
+
+                    if normalized not in tag_map:
+                        tag_map[normalized] = {
+                            "label": label,
+                            "confidence": confidence,
+                            "plugins": [plugin_name],
+                        }
+                    else:
+                        # Track which plugins found this tag
+                        if plugin_name not in tag_map[normalized]["plugins"]:
+                            tag_map[normalized]["plugins"].append(plugin_name)
+                        # Keep highest confidence
+                        existing_conf = tag_map[normalized]["confidence"]
+                        if confidence is not None:
+                            if existing_conf is None or confidence > existing_conf:
+                                tag_map[normalized]["confidence"] = confidence
+
+            # Convert to list for XMP writer
+            all_tags = [
+                {
+                    "label": v["label"],
+                    "confidence": v["confidence"],
+                    "plugin": ",".join(v["plugins"]),  # Comma-separated source plugins
+                    "agreement": len(v["plugins"]),  # How many models agreed
+                }
+                for v in tag_map.values()
+            ]
 
             # Write XMP sidecar
             if xmp_handler and all_tags:

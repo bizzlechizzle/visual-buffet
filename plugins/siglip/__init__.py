@@ -78,6 +78,8 @@ class SigLIPPlugin(PluginBase):
             "use_yolo": False,         # Object detection (80 COCO classes)
             "use_paddle_ocr": False,   # Text detection (OCR)
             "use_easyocr": False,      # Scene text recognition (photos/signs)
+            # Custom vocabulary from external source (e.g., vocablearn database)
+            "custom_vocabulary": None,  # List of labels or None
         }
 
     def get_info(self) -> PluginInfo:
@@ -209,6 +211,12 @@ class SigLIPPlugin(PluginBase):
             self._config["use_paddle_ocr"] = bool(kwargs["use_paddle_ocr"])
         if "use_easyocr" in kwargs:
             self._config["use_easyocr"] = bool(kwargs["use_easyocr"])
+        # Custom vocabulary from external source (e.g., vocablearn)
+        if "custom_vocabulary" in kwargs:
+            vocab = kwargs["custom_vocabulary"]
+            if vocab is not None and not isinstance(vocab, list):
+                raise PluginError("custom_vocabulary must be a list of labels or None")
+            self._config["custom_vocabulary"] = vocab
 
     def tag(self, image_path: Path) -> TagResult:
         """Tag an image using SigLIP zero-shot classification.
@@ -256,58 +264,75 @@ class SigLIPPlugin(PluginBase):
     def _tag_with_discovery(self, image_path: Path) -> TagResult:
         """Tag using discovered vocabulary from RAM++ and/or Florence-2.
 
-        Runs discovery plugins first to get candidate tags, then uses SigLIP
-        to score each candidate with real sigmoid confidence values.
+        If custom_vocabulary is set, uses that directly without running
+        discovery plugins. Otherwise runs discovery plugins first to get
+        candidate tags, then uses SigLIP to score each candidate.
 
         Returns:
             TagResult with scored tags and discovery metadata containing
             full results from all models that ran.
         """
-        # Determine which discovery sources are available and enabled
-        available_sources = []
-        for source_name, config_key in [
-            ("ram_plus", "use_ram_plus"),
-            ("florence_2", "use_florence_2"),
-            ("yolo", "use_yolo"),
-            ("paddle_ocr", "use_paddle_ocr"),
-            ("easyocr", "use_easyocr"),
-        ]:
-            if self._config.get(config_key) and source_name in self._discovery_plugins:
-                plugin = self._discovery_plugins[source_name]
-                if plugin.is_available():
-                    available_sources.append(source_name)
-
-        if not available_sources:
-            raise PluginError(
-                "Discovery mode enabled but no discovery plugins available. "
-                "Either enable ram_plus or florence_2 in settings, ensure they "
-                "are installed, or disable discovery mode."
-            )
-
-        # Collect candidates from discovery plugins
-        all_candidates: set[str] = set()
         discovery_results: dict[str, dict] = {}
         total_discovery_time = 0.0
+        available_sources = []
 
-        for name in available_sources:
-            plugin = self._discovery_plugins[name]
-            result = plugin.tag(image_path)
-
-            # Collect unique lowercase tags
-            for tag in result.tags:
-                all_candidates.add(tag.label.lower().strip())
-
-            # Store full results for display
-            discovery_results[name] = {
-                "tags": [t.to_dict() for t in result.tags],
-                "model": plugin.get_info().name,
-                "inference_time_ms": result.inference_time_ms or 0,
-                "total_tags": len(result.tags),
+        # Check if custom vocabulary is provided (from vocablearn database)
+        custom_vocab = self._config.get("custom_vocabulary")
+        if custom_vocab:
+            # Use custom vocabulary directly - no discovery plugins needed
+            candidate_list = [v.lower().strip() for v in custom_vocab]
+            discovery_results["vocablearn"] = {
+                "tags": [],
+                "model": "vocablearn",
+                "inference_time_ms": 0,
+                "total_tags": len(candidate_list),
+                "source": "vocabulary_database",
             }
-            total_discovery_time += result.inference_time_ms or 0
+            available_sources = ["vocablearn"]
+        else:
+            # Determine which discovery sources are available and enabled
+            for source_name, config_key in [
+                ("ram_plus", "use_ram_plus"),
+                ("florence_2", "use_florence_2"),
+                ("yolo", "use_yolo"),
+                ("paddle_ocr", "use_paddle_ocr"),
+                ("easyocr", "use_easyocr"),
+            ]:
+                if self._config.get(config_key) and source_name in self._discovery_plugins:
+                    plugin = self._discovery_plugins[source_name]
+                    if plugin.is_available():
+                        available_sources.append(source_name)
 
-        # Set vocabulary to discovered tags
-        candidate_list = sorted(all_candidates)
+            if not available_sources:
+                raise PluginError(
+                    "Discovery mode enabled but no discovery plugins available. "
+                    "Either enable ram_plus or florence_2 in settings, ensure they "
+                    "are installed, provide custom_vocabulary, or disable discovery mode."
+                )
+
+            # Collect candidates from discovery plugins
+            all_candidates: set[str] = set()
+
+            for name in available_sources:
+                plugin = self._discovery_plugins[name]
+                result = plugin.tag(image_path)
+
+                # Collect unique lowercase tags
+                for tag in result.tags:
+                    all_candidates.add(tag.label.lower().strip())
+
+                # Store full results for display
+                discovery_results[name] = {
+                    "tags": [t.to_dict() for t in result.tags],
+                    "model": plugin.get_info().name,
+                    "inference_time_ms": result.inference_time_ms or 0,
+                    "total_tags": len(result.tags),
+                }
+                total_discovery_time += result.inference_time_ms or 0
+
+            # Set vocabulary to discovered tags
+            candidate_list = sorted(all_candidates)
+
         self.set_vocabulary(candidate_list)
 
         # Lazy load SigLIP model

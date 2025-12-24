@@ -767,6 +767,50 @@ class SQLiteStorage:
             cursor = conn.execute("SELECT * FROM vocabulary ORDER BY total_occurrences DESC")
             return [self._row_to_tag(row).to_dict() for row in cursor.fetchall()]
 
+    def get_vocabulary_labels(
+        self,
+        min_occurrences: int = 1,
+        min_confidence: float = 0.0,
+        sources: list[str] | None = None,
+    ) -> list[str]:
+        """Get list of vocabulary labels for external use (e.g., SigLIP).
+
+        Args:
+            min_occurrences: Minimum total occurrences required
+            min_confidence: Minimum prior confidence required
+            sources: Filter to tags from specific sources (ram_plus, florence_2, etc.)
+
+        Returns:
+            List of tag labels sorted by occurrence count
+        """
+        with self._connection() as conn:
+            if sources:
+                # Filter by source - need to join with tag_events
+                placeholders = ",".join("?" * len(sources))
+                cursor = conn.execute(
+                    f"""
+                    SELECT DISTINCT v.label
+                    FROM vocabulary v
+                    JOIN tag_events te ON v.tag_id = te.tag_id
+                    WHERE v.total_occurrences >= ?
+                      AND v.prior_confidence >= ?
+                      AND te.source IN ({placeholders})
+                    ORDER BY v.total_occurrences DESC
+                    """,
+                    [min_occurrences, min_confidence] + sources,
+                )
+            else:
+                cursor = conn.execute(
+                    """
+                    SELECT label FROM vocabulary
+                    WHERE total_occurrences >= ?
+                      AND prior_confidence >= ?
+                    ORDER BY total_occurrences DESC
+                    """,
+                    [min_occurrences, min_confidence],
+                )
+            return [row[0] for row in cursor.fetchall()]
+
     def import_vocabulary(self, tags: list[dict], merge: bool = True) -> int:
         """Import vocabulary from list of dicts.
 

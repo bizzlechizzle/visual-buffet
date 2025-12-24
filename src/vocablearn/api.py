@@ -425,6 +425,39 @@ class VocabLearn:
     # EXPORT / IMPORT
     # =========================================================================
 
+    def get_vocabulary_labels(
+        self,
+        min_occurrences: int = 1,
+        min_confidence: float = 0.0,
+        sources: list[str] | None = None,
+    ) -> list[str]:
+        """Get vocabulary labels for external use (e.g., SigLIP vocabulary).
+
+        Returns a list of tag labels from the vocabulary database,
+        filtered by occurrence count and confidence. Useful for feeding
+        historical vocabulary to SigLIP for scoring.
+
+        Args:
+            min_occurrences: Minimum occurrences required (default 1)
+            min_confidence: Minimum prior confidence (default 0.0)
+            sources: Filter to specific sources (e.g., ['ram_plus', 'florence_2'])
+
+        Returns:
+            List of tag labels sorted by occurrence count
+
+        Example:
+            >>> vocab = VocabLearn("./vocab.db")
+            >>> labels = vocab.get_vocabulary_labels(min_occurrences=3)
+            >>> # Use these labels as SigLIP vocabulary
+            >>> len(labels)
+            1547
+        """
+        return self._storage.get_vocabulary_labels(
+            min_occurrences=min_occurrences,
+            min_confidence=min_confidence,
+            sources=sources,
+        )
+
     def export_vocabulary(self, path: str | Path) -> None:
         """Export vocabulary to JSON file.
 
