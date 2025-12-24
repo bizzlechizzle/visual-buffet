@@ -1,0 +1,163 @@
+{
+  "file": "/Volumes/projects/visual-buffet/images/testimage02.jpg",
+  "filename": "testimage02.jpg",
+  "tagged_at": "2025-12-24T16:05:21.601856+00:00",
+  "threshold": 0.5,
+  "size": "original",
+  "inference_time_ms": 1057.28,
+  "results": {
+    "florence_2": {
+      "tags": [],
+      "model": "florence_2"
+    },
+    "siglip": {
+      "tags": [
+        {
+          "label": "clothes_hanging",
+          "confidence": 0.9449314475059509,
+          "plugin": "siglip"
+        },
+        {
+          "label": "abandoned_clothing",
+          "confidence": 0.8274401426315308,
+          "plugin": "siglip"
+        },
+        {
+          "label": "storage room",
+          "confidence": 0.719745397567749,
+          "plugin": "siglip"
+        },
+        {
+          "label": "hanger",
+          "confidence": 0.5898884534835815,
+          "plugin": "siglip"
+        },
+        {
+          "label": "laundry",
+          "confidence": 0.5612152814865112,
+          "plugin": "siglip"
+        },
+        {
+          "label": "clothes",
+          "confidence": 0.55884850025177,
+          "plugin": "siglip"
+        },
+        {
+          "label": "dressing room",
+          "confidence": 0.4949570894241333,
+          "plugin": "siglip"
+        },
+        {
+          "label": "racks",
+          "confidence": 0.33326199650764465,
+          "plugin": "siglip"
+        },
+        {
+          "label": "abandoned_condition",
+          "confidence": 0.29868412017822266,
+          "plugin": "siglip"
+        },
+        {
+          "label": "clothing",
+          "confidence": 0.24304892122745514,
+          "plugin": "siglip"
+        },
+        {
+          "label": "dilapidated",
+          "confidence": 0.19967105984687805,
+          "plugin": "siglip"
+        },
+        {
+          "label": "clothesline",
+          "confidence": 0.19004341959953308,
+          "plugin": "siglip"
+        },
+        {
+          "label": "hanging",
+          "confidence": 0.1756851226091385,
+          "plugin": "siglip"
+        },
+        {
+          "label": "clothing_store",
+          "confidence": 0.17231829464435577,
+          "plugin": "siglip"
+        },
+        {
+          "label": "suit",
+          "confidence": 0.11670314520597458,
+          "plugin": "siglip"
+        },
+        {
+          "label": "clothing store",
+          "confidence": 0.11431464552879333,
+          "plugin": "siglip"
+        },
+        {
+          "label": "room",
+          "confidence": 0.10150887072086334,
+          "plugin": "siglip"
+        },
+        {
+          "label": "clothe",
+          "confidence": 0.09784799814224243,
+          "plugin": "siglip"
+        },
+        {
+          "label": "mess",
+          "confidence": 0.09521423280239105,
+          "plugin": "siglip"
+        },
+        {
+          "label": "basement",
+          "confidence": 0.07647157460451126,
+          "plugin": "siglip"
+        },
+        {
+          "label": "garment",
+          "confidence": 0.07291354984045029,
+          "plugin": "siglip"
+        },
+        {
+          "label": "coat",
+          "confidence": 0.027124503627419472,
+          "plugin": "siglip"
+        },
+        {
+          "label": "hang",
+          "confidence": 0.019721616059541702,
+          "plugin": "siglip"
+        },
+        {
+          "label": "neglect",
+          "confidence": 0.013422735035419464,
+          "plugin": "siglip"
+        },
+        {
+          "label": "cloth",
+          "confidence": 0.013191861100494862,
+          "plugin": "siglip"
+        },
+        {
+          "label": "furniture",
+          "confidence": 0.012858225964009762,
+          "plugin": "siglip"
+        },
+        {
+          "label": "neglected",
+          "confidence": 0.012053790502250195,
+          "plugin": "siglip"
+        },
+        {
+          "label": "overall",
+          "confidence": 0.011952625587582588,
+          "plugin": "siglip"
+        }
+      ],
+      "model": "siglip"
+    },
+    "ram_plus": {
+      "tags": [],
+      "model": "ram_plus"
+    }
+  }
+}

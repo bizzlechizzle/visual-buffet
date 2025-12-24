@@ -35,7 +35,6 @@ class TestDefaultConfig:
     def test_default_config_general_values(self):
         """Test default config general values."""
         assert DEFAULT_CONFIG["general"]["default_threshold"] == 0.5
-        assert DEFAULT_CONFIG["general"]["default_limit"] == 50
         assert DEFAULT_CONFIG["general"]["default_format"] == "json"
 
     def test_default_config_plugins_values(self):
@@ -67,7 +66,6 @@ class TestLoadConfig:
                 """
 [general]
 default_threshold = 0.7
-default_limit = 100
 default_format = "json"
 
 [plugins]
@@ -79,7 +77,6 @@ enabled = ["ram_plus"]
                 config = load_config()
 
             assert config["general"]["default_threshold"] == 0.7
-            assert config["general"]["default_limit"] == 100
             assert config["plugins"]["enabled"] == ["ram_plus"]
 
 
@@ -205,7 +202,6 @@ class TestConfigRoundTrip:
             original = {
                 "general": {
                     "default_threshold": 0.65,
-                    "default_limit": 75,
                     "default_format": "json",
                 },
                 "plugins": {
@@ -218,5 +214,4 @@ class TestConfigRoundTrip:
                 loaded = load_config()
 
             assert loaded["general"]["default_threshold"] == 0.65
-            assert loaded["general"]["default_limit"] == 75
             assert loaded["plugins"]["enabled"] == ["ram_plus"]

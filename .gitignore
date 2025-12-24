@@ -81,3 +81,5 @@ results.json
 # Generated imlage folders (thumbnails/tags next to images)
 **/imlage/
 !src/imlage/
+.venv2/
+tests/benchmark/*_*.json

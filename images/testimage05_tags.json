@@ -1,0 +1,118 @@
+{
+  "file": "/Volumes/projects/visual-buffet/images/testimage05.jpg",
+  "filename": "testimage05.jpg",
+  "tagged_at": "2025-12-24T16:05:22.228850+00:00",
+  "threshold": 0.5,
+  "size": "original",
+  "inference_time_ms": 1034.29,
+  "results": {
+    "florence_2": {
+      "tags": [],
+      "model": "florence_2"
+    },
+    "siglip": {
+      "tags": [
+        {
+          "label": "dilapidated_kitchen",
+          "confidence": 0.9990110397338867,
+          "plugin": "siglip"
+        },
+        {
+          "label": "dilapidated",
+          "confidence": 0.6379793286323547,
+          "plugin": "siglip"
+        },
+        {
+          "label": "cluttered",
+          "confidence": 0.44321537017822266,
+          "plugin": "siglip"
+        },
+        {
+          "label": "mess",
+          "confidence": 0.3547526001930237,
+          "plugin": "siglip"
+        },
+        {
+          "label": "kitchen",
+          "confidence": 0.18043503165245056,
+          "plugin": "siglip"
+        },
+        {
+          "label": "neglect",
+          "confidence": 0.14174601435661316,
+          "plugin": "siglip"
+        },
+        {
+          "label": "cabinets",
+          "confidence": 0.12697502970695496,
+          "plugin": "siglip"
+        },
+        {
+          "label": "kitchen table",
+          "confidence": 0.08579840511083603,
+          "plugin": "siglip"
+        },
+        {
+          "label": "trash",
+          "confidence": 0.07612328976392746,
+          "plugin": "siglip"
+        },
+        {
+          "label": "stove",
+          "confidence": 0.03371209278702736,
+          "plugin": "siglip"
+        },
+        {
+          "label": "garbage",
+          "confidence": 0.026908010244369507,
+          "plugin": "siglip"
+        },
+        {
+          "label": "including_trash",
+          "confidence": 0.0209099929779768,
+          "plugin": "siglip"
+        },
+        {
+          "label": "kitchen counter",
+          "confidence": 0.0193383377045393,
+          "plugin": "siglip"
+        },
+        {
+          "label": "house",
+          "confidence": 0.01657916232943535,
+          "plugin": "siglip"
+        },
+        {
+          "label": "home",
+          "confidence": 0.015149769373238087,
+          "plugin": "siglip"
+        },
+        {
+          "label": "waste",
+          "confidence": 0.01433529146015644,
+          "plugin": "siglip"
+        },
+        {
+          "label": "remodel",
+          "confidence": 0.013371783308684826,
+          "plugin": "siglip"
+        },
+        {
+          "label": "overall",
+          "confidence": 0.01089885737746954,
+          "plugin": "siglip"
+        },
+        {
+          "label": "brick",
+          "confidence": 0.010538529604673386,
+          "plugin": "siglip"
+        }
+      ],
+      "model": "siglip"
+    },
+    "ram_plus": {
+      "tags": [],
+      "model": "ram_plus"
+    }
+  }
+}

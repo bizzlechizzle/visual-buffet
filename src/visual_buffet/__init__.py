@@ -3,6 +3,16 @@
 from importlib.metadata import PackageNotFoundError, version
 from pathlib import Path
 
+# Lazy import to avoid loading vocablearn unless needed
+def get_vocab_integration():
+    """Get VocabIntegration class for vocabulary learning.
+
+    Returns:
+        VocabIntegration class
+    """
+    from visual_buffet.vocab_integration import VocabIntegration
+    return VocabIntegration
+
 
 def _get_version() -> str:
     """Get version from package metadata or VERSION file."""

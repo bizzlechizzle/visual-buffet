@@ -463,7 +463,6 @@ class PluginConfig(BaseModel):
     # None means use plugin's recommended threshold
     # SigLIP needs 0.01, others use 0.0 (no filtering)
     threshold: float | None = None
-    quality: Literal["quick", "standard", "max"] = "standard"
 
     # SigLIP discovery mode settings
     discovery_mode: bool = False
@@ -476,6 +475,7 @@ class PluginConfig(BaseModel):
 class TagRequest(BaseModel):
     plugins: list[str] | None = None
     plugin_configs: dict[str, PluginConfig] | None = None
+    size: Literal["little", "small", "large", "huge", "original"] = "original"
 
 
 @app.post("/api/tag/{image_id}")
@@ -489,6 +489,7 @@ async def tag_image(image_id: str, request: TagRequest | None = None):
     # Extract settings from request
     plugins = request.plugins if request else None
     plugin_configs = request.plugin_configs if request else None
+    size = request.size if request else "original"
 
     try:
         # Write to temp file for processing - use original extension for RAW support
@@ -505,6 +506,7 @@ async def tag_image(image_id: str, request: TagRequest | None = None):
                 tmp_path,
                 plugin_names=plugins,
                 plugin_configs=plugin_configs,
+                size=size,
                 save_tags=False,
             )
 
@@ -530,6 +532,7 @@ class BatchTagRequest(BaseModel):
     image_ids: list[str]
     plugins: list[str] | None = None
     plugin_configs: dict[str, PluginConfig] | None = None
+    size: Literal["little", "small", "large", "huge", "original"] = "original"
 
 
 @app.post("/api/tag-batch")
@@ -546,6 +549,7 @@ async def tag_batch_api(request: BatchTagRequest):
             tag_request = TagRequest(
                 plugins=request.plugins,
                 plugin_configs=request.plugin_configs,
+                size=request.size,
             )
             result = await tag_image(image_id, tag_request)
             result["id"] = image_id

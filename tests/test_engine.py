@@ -145,8 +145,8 @@ class TestTagImage:
             tags = result["results"]["mock"]["tags"]
             assert all(t["confidence"] >= 0.7 for t in tags)
 
-    def test_tag_image_limit(self):
-        """Test tagging with tag limit."""
+    def test_tag_image_with_size(self):
+        """Test tagging with specified size."""
         with tempfile.TemporaryDirectory() as tmpdir:
             test_image = Path(tmpdir) / "test.jpg"
             img = Image.new("RGB", (100, 100))
@@ -156,9 +156,10 @@ class TestTagImage:
 
             with patch("visual_buffet.core.engine.load_all_plugins", return_value=mock_plugins):
                 engine = TaggingEngine()
-                result = engine.tag_image(test_image, limit=2)
+                result = engine.tag_image(test_image, size="small")
 
-            assert len(result["results"]["mock"]["tags"]) <= 2
+            # Result should include size field
+            assert result["results"]["mock"]["size"] == "small"
 
     def test_tag_image_skips_unavailable(self):
         """Test tagging skips unavailable plugins."""

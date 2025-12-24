@@ -1,0 +1,98 @@
+{
+  "file": "/Volumes/projects/visual-buffet/images/testimage03.jpg",
+  "filename": "testimage03.jpg",
+  "tagged_at": "2025-12-24T16:05:21.812322+00:00",
+  "threshold": 0.5,
+  "size": "original",
+  "inference_time_ms": 726.82,
+  "results": {
+    "florence_2": {
+      "tags": [],
+      "model": "florence_2"
+    },
+    "siglip": {
+      "tags": [
+        {
+          "label": "pews",
+          "confidence": 0.9812939763069153,
+          "plugin": "siglip"
+        },
+        {
+          "label": "wooden_pews",
+          "confidence": 0.9581219553947449,
+          "plugin": "siglip"
+        },
+        {
+          "label": "church bench",
+          "confidence": 0.8202000856399536,
+          "plugin": "siglip"
+        },
+        {
+          "label": "pulpit",
+          "confidence": 0.7742975354194641,
+          "plugin": "siglip"
+        },
+        {
+          "label": "chapel",
+          "confidence": 0.6588369011878967,
+          "plugin": "siglip"
+        },
+        {
+          "label": "church",
+          "confidence": 0.6585718989372253,
+          "plugin": "siglip"
+        },
+        {
+          "label": "cross",
+          "confidence": 0.32446736097335815,
+          "plugin": "siglip"
+        },
+        {
+          "label": "altar",
+          "confidence": 0.30695271492004395,
+          "plugin": "siglip"
+        },
+        {
+          "label": "religious",
+          "confidence": 0.238851398229599,
+          "plugin": "siglip"
+        },
+        {
+          "label": "wooden_altar",
+          "confidence": 0.2196284830570221,
+          "plugin": "siglip"
+        },
+        {
+          "label": "religion",
+          "confidence": 0.1722506880760193,
+          "plugin": "siglip"
+        },
+        {
+          "label": "cross_hanging",
+          "confidence": 0.07217367738485336,
+          "plugin": "siglip"
+        },
+        {
+          "label": "empty",
+          "confidence": 0.050012510269880295,
+          "plugin": "siglip"
+        },
+        {
+          "label": "crucifix",
+          "confidence": 0.04696379601955414,
+          "plugin": "siglip"
+        },
+        {
+          "label": "neglect",
+          "confidence": 0.010091696865856647,
+          "plugin": "siglip"
+        }
+      ],
+      "model": "siglip"
+    },
+    "ram_plus": {
+      "tags": [],
+      "model": "ram_plus"
+    }
+  }
+}

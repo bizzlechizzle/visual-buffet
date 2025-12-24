@@ -1,0 +1,133 @@
+{
+  "file": "/Volumes/projects/visual-buffet/images/testimage10.jpg",
+  "filename": "testimage10.jpg",
+  "tagged_at": "2025-12-24T16:05:23.256351+00:00",
+  "threshold": 0.5,
+  "size": "original",
+  "inference_time_ms": 967.42,
+  "results": {
+    "florence_2": {
+      "tags": [],
+      "model": "florence_2"
+    },
+    "siglip": {
+      "tags": [
+        {
+          "label": "power station",
+          "confidence": 0.5781369805335999,
+          "plugin": "siglip"
+        },
+        {
+          "label": "smokestack",
+          "confidence": 0.5236230492591858,
+          "plugin": "siglip"
+        },
+        {
+          "label": "mill",
+          "confidence": 0.37197884917259216,
+          "plugin": "siglip"
+        },
+        {
+          "label": "large_smokestack",
+          "confidence": 0.33342647552490234,
+          "plugin": "siglip"
+        },
+        {
+          "label": "chimney",
+          "confidence": 0.3321743607521057,
+          "plugin": "siglip"
+        },
+        {
+          "label": "dilapidated",
+          "confidence": 0.29774725437164307,
+          "plugin": "siglip"
+        },
+        {
+          "label": "brick building",
+          "confidence": 0.18412496149539948,
+          "plugin": "siglip"
+        },
+        {
+          "label": "tall_chimney",
+          "confidence": 0.17646901309490204,
+          "plugin": "siglip"
+        },
+        {
+          "label": "industrial_structure",
+          "confidence": 0.17574037611484528,
+          "plugin": "siglip"
+        },
+        {
+          "label": "large_industrial",
+          "confidence": 0.1642996221780777,
+          "plugin": "siglip"
+        },
+        {
+          "label": "factory",
+          "confidence": 0.15907281637191772,
+          "plugin": "siglip"
+        },
+        {
+          "label": "brick_factory",
+          "confidence": 0.1402921825647354,
+          "plugin": "siglip"
+        },
+        {
+          "label": "structure",
+          "confidence": 0.13312913477420807,
+          "plugin": "siglip"
+        },
+        {
+          "label": "pond",
+          "confidence": 0.09199820458889008,
+          "plugin": "siglip"
+        },
+        {
+          "label": "industry",
+          "confidence": 0.06153926998376846,
+          "plugin": "siglip"
+        },
+        {
+          "label": "industrial",
+          "confidence": 0.037400152534246445,
+          "plugin": "siglip"
+        },
+        {
+          "label": "building",
+          "confidence": 0.028890272602438927,
+          "plugin": "siglip"
+        },
+        {
+          "label": "water",
+          "confidence": 0.020249713212251663,
+          "plugin": "siglip"
+        },
+        {
+          "label": "pollution",
+          "confidence": 0.01595200225710869,
+          "plugin": "siglip"
+        },
+        {
+          "label": "lake",
+          "confidence": 0.015512609854340553,
+          "plugin": "siglip"
+        },
+        {
+          "label": "abandoned",
+          "confidence": 0.015193742699921131,
+          "plugin": "siglip"
+        },
+        {
+          "label": "silo",
+          "confidence": 0.013886758126318455,
+          "plugin": "siglip"
+        }
+      ],
+      "model": "siglip"
+    },
+    "ram_plus": {
+      "tags": [],
+      "model": "ram_plus"
+    }
+  }
+}

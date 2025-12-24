@@ -11,7 +11,7 @@ Usage:
 
 import json
 import platform
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 
 import psutil
@@ -63,7 +63,7 @@ def _save_cache(profile: HardwareProfile) -> None:
     """Save hardware profile to cache file."""
     CACHE_DIR.mkdir(parents=True, exist_ok=True)
 
-    data = {"detected_at": datetime.now().isoformat(), "hardware": profile.to_dict()}
+    data = {"detected_at": datetime.now(timezone.utc).isoformat(), "hardware": profile.to_dict()}
 
     with open(CACHE_FILE, "w") as f:
         json.dump(data, f, indent=2)

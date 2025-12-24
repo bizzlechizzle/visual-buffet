@@ -1,6 +1,6 @@
 [project]
 name = "visual-buffet"
-version = "0.1.9"
+version = "0.1.10"
 description = "Visual Buffet - Compare visual tagging results from local ML tools"
 readme = "README.md"
 license = { text = "MIT" }
@@ -40,6 +40,9 @@ dependencies = [
 dev = [
     "pytest>=8.0",
     "pytest-cov>=4.0",
+    "pytest-benchmark>=4.0",
+    "hypothesis>=6.100",
+    "jsonschema>=4.20",
     "ruff>=0.4",
     "httpx>=0.27",
 ]
@@ -161,3 +164,15 @@ select = [
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["src"]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "gpu: marks tests requiring GPU",
+    "integration: marks integration tests",
+    "regression: marks regression tests",
+    "benchmark: marks benchmark tests",
+]
+addopts = "-v --strict-markers"
+filterwarnings = [
+    "ignore::DeprecationWarning:torch.*",
+    "ignore::UserWarning:PIL.*",
+]

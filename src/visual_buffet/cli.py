@@ -14,6 +14,15 @@ from typing import Any
 
 import click
 from rich.console import Console
+from rich.progress import (
+    BarColumn,
+    MofNCompleteColumn,
+    Progress,
+    SpinnerColumn,
+    TaskProgressColumn,
+    TextColumn,
+    TimeElapsedColumn,
+)
 from rich.table import Table
 
 from visual_buffet import __version__
@@ -31,6 +40,7 @@ from visual_buffet.exceptions import VisualBuffetError
 from visual_buffet.plugins.loader import discover_plugins, get_plugins_dir, load_plugin
 from visual_buffet.utils.config import get_value, load_config, save_config, set_value
 from visual_buffet.utils.image import expand_paths
+from visual_buffet.utils.progress import ProgressState, format_duration, truncate_middle
 
 console = Console()
 
@@ -94,6 +104,21 @@ def main(ctx: click.Context, debug: bool) -> None:
     is_flag=True,
     help="Discovery mode: SigLIP uses RAM++/Florence-2 to discover vocabulary",
 )
+@click.option(
+    "--xmp/--no-xmp",
+    default=True,
+    help="Write tags to XMP sidecar (default: on)",
+)
+@click.option(
+    "--dry-run",
+    is_flag=True,
+    help="Preview what would be tagged without writing files",
+)
+@click.option(
+    "--vocab",
+    type=click.Path(),
+    help="Record tags to vocabulary database for learning",
+)
 @click.pass_context
 def tag(
     ctx: click.Context,
@@ -105,6 +130,9 @@ def tag(
     recursive: bool,
     size: str,
     discover: bool,
+    xmp: bool,
+    dry_run: bool,
+    vocab: str | None,
 ) -> None:
     """Tag image(s) using configured plugins.
 
@@ -121,14 +149,42 @@ def tag(
         visual-buffet tag photo.jpg --size small
 
         visual-buffet tag photo.jpg --discover
+
+        visual-buffet tag photo.jpg --xmp --vocab vocab.db
     """
     try:
+        # Import XMP handler and vocab integration
+        from visual_buffet.services.xmp_handler import XMPHandler
+
+        xmp_handler = XMPHandler() if xmp else None
+        vocab_integration = None
+
+        if vocab:
+            try:
+                from visual_buffet.vocab_integration import VocabIntegration
+                vocab_integration = VocabIntegration(vocab)
+            except ImportError:
+                console.print("[yellow]Warning: vocablearn not available[/yellow]")
+
         # Expand paths to file list
         image_paths = expand_paths(list(path), recursive=recursive)
 
         if not image_paths:
             console.print("[red]No images found[/red]")
             sys.exit(ExitCode.FILE_NOT_FOUND)
+
+        # Dry run mode
+        if dry_run:
+            console.print("[bold yellow]DRY RUN[/bold yellow] - No files will be written")
+            console.print(f"Would process {len(image_paths)} image(s)")
+            console.print(f"[dim]Plugins: {', '.join(plugins) if plugins else 'all'}[/dim]")
+            console.print(f"[dim]XMP output: {'yes' if xmp else 'no'}[/dim]")
+            console.print(f"[dim]Vocab learning: {vocab if vocab else 'no'}[/dim]")
+            for img_path in image_paths[:10]:
+                console.print(f"  - {img_path}")
+            if len(image_paths) > 10:
+                console.print(f"  ... and {len(image_paths) - 10} more")
+            return
 
         console.print(f"[dim]Found {len(image_paths)} image(s)[/dim]")
 
@@ -178,14 +234,78 @@ def tag(
             console.print(f"[dim]Size: {size} | Threshold: {threshold}[/dim]")
             console.print()
 
-        # Process images
-        results = engine.tag_batch(
+        # Process images with progress bar
+        results = _tag_with_progress(
+            engine,
             image_paths,
             plugin_names=plugin_names,
             threshold=threshold,
             plugin_configs=plugin_configs if plugin_configs else None,
             size=size,
         )
+
+        # Post-processing: XMP and vocabulary recording
+        xmp_count = 0
+        vocab_count = 0
+        plugins_used = list(plugins) if plugins else list(available)
+
+        for result in results:
+            if "error" in result:
+                continue
+
+            file_path = Path(result.get("file", ""))
+            if not file_path.exists():
+                continue
+
+            # Collect all tags from all plugins
+            all_tags = []
+            total_inference_ms = 0.0
+
+            for plugin_name, plugin_result in result.get("results", {}).items():
+                if "error" in plugin_result:
+                    continue
+
+                inference_ms = plugin_result.get("inference_time_ms", 0.0)
+                total_inference_ms += inference_ms
+
+                for tag in plugin_result.get("tags", []):
+                    all_tags.append({
+                        "label": tag.get("label", ""),
+                        "confidence": tag.get("confidence"),
+                        "plugin": plugin_name,
+                    })
+
+            # Write XMP sidecar
+            if xmp_handler and all_tags:
+                try:
+                    if xmp_handler.write_tags(
+                        image_path=file_path,
+                        tags=all_tags,
+                        plugins_used=plugins_used,
+                        threshold=threshold,
+                        size_used=size,
+                        inference_time_ms=total_inference_ms,
+                    ):
+                        xmp_count += 1
+                except Exception as e:
+                    if ctx.obj.get("debug"):
+                        console.print(f"[dim]XMP error for {file_path.name}: {e}[/dim]")
+
+            # Record to vocabulary
+            if vocab_integration:
+                try:
+                    recorded = vocab_integration.record_tagging_result(file_path, result)
+                    if recorded > 0:
+                        vocab_count += 1
+                except Exception as e:
+                    if ctx.obj.get("debug"):
+                        console.print(f"[dim]Vocab error for {file_path.name}: {e}[/dim]")
+
+        # Show post-processing summary
+        if xmp_count > 0:
+            console.print(f"[dim]Wrote XMP sidecars for {xmp_count} image(s)[/dim]")
+        if vocab_count > 0:
+            console.print(f"[dim]Recorded {vocab_count} image(s) to vocabulary[/dim]")
 
         # Output results
         output_json = json.dumps(results, indent=2)
@@ -204,6 +324,113 @@ def tag(
     except KeyboardInterrupt:
         console.print("\n[yellow]Interrupted[/yellow]")
         sys.exit(ExitCode.KEYBOARD_INTERRUPT)
+
+
+class ETAColumn(TextColumn):
+    """Custom column showing EWMA-smoothed ETA."""
+
+    def __init__(self, progress_state: ProgressState):
+        super().__init__("")
+        self.progress_state = progress_state
+
+    def render(self, task) -> str:
+        eta_ms = self.progress_state.eta_ms
+        if eta_ms is None:
+            return "[dim]ETA: --[/dim]"
+        if eta_ms <= 0:
+            return "[dim]ETA: < 1s[/dim]"
+        return f"[dim]ETA: {format_duration(eta_ms)}[/dim]"
+
+
+def _tag_with_progress(
+    engine: TaggingEngine,
+    image_paths: list[Path],
+    plugin_names: list[str] | None = None,
+    threshold: float = 0.0,
+    plugin_configs: dict[str, Any] | None = None,
+    size: str = "original",
+) -> list[dict[str, Any]]:
+    """Tag images with progress bar display.
+
+    Uses EWMA-smoothed ETA for stable time remaining estimates.
+    Shows progress bar for batches > 1 image, spinner for single image.
+    """
+    total = len(image_paths)
+
+    # Single image: use simple spinner (no progress bar for < 4s tasks)
+    if total == 1:
+        with Progress(
+            SpinnerColumn(),
+            TextColumn("[progress.description]{task.description}"),
+            console=console,
+            transient=True,
+        ) as progress:
+            progress.add_task(f"Tagging {image_paths[0].name}...", total=None)
+            return engine.tag_batch(
+                image_paths,
+                plugin_names=plugin_names,
+                threshold=threshold,
+                plugin_configs=plugin_configs,
+                size=size,
+            )
+
+    # Multiple images: show progress bar with ETA
+    progress_state = ProgressState(files_total=total)
+    eta_column = ETAColumn(progress_state)
+
+    with Progress(
+        SpinnerColumn(),
+        TextColumn("[bold blue]{task.description}"),
+        BarColumn(bar_width=30),
+        TaskProgressColumn(),
+        MofNCompleteColumn(),
+        eta_column,
+        TimeElapsedColumn(),
+        console=console,
+        transient=False,
+    ) as progress:
+        task = progress.add_task("Tagging", total=total)
+
+        def on_progress(path: Path, result: dict[str, Any]) -> None:
+            """Callback to update progress after each file."""
+            # Calculate total inference time from all plugins
+            total_time_ms = 0.0
+            if "results" in result:
+                for plugin_result in result["results"].values():
+                    if isinstance(plugin_result, dict) and "inference_time_ms" in plugin_result:
+                        total_time_ms += plugin_result["inference_time_ms"]
+
+            # Update EWMA state
+            progress_state.update(path.name, total_time_ms or 100.0)
+
+            # Update rich progress bar
+            progress.update(
+                task,
+                advance=1,
+                description=f"[bold blue]{truncate_middle(path.name, 25)}",
+            )
+
+        results = engine.tag_batch(
+            image_paths,
+            plugin_names=plugin_names,
+            threshold=threshold,
+            plugin_configs=plugin_configs,
+            size=size,
+            on_progress=on_progress,
+        )
+
+        # Final update to show completion
+        progress.update(task, description="[bold green]Complete")
+
+    # Print summary
+    elapsed = format_duration(progress_state.elapsed_ms)
+    avg_time = progress_state.avg_time_per_file_ms
+    console.print(
+        f"[dim]Processed {total} images in {elapsed} "
+        f"(avg {avg_time:.0f}ms/image)[/dim]"
+    )
+
+    return results
 
 
 def _print_result(result: dict) -> None:
@@ -625,6 +852,238 @@ def gui(host: str, port: int, no_browser: bool) -> None:
         )
     except KeyboardInterrupt:
         console.print("\n[yellow]Server stopped[/yellow]")
+
+
+# ============================================================================
+# VOCAB COMMAND (Vocabulary Learning)
+# ============================================================================
+
+
+@main.group()
+def vocab() -> None:
+    """Vocabulary learning commands.
+
+    Track and learn from tagging results over time.
+    """
+    pass
+
+
+@vocab.command("stats")
+@click.option("--db", "db_path", default="vocabulary.db", help="Vocabulary database path")
+def vocab_stats(db_path: str) -> None:
+    """Show vocabulary statistics.
+
+    Displays counts of tags, feedback, calibration data, and model agreement.
+    """
+    try:
+        from visual_buffet.vocab_integration import VocabIntegration
+
+        vocab = VocabIntegration(db_path)
+        stats = vocab.get_statistics()
+
+        table = Table(title="Vocabulary Statistics")
+        table.add_column("Metric", style="cyan")
+        table.add_column("Value", justify="right")
+
+        table.add_row("Total Tags", str(stats.get("total_tags", 0)))
+        table.add_row("Total Events", str(stats.get("total_events", 0)))
+        table.add_row("Unique Images", str(stats.get("unique_images", 0)))
+        table.add_row("Feedback Count", str(stats.get("feedback_count", 0)))
+        table.add_row("Calibration Points", str(stats.get("calibration_points", 0)))
+
+        if "model_counts" in stats:
+            table.add_row("", "")  # Separator
+            for model, count in stats["model_counts"].items():
+                table.add_row(f"  {model}", str(count))
+
+        console.print(table)
+
+    except ImportError:
+        console.print("[red]vocablearn not installed[/red]")
+        sys.exit(1)
+    except Exception as e:
+        console.print(f"[red]Error: {e}[/red]")
+        sys.exit(1)
+
+
+@vocab.command("search")
+@click.argument("query", required=False)
+@click.option("--db", "db_path", default="vocabulary.db", help="Vocabulary database path")
+@click.option("--min-count", default=1, help="Minimum occurrence count")
+@click.option("--limit", default=50, help="Maximum results")
+def vocab_search(query: str | None, db_path: str, min_count: int, limit: int) -> None:
+    """Search vocabulary entries.
+
+    QUERY is an optional prefix to search for.
+    """
+    try:
+        from visual_buffet.vocab_integration import VocabIntegration
+
+        vocab = VocabIntegration(db_path)
+        tags = vocab.vocab.search_vocabulary(
+            query=query,
+            min_occurrences=min_count,
+            limit=limit,
+        )
+
+        if not tags:
+            console.print("[dim]No tags found[/dim]")
+            return
+
+        table = Table(title=f"Vocabulary Search{f': {query}' if query else ''}")
+        table.add_column("Tag", style="cyan")
+        table.add_column("Count", justify="right")
+        table.add_column("Prior", justify="right")
+        table.add_column("RAM++", justify="right")
+        table.add_column("Florence", justify="right")
+        table.add_column("SigLIP", justify="right")
+
+        for tag in tags:
+            table.add_row(
+                tag.label,
+                str(tag.total_occurrences),
+                f"{tag.prior_confidence:.2f}",
+                str(tag.ram_plus_count),
+                str(tag.florence_2_count),
+                str(tag.siglip_count),
+            )
+
+        console.print(table)
+
+    except ImportError:
+        console.print("[red]vocablearn not installed[/red]")
+        sys.exit(1)
+    except Exception as e:
+        console.print(f"[red]Error: {e}[/red]")
+        sys.exit(1)
+
+
+@vocab.command("export")
+@click.argument("output", type=click.Path())
+@click.option("--db", "db_path", default="vocabulary.db", help="Vocabulary database path")
+def vocab_export(output: str, db_path: str) -> None:
+    """Export vocabulary to JSON file.
+
+    OUTPUT is the destination file path.
+    """
+    try:
+        from visual_buffet.vocab_integration import VocabIntegration
+
+        vocab = VocabIntegration(db_path)
+        vocab.export_vocabulary(output)
+        console.print(f"[green]Vocabulary exported to {output}[/green]")
+
+    except ImportError:
+        console.print("[red]vocablearn not installed[/red]")
+        sys.exit(1)
+    except Exception as e:
+        console.print(f"[red]Error: {e}[/red]")
+        sys.exit(1)
+
+
+@vocab.command("import")
+@click.argument("input_file", type=click.Path(exists=True))
+@click.option("--db", "db_path", default="vocabulary.db", help="Vocabulary database path")
+@click.option("--merge/--replace", default=True, help="Merge with existing or replace")
+def vocab_import(input_file: str, db_path: str, merge: bool) -> None:
+    """Import vocabulary from JSON file.
+
+    INPUT_FILE is the source vocabulary file.
+    """
+    try:
+        from visual_buffet.vocab_integration import VocabIntegration
+
+        vocab = VocabIntegration(db_path)
+        count = vocab.import_vocabulary(input_file, merge=merge)
+        console.print(f"[green]Imported {count} tags[/green]")
+
+    except ImportError:
+        console.print("[red]vocablearn not installed[/red]")
+        sys.exit(1)
+    except Exception as e:
+        console.print(f"[red]Error: {e}[/red]")
+        sys.exit(1)
+
+
+@vocab.command("learn")
+@click.option("--db", "db_path", default="vocabulary.db", help="Vocabulary database path")
+@click.option("--min-samples", default=5, help="Minimum samples for prior updates")
+def vocab_learn(db_path: str, min_samples: int) -> None:
+    """Update priors and calibrators from feedback.
+
+    Recalculates Bayesian priors and rebuilds isotonic regression
+    calibrators from accumulated human feedback.
+    """
+    try:
+        from visual_buffet.vocab_integration import VocabIntegration
+
+        vocab = VocabIntegration(db_path)
+        result = vocab.update_learning(min_samples=min_samples)
+
+        console.print(f"[green]Updated {result['priors_updated']} priors[/green]")
+        console.print(f"[green]Rebuilt {result['calibrators_rebuilt']} calibrators[/green]")
+
+    except ImportError:
+        console.print("[red]vocablearn not installed[/red]")
+        sys.exit(1)
+    except Exception as e:
+        console.print(f"[red]Error: {e}[/red]")
+        sys.exit(1)
+
+
+@vocab.command("review")
+@click.option("--db", "db_path", default="vocabulary.db", help="Vocabulary database path")
+@click.option("-n", "--count", default=10, help="Number of images to select")
+@click.option(
+    "--strategy",
+    type=click.Choice(["uncertainty", "diversity", "high_volume"]),
+    default="uncertainty",
+    help="Selection strategy",
+)
+def vocab_review(db_path: str, count: int, strategy: str) -> None:
+    """Select images for human review.
+
+    Uses active learning to prioritize images that would
+    provide the most learning value.
+
+    Strategies:
+      uncertainty: Images with uncertain predictions
+      diversity: Images representing diverse tag distributions
+      high_volume: High-frequency tags needing validation
+    """
+    try:
+        from visual_buffet.vocab_integration import VocabIntegration
+
+        vocab = VocabIntegration(db_path)
+        candidates = vocab.select_for_review(n=count, strategy=strategy)
+
+        if not candidates:
+            console.print("[dim]No candidates found for review[/dim]")
+            return
+
+        table = Table(title=f"Review Candidates ({strategy})")
+        table.add_column("Image ID", style="cyan")
+        table.add_column("Priority", justify="right")
+        table.add_column("Uncertain Tags")
+
+        for candidate in candidates:
+            tags = ", ".join(candidate.get("uncertain_tags", [])[:5])
+            if len(candidate.get("uncertain_tags", [])) > 5:
+                tags += "..."
+            table.add_row(
+                candidate.get("image_id", "")[:16],
+                f"{candidate.get('priority', 0):.2f}",
+                tags,
+            )
+
+        console.print(table)
+
+    except ImportError:
+        console.print("[red]vocablearn not installed[/red]")
+        sys.exit(1)
+    except Exception as e:
+        console.print(f"[red]Error: {e}[/red]")
+        sys.exit(1)
 
 
 if __name__ == "__main__":

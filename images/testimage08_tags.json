@@ -1,0 +1,93 @@
+{
+  "file": "/Volumes/projects/visual-buffet/images/testimage08.jpg",
+  "filename": "testimage08.jpg",
+  "tagged_at": "2025-12-24T16:05:22.846481+00:00",
+  "threshold": 0.5,
+  "size": "original",
+  "inference_time_ms": 821.06,
+  "results": {
+    "florence_2": {
+      "tags": [],
+      "model": "florence_2"
+    },
+    "siglip": {
+      "tags": [
+        {
+          "label": "church",
+          "confidence": 0.5703594088554382,
+          "plugin": "siglip"
+        },
+        {
+          "label": "white_church",
+          "confidence": 0.444148451089859,
+          "plugin": "siglip"
+        },
+        {
+          "label": "chapel",
+          "confidence": 0.24381312727928162,
+          "plugin": "siglip"
+        },
+        {
+          "label": "dilapidated_white",
+          "confidence": 0.22736844420433044,
+          "plugin": "siglip"
+        },
+        {
+          "label": "steep_steeple",
+          "confidence": 0.1997794508934021,
+          "plugin": "siglip"
+        },
+        {
+          "label": "dilapidated",
+          "confidence": 0.1937956064939499,
+          "plugin": "siglip"
+        },
+        {
+          "label": "steeple",
+          "confidence": 0.15124644339084625,
+          "plugin": "siglip"
+        },
+        {
+          "label": "rural",
+          "confidence": 0.058286767452955246,
+          "plugin": "siglip"
+        },
+        {
+          "label": "historic",
+          "confidence": 0.03436846658587456,
+          "plugin": "siglip"
+        },
+        {
+          "label": "old",
+          "confidence": 0.03228147327899933,
+          "plugin": "siglip"
+        },
+        {
+          "label": "structure",
+          "confidence": 0.0304576363414526,
+          "plugin": "siglip"
+        },
+        {
+          "label": "church tower",
+          "confidence": 0.022113392129540443,
+          "plugin": "siglip"
+        },
+        {
+          "label": "religious",
+          "confidence": 0.017222588881850243,
+          "plugin": "siglip"
+        },
+        {
+          "label": "fall",
+          "confidence": 0.011054380796849728,
+          "plugin": "siglip"
+        }
+      ],
+      "model": "siglip"
+    },
+    "ram_plus": {
+      "tags": [],
+      "model": "ram_plus"
+    }
+  }
+}

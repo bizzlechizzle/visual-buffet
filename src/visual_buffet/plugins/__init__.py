@@ -8,7 +8,7 @@ This module provides the plugin infrastructure:
 
 from .base import PluginBase
 from .loader import discover_plugins, get_plugins_dir, load_all_plugins, load_plugin
-from .schemas import HardwareProfile, PluginInfo, Tag, TagResult
+from .schemas import HardwareProfile, ImageSize, PluginInfo, Tag, TagResult
 
 __all__ = [
     "PluginBase",
@@ -16,6 +16,7 @@ __all__ = [
     "Tag",
     "TagResult",
     "HardwareProfile",
+    "ImageSize",
     "discover_plugins",
     "load_plugin",
     "load_all_plugins",

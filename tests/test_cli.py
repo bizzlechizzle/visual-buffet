@@ -35,7 +35,8 @@ class TestMainCommand:
         """Test --version flag."""
         result = runner.invoke(main, ["--version"])
         assert result.exit_code == 0
-        assert "0.1.0" in result.output
+        assert "visual-buffet" in result.output.lower()
+        assert "version" in result.output.lower()
 
     def test_help(self, runner):
         """Test --help flag."""
@@ -68,7 +69,7 @@ class TestTagCommand:
         assert "--plugin" in result.output
         assert "--output" in result.output
         assert "--threshold" in result.output
-        assert "--limit" in result.output
+        assert "--discover" in result.output
 
     def test_tag_no_path(self, runner):
         """Test tag command requires path."""

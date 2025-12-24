@@ -1,0 +1,138 @@
+{
+  "file": "/Volumes/projects/visual-buffet/images/testimage07.jpg",
+  "filename": "testimage07.jpg",
+  "tagged_at": "2025-12-24T16:05:22.643038+00:00",
+  "threshold": 0.5,
+  "size": "original",
+  "inference_time_ms": 827.91,
+  "results": {
+    "florence_2": {
+      "tags": [],
+      "model": "florence_2"
+    },
+    "siglip": {
+      "tags": [
+        {
+          "label": "dilapidated_two",
+          "confidence": 0.9780657887458801,
+          "plugin": "siglip"
+        },
+        {
+          "label": "dilapidated",
+          "confidence": 0.9645330905914307,
+          "plugin": "siglip"
+        },
+        {
+          "label": "farmhouse",
+          "confidence": 0.45735540986061096,
+          "plugin": "siglip"
+        },
+        {
+          "label": "house",
+          "confidence": 0.23199748992919922,
+          "plugin": "siglip"
+        },
+        {
+          "label": "abandonment",
+          "confidence": 0.2084699124097824,
+          "plugin": "siglip"
+        },
+        {
+          "label": "country house",
+          "confidence": 0.16556675732135773,
+          "plugin": "siglip"
+        },
+        {
+          "label": "broken_windows",
+          "confidence": 0.1394365429878235,
+          "plugin": "siglip"
+        },
+        {
+          "label": "neglect",
+          "confidence": 0.09837879240512848,
+          "plugin": "siglip"
+        },
+        {
+          "label": "broken_door",
+          "confidence": 0.07401864975690842,
+          "plugin": "siglip"
+        },
+        {
+          "label": "structure",
+          "confidence": 0.07257544994354248,
+          "plugin": "siglip"
+        },
+        {
+          "label": "old",
+          "confidence": 0.07142606377601624,
+          "plugin": "siglip"
+        },
+        {
+          "label": "home",
+          "confidence": 0.06446147710084915,
+          "plugin": "siglip"
+        },
+        {
+          "label": "estate",
+          "confidence": 0.05609191581606865,
+          "plugin": "siglip"
+        },
+        {
+          "label": "house exterior",
+          "confidence": 0.04021496698260307,
+          "plugin": "siglip"
+        },
+        {
+          "label": "broken",
+          "confidence": 0.034619759768247604,
+          "plugin": "siglip"
+        },
+        {
+          "label": "rural",
+          "confidence": 0.023891620337963104,
+          "plugin": "siglip"
+        },
+        {
+          "label": "front_porch",
+          "confidence": 0.02162439003586769,
+          "plugin": "siglip"
+        },
+        {
+          "label": "building",
+          "confidence": 0.02122640050947666,
+          "plugin": "siglip"
+        },
+        {
+          "label": "mansion",
+          "confidence": 0.020029917359352112,
+          "plugin": "siglip"
+        },
+        {
+          "label": "porch",
+          "confidence": 0.019382627680897713,
+          "plugin": "siglip"
+        },
+        {
+          "label": "barn",
+          "confidence": 0.019222712144255638,
+          "plugin": "siglip"
+        },
+        {
+          "label": "ruins",
+          "confidence": 0.01409139670431614,
+          "plugin": "siglip"
+        },
+        {
+          "label": "damage",
+          "confidence": 0.011695224791765213,
+          "plugin": "siglip"
+        }
+      ],
+      "model": "siglip"
+    },
+    "ram_plus": {
+      "tags": [],
+      "model": "ram_plus"
+    }
+  }
+}

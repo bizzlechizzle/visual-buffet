@@ -1,0 +1,193 @@
+{
+  "file": "/Volumes/projects/visual-buffet/images/testimage04.jpg",
+  "filename": "testimage04.jpg",
+  "tagged_at": "2025-12-24T16:05:22.018416+00:00",
+  "threshold": 0.5,
+  "size": "original",
+  "inference_time_ms": 1092.28,
+  "results": {
+    "florence_2": {
+      "tags": [],
+      "model": "florence_2"
+    },
+    "siglip": {
+      "tags": [
+        {
+          "label": "abandoned_building",
+          "confidence": 0.8952341675758362,
+          "plugin": "siglip"
+        },
+        {
+          "label": "stairwell",
+          "confidence": 0.8141087889671326,
+          "plugin": "siglip"
+        },
+        {
+          "label": "stairs",
+          "confidence": 0.45139211416244507,
+          "plugin": "siglip"
+        },
+        {
+          "label": "jail cell",
+          "confidence": 0.44359052181243896,
+          "plugin": "siglip"
+        },
+        {
+          "label": "cage",
+          "confidence": 0.3882419466972351,
+          "plugin": "siglip"
+        },
+        {
+          "label": "metal_bars",
+          "confidence": 0.3863125145435333,
+          "plugin": "siglip"
+        },
+        {
+          "label": "scaffold",
+          "confidence": 0.34280139207839966,
+          "plugin": "siglip"
+        },
+        {
+          "label": "stairs_leading",
+          "confidence": 0.291384756565094,
+          "plugin": "siglip"
+        },
+        {
+          "label": "prison",
+          "confidence": 0.28737762570381165,
+          "plugin": "siglip"
+        },
+        {
+          "label": "abandoned",
+          "confidence": 0.26015976071357727,
+          "plugin": "siglip"
+        },
+        {
+          "label": "ladder",
+          "confidence": 0.2443726658821106,
+          "plugin": "siglip"
+        },
+        {
+          "label": "narrow_corridor",
+          "confidence": 0.13101167976856232,
+          "plugin": "siglip"
+        },
+        {
+          "label": "second_floor",
+          "confidence": 0.11960563063621521,
+          "plugin": "siglip"
+        },
+        {
+          "label": "bird cage",
+          "confidence": 0.1050988957285881,
+          "plugin": "siglip"
+        },
+        {
+          "label": "fire escape",
+          "confidence": 0.10329882800579071,
+          "plugin": "siglip"
+        },
+        {
+          "label": "hallway",
+          "confidence": 0.0969860628247261,
+          "plugin": "siglip"
+        },
+        {
+          "label": "decay",
+          "confidence": 0.08842375874519348,
+          "plugin": "siglip"
+        },
+        {
+          "label": "neglect",
+          "confidence": 0.05063004791736603,
+          "plugin": "siglip"
+        },
+        {
+          "label": "building",
+          "confidence": 0.048254579305648804,
+          "plugin": "siglip"
+        },
+        {
+          "label": "basement",
+          "confidence": 0.04227008298039436,
+          "plugin": "siglip"
+        },
+        {
+          "label": "walls",
+          "confidence": 0.04070870578289032,
+          "plugin": "siglip"
+        },
+        {
+          "label": "corridor",
+          "confidence": 0.036863379180431366,
+          "plugin": "siglip"
+        },
+        {
+          "label": "dark",
+          "confidence": 0.035788796842098236,
+          "plugin": "siglip"
+        },
+        {
+          "label": "brick building",
+          "confidence": 0.030959244817495346,
+          "plugin": "siglip"
+        },
+        {
+          "label": "stair",
+          "confidence": 0.029641613364219666,
+          "plugin": "siglip"
+        },
+        {
+          "label": "ruins",
+          "confidence": 0.02746688202023506,
+          "plugin": "siglip"
+        },
+        {
+          "label": "structure",
+          "confidence": 0.02647511288523674,
+          "plugin": "siglip"
+        },
+        {
+          "label": "mezzanine",
+          "confidence": 0.025206616148352623,
+          "plugin": "siglip"
+        },
+        {
+          "label": "peeling_paint",
+          "confidence": 0.021561287343502045,
+          "plugin": "siglip"
+        },
+        {
+          "label": "high_ceiling",
+          "confidence": 0.018025534227490425,
+          "plugin": "siglip"
+        },
+        {
+          "label": "large_window",
+          "confidence": 0.01694040186703205,
+          "plugin": "siglip"
+        },
+        {
+          "label": "tower",
+          "confidence": 0.014851371757686138,
+          "plugin": "siglip"
+        },
+        {
+          "label": "metal",
+          "confidence": 0.012687096372246742,
+          "plugin": "siglip"
+        },
+        {
+          "label": "room",
+          "confidence": 0.011806659400463104,
+          "plugin": "siglip"
+        }
+      ],
+      "model": "siglip"
+    },
+    "ram_plus": {
+      "tags": [],
+      "model": "ram_plus"
+    }
+  }
+}

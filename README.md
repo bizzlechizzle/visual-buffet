@@ -8,11 +8,14 @@ Visual Buffet is a CLI-first application that processes images through multiple 
 
 - **10 ML Plugins** - Image tagging, object detection, OCR, and vision-language models
 - **XMP Integration** - Works with wake-n-blake/shoemaker pipeline for unified metadata
+- **Vocabulary Learning** - Track tag accuracy and improve over time with human feedback
 - **Web GUI** - Drag-and-drop interface with lightbox view and side-by-side comparison
 - **Quality Levels** - Little (480px), Small (1080px), Large (2048px), Huge (4096px) processing
 - **RAW Support** - Process Sony ARW, Canon CR2/CR3, Nikon NEF, Adobe DNG, and more
 - **HEIC/HEIF Support** - Native Apple image format support
 - **Discovery Mode** - SigLIP vocabulary discovery using RAM++/Florence-2
+- **Scene Classification** - SigLIP zero-shot classification (indoor/outdoor, time of day)
+- **Duplicate Detection** - Find similar/duplicate images using embeddings
 
 ## Installation
 
@@ -72,7 +75,7 @@ uv pip install -e ".[dev]"
 ## Quick Start
 
 ```bash
-# Tag a single image
+# Tag a single image (uses all available plugins)
 visual-buffet tag photo.jpg
 
 # Tag multiple images recursively
@@ -81,14 +84,18 @@ visual-buffet tag ./photos --recursive
 # Save results to file
 visual-buffet tag photo.jpg -o results.json
 
-# Use specific threshold
+# Use specific threshold (0.5 is optimal for RAM++)
 visual-buffet tag photo.jpg --threshold 0.5
 
 # Use smaller image size for faster processing
 visual-buffet tag photo.jpg --size small
 
-# Discovery mode (SigLIP + vocabulary from other plugins)
-visual-buffet tag photo.jpg --discover
+# RECOMMENDED: Full multi-model tagging with discovery mode
+# Discovery mode: SigLIP scores vocabulary from RAM++/Florence-2
+visual-buffet tag photo.jpg --discover --xmp
+
+# Use specific plugins
+visual-buffet tag photo.jpg --plugin ram_plus --plugin florence_2 --plugin siglip
 
 # List available plugins
 visual-buffet plugins list
@@ -101,6 +108,20 @@ visual-buffet hardware
 
 # Launch web GUI
 visual-buffet gui
+```
+
+### Recommended Multi-Model Workflow
+
+For best results with abandoned/urbex photography or specialized subjects:
+
+```bash
+# Full 3-model tagging with discovery + XMP output
+visual-buffet tag ./photos --discover --threshold 0.5 --xmp --recursive
+
+# This runs:
+# 1. RAM++ (157 tags/image, confidence 0.50-1.00)
+# 2. Florence-2 (64 tags/image, caption-based phrases)
+# 3. SigLIP (scores all discovered vocabulary with sigmoid confidence)
 ```
 
 ## CLI Reference
@@ -117,6 +138,7 @@ visual-buffet gui
 | `config show` | Show current configuration |
 | `config set KEY VALUE` | Set a configuration value |
 | `config get KEY` | Get a configuration value |
+| `vocab [SUBCOMMAND]` | Vocabulary learning commands |
 | `gui [OPTIONS]` | Launch the web GUI |
 
 ### Tag Command Options
@@ -130,6 +152,9 @@ visual-buffet gui
 | `--recursive` | false | Search folders recursively |
 | `--size SIZE` | original | Image size: little, small, large, huge, original |
 | `--discover` | false | Enable SigLIP discovery mode |
+| `--xmp/--no-xmp` | --xmp | Write tags to XMP sidecar files |
+| `--dry-run` | false | Preview what would be tagged without writing |
+| `--vocab PATH` | (none) | Record tags to vocabulary database for learning |
 
 ### GUI Command Options
 
@@ -148,6 +173,46 @@ visual-buffet gui
 | `large` | 2048px | High detail |
 | `huge` | 4096px | Maximum detail |
 | `original` | Native | Default, no resize |
+
+### Vocabulary Learning Commands
+
+| Command | Description |
+|---------|-------------|
+| `vocab stats [--db PATH]` | Show vocabulary statistics |
+| `vocab search [QUERY] [--db PATH]` | Search vocabulary entries |
+| `vocab export OUTPUT [--db PATH]` | Export vocabulary to JSON |
+| `vocab import INPUT [--db PATH]` | Import vocabulary from JSON |
+| `vocab learn [--db PATH]` | Update priors and calibrators from feedback |
+| `vocab review [--db PATH] [-n COUNT]` | Select images for human review |
+
+#### Vocabulary Learning Workflow
+
+1. **Enable vocabulary learning during tagging:**
+   ```bash
+   visual-buffet tag photos/ --vocab ./vocabulary.db
+   ```
+
+2. **Review uncertain predictions:**
+   ```bash
+   visual-buffet vocab review --db vocabulary.db -n 20
+   ```
+
+3. **After providing feedback, update learning:**
+   ```bash
+   visual-buffet vocab learn --db vocabulary.db
+   ```
+
+4. **View vocabulary statistics:**
+   ```bash
+   visual-buffet vocab stats --db vocabulary.db
+   ```
+
+The vocabulary learning system:
+- **Tracks tag occurrences** from RAM++, Florence-2, and SigLIP
+- **Records human feedback** to learn which predictions are accurate
+- **Calculates Bayesian priors** based on historical accuracy
+- **Builds isotonic regression calibrators** for confidence calibration
+- **Supports active learning** to prioritize uncertain images for review
 
 ## XMP Pipeline Integration
 
@@ -361,28 +426,43 @@ uv run mypy src
 
 ```
 visual-buffet/
-├── src/visual_buffet/
-│   ├── cli.py              # CLI entry point
-│   ├── constants.py        # Application constants
-│   ├── exceptions.py       # Exception hierarchy
-│   ├── core/
-│   │   ├── engine.py       # Tagging orchestrator
-│   │   └── hardware.py     # Hardware detection
-│   ├── plugins/
-│   │   ├── base.py         # Plugin base class
-│   │   ├── loader.py       # Plugin discovery
-│   │   └── schemas.py      # Data schemas
-│   ├── services/
-│   │   └── xmp_handler.py  # XMP metadata integration
-│   ├── utils/
-│   │   ├── config.py       # TOML config management
-│   │   └── image.py        # Image loading utilities
-│   └── gui/
-│       ├── server.py       # FastAPI backend
-│       └── static/         # Frontend assets
-├── plugins/                # ML plugin implementations
-├── tests/                  # Test suite
-└── docs/                   # Documentation
+├── src/
+│   ├── visual_buffet/          # Main application
+│   │   ├── cli.py              # CLI entry point
+│   │   ├── constants.py        # Application constants
+│   │   ├── exceptions.py       # Exception hierarchy
+│   │   ├── vocab_integration.py # VocabLearn integration
+│   │   ├── core/
+│   │   │   ├── engine.py       # Tagging orchestrator
+│   │   │   └── hardware.py     # Hardware detection
+│   │   ├── plugins/
+│   │   │   ├── base.py         # Plugin base class
+│   │   │   ├── loader.py       # Plugin discovery
+│   │   │   └── schemas.py      # Data schemas
+│   │   ├── services/
+│   │   │   └── xmp_handler.py  # XMP metadata integration
+│   │   ├── utils/
+│   │   │   ├── config.py       # TOML config management
+│   │   │   └── image.py        # Image loading utilities
+│   │   └── gui/
+│   │       ├── server.py       # FastAPI backend
+│   │       └── static/         # Frontend assets
+│   └── vocablearn/             # Vocabulary learning library
+│       ├── api.py              # High-level VocabLearn API
+│       ├── models.py           # Data models and confidence tiers
+│       ├── storage/
+│       │   └── sqlite.py       # SQLite storage backend
+│       ├── learning/
+│       │   ├── priors.py       # Bayesian prior calculation
+│       │   ├── calibration.py  # Isotonic regression calibration
+│       │   └── active.py       # Active learning sample selection
+│       └── ml/                 # ML enhancements
+│           ├── classifier.py   # SigLIP scene classification
+│           ├── cooccurrence.py # Tag co-occurrence (PMI)
+│           └── embeddings.py   # Image embeddings for duplicates
+├── plugins/                    # ML plugin implementations
+├── tests/                      # Test suite
+└── docs/                       # Documentation
 ```
 
 ### Creating a Plugin

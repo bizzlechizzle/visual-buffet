@@ -208,7 +208,102 @@ Unlike CLIP's softmax (probabilities sum to 1), SigLIP's sigmoid outputs **indep
 
 ---
 
-## 5. Hardware Requirements
+## 5. Prompt Engineering for Better Accuracy
+
+### The Default Isn't Always Best
+
+The default prompt `"This is a photo of {label}."` works for general use, but **OpenAI's CLIP research shows that prompt ensembling can improve accuracy by 3.5-5%**.
+
+### OpenAI's 80-Template Ensemble (CLIP)
+
+OpenAI found that using 80 different prompt templates and averaging their embeddings significantly improves ImageNet classification. Key templates include:
+
+| Category | Example Templates |
+|----------|-------------------|
+| **Quality variations** | "a bad photo of a {}", "a good photo of a {}", "a blurry photo of a {}" |
+| **Size variations** | "a photo of a big {}", "a photo of a small {}" |
+| **Artistic renderings** | "a painting of a {}", "a sketch of a {}", "a sculpture of a {}" |
+| **Context variations** | "a {} in a video game", "the origami {}", "the toy {}" |
+| **Technical views** | "a close-up photo of a {}", "a cropped photo of a {}" |
+| **Lighting conditions** | "a bright photo of a {}", "a dark photo of a {}" |
+
+### Applying to SigLIP
+
+SigLIP shares CLIP's architecture and benefits from similar prompt strategies:
+
+```python
+# Prompt ensembling for SigLIP
+PROMPT_TEMPLATES = [
+    "This is a photo of {}.",           # Default
+    "a photo of a {}.",                 # Simple
+    "a photo of the {}.",               # Definite article
+    "a good photo of a {}.",            # Quality
+    "a bad photo of a {}.",             # Quality (catches poor images)
+    "a close-up photo of a {}.",        # View
+    "a photo of a big {}.",             # Size
+    "a photo of a small {}.",           # Size
+]
+
+def get_ensemble_confidence(model, processor, image, label):
+    """Get averaged confidence across multiple prompts."""
+    total_conf = 0.0
+    label_lower = label.lower()
+
+    for template in PROMPT_TEMPLATES:
+        text = template.format(label_lower)
+        inputs = processor(text=[text], images=image,
+                          padding="max_length", return_tensors="pt")
+        outputs = model(**inputs)
+        prob = torch.sigmoid(outputs.logits_per_image).item()
+        total_conf += prob
+
+    return total_conf / len(PROMPT_TEMPLATES)
+```
+
+### Trade-offs
+
+| Approach | Speed | Accuracy | When to Use |
+|----------|-------|----------|-------------|
+| Single prompt | 1x | Baseline | Real-time tagging |
+| 3-prompt ensemble | 3x | +1-2% | Balanced |
+| 7-prompt ensemble | 7x | +2-3% | Quality-focused |
+| 80-prompt ensemble | 80x | +3-5% | Benchmarking only |
+
+**Recommendation**: For archive applications where accuracy matters more than speed, use a 7-prompt ensemble. OpenAI's sequential forward selection found that 7 templates captured most of the gain:
+
+```python
+SELECTED_7_TEMPLATES = [
+    "a photo of a {}.",
+    "a bad photo of a {}.",             # Handles poor quality
+    "a photo of a small {}.",           # Scale variation
+    "a photo of a large {}.",           # Scale variation
+    "a origami {}.",                    # Abstract rendering
+    "a {} in a video game.",            # Abstract rendering
+    "a close-up photo of a {}.",        # View variation
+]
+```
+
+### Domain-Specific Templates
+
+For specific image types, specialized templates outperform generic ones:
+
+| Image Domain | Recommended Templates |
+|--------------|----------------------|
+| **Satellite/Aerial** | "satellite imagery of {}", "aerial photo of a {}" |
+| **Documents** | "a scan of a {}", "a photo of a document showing {}" |
+| **Food** | "a photo of a plate of {}", "a photo of {} food" |
+| **Art** | "a painting of a {}", "artwork depicting a {}" |
+| **Indoor/Scenes** | "a photo of a room with {}", "interior with {}" |
+
+### Sources
+
+- [OpenAI CLIP Prompts](https://github.com/openai/CLIP/blob/main/data/prompts.md)
+- [ImageNet Prompt Engineering Notebook](https://github.com/openai/CLIP/blob/main/notebooks/Prompt_Engineering_for_ImageNet.ipynb)
+- [Meta-Prompting for Zero-shot Recognition (arXiv:2403.11755)](https://arxiv.org/abs/2403.11755)
+
+---
+
+## 6. Hardware Requirements
 
 | Model Variant | Min VRAM (fp16) | Recommended VRAM |
 |---------------|-----------------|------------------|

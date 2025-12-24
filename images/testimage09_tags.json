@@ -1,0 +1,58 @@
+{
+  "file": "/Volumes/projects/visual-buffet/images/testimage09.jpg",
+  "filename": "testimage09.jpg",
+  "tagged_at": "2025-12-24T16:05:23.050111+00:00",
+  "threshold": 0.5,
+  "size": "original",
+  "inference_time_ms": 841.94,
+  "results": {
+    "florence_2": {
+      "tags": [],
+      "model": "florence_2"
+    },
+    "siglip": {
+      "tags": [
+        {
+          "label": "abandoned_cars",
+          "confidence": 0.9795206785202026,
+          "plugin": "siglip"
+        },
+        {
+          "label": "junkyard",
+          "confidence": 0.6418482065200806,
+          "plugin": "siglip"
+        },
+        {
+          "label": "abandoned",
+          "confidence": 0.20351578295230865,
+          "plugin": "siglip"
+        },
+        {
+          "label": "cars",
+          "confidence": 0.09381014108657837,
+          "plugin": "siglip"
+        },
+        {
+          "label": "desolate",
+          "confidence": 0.04567901790142059,
+          "plugin": "siglip"
+        },
+        {
+          "label": "fallen_leaves",
+          "confidence": 0.028098972514271736,
+          "plugin": "siglip"
+        },
+        {
+          "label": "fall",
+          "confidence": 0.026641907170414925,
+          "plugin": "siglip"
+        }
+      ],
+      "model": "siglip"
+    },
+    "ram_plus": {
+      "tags": [],
+      "model": "ram_plus"
+    }
+  }
+}

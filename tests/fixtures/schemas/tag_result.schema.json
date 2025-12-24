@@ -1,0 +1,82 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://visual-buffet/schemas/tag_result.json",
+  "title": "Tag Result",
+  "description": "Schema for Visual Buffet tag command output",
+  "oneOf": [
+    { "$ref": "#/definitions/singleResult" },
+    {
+      "type": "array",
+      "items": { "$ref": "#/definitions/singleResult" }
+    }
+  ],
+  "definitions": {
+    "singleResult": {
+      "type": "object",
+      "required": ["file", "results"],
+      "properties": {
+        "file": {
+          "type": "string",
+          "description": "Path to the processed image"
+        },
+        "results": {
+          "type": "object",
+          "description": "Results from each plugin",
+          "additionalProperties": { "$ref": "#/definitions/pluginResult" }
+        },
+        "error": {
+          "type": "string",
+          "description": "Error message if processing failed"
+        }
+      }
+    },
+    "pluginResult": {
+      "type": "object",
+      "required": ["tags", "model", "version"],
+      "properties": {
+        "tags": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/tag" }
+        },
+        "model": {
+          "type": "string",
+          "description": "Name of the ML model used"
+        },
+        "version": {
+          "type": "string",
+          "description": "Version of the model/plugin"
+        },
+        "inference_time_ms": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Time taken for inference in milliseconds"
+        },
+        "metadata": {
+          "type": "object",
+          "description": "Additional plugin-specific metadata"
+        },
+        "error": {
+          "type": "string",
+          "description": "Error message if plugin failed"
+        }
+      }
+    },
+    "tag": {
+      "type": "object",
+      "required": ["label"],
+      "properties": {
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The tag label/name"
+        },
+        "confidence": {
+          "type": ["number", "null"],
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Confidence score between 0 and 1"
+        }
+      }
+    }
+  }
+}

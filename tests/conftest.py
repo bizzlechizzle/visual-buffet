@@ -10,16 +10,23 @@ from PIL import Image
 
 
 @pytest.fixture
-def cli():
+def runner():
     """Create a Click CLI test runner."""
     return CliRunner()
 
 
 @pytest.fixture
-def cli_isolated(cli):
+def cli():
+    """Get the actual CLI command for testing."""
+    from visual_buffet.cli import main
+    return main
+
+
+@pytest.fixture
+def cli_isolated(runner):
     """Create an isolated CLI runner with a temporary filesystem."""
-    with cli.isolated_filesystem():
-        yield cli
+    with runner.isolated_filesystem():
+        yield runner
 
 
 @pytest.fixture

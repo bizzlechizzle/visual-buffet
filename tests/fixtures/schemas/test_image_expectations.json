@@ -1,0 +1,339 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Visual Buffet Test Image Expectations",
+  "description": "Ground truth and expected outcomes for the 10 test images",
+  "version": "1.0.0",
+  "generated": "2025-12-23",
+  "images": {
+    "testimage01.jpg": {
+      "description": "Abandoned diner interior with bar stools and ceiling fans",
+      "dimensions": "6000x4000",
+      "file_size_mb": 7.46,
+      "camera": "Sony ILCE-7M3",
+      "scene_type": "indoor",
+      "primary_subjects": ["bar", "stools", "restaurant", "counter"],
+      "expected_tags": {
+        "ram_plus": {
+          "must_include": ["bar", "stool", "floor", "restaurant", "counter", "room"],
+          "should_include": ["ceiling fan", "bar stool", "window", "chair"],
+          "should_not_include": ["outdoor", "car", "person", "animal"]
+        },
+        "florence_2": {
+          "caption_must_mention": ["bar", "stool", "restaurant", "diner"],
+          "objects_detected": ["stool", "counter", "window"]
+        }
+      }
+    },
+    "testimage02.jpg": {
+      "description": "Abandoned dry cleaner with hanging clothes",
+      "dimensions": "6016x4016",
+      "file_size_mb": 5.81,
+      "camera": "Nikon D750",
+      "scene_type": "indoor",
+      "primary_subjects": ["interior", "clothing", "hanger", "room"],
+      "expected_tags": {
+        "ram_plus": {
+          "must_include": ["room", "window", "floor"],
+          "should_include": ["clothing", "hanger", "interior", "wall"],
+          "should_not_include": ["outdoor", "car", "nature"]
+        },
+        "florence_2": {
+          "caption_must_mention": ["room", "interior", "abandoned"],
+          "objects_detected": ["window", "wall"]
+        }
+      }
+    },
+    "testimage03.jpg": {
+      "description": "Abandoned church interior with pews and cross",
+      "dimensions": "4771x3161",
+      "file_size_mb": 3.47,
+      "camera": null,
+      "scene_type": "indoor",
+      "primary_subjects": ["church", "cross", "pew", "chapel"],
+      "expected_tags": {
+        "ram_plus": {
+          "must_include": ["church", "cross", "chapel"],
+          "should_include": ["bench", "row", "window", "altar"],
+          "should_not_include": ["outdoor", "car", "person"]
+        },
+        "florence_2": {
+          "caption_must_mention": ["church", "cross", "pew"],
+          "objects_detected": ["cross", "bench", "window"]
+        }
+      }
+    },
+    "testimage04.jpg": {
+      "description": "Abandoned house interior",
+      "dimensions": "6016x4016",
+      "file_size_mb": 8.94,
+      "camera": null,
+      "scene_type": "indoor",
+      "primary_subjects": ["room", "floor", "window", "wall"],
+      "expected_tags": {
+        "ram_plus": {
+          "must_include": ["room", "floor", "window"],
+          "should_include": ["wall", "door", "interior", "house"],
+          "should_not_include": ["outdoor", "car", "nature"]
+        },
+        "florence_2": {
+          "caption_must_mention": ["room", "interior"],
+          "objects_detected": ["window", "door", "wall"]
+        }
+      }
+    },
+    "testimage05.jpg": {
+      "description": "Industrial building exterior/interior",
+      "dimensions": "6016x4016",
+      "file_size_mb": 6.03,
+      "camera": null,
+      "scene_type": "mixed",
+      "primary_subjects": ["building", "industrial", "window"],
+      "expected_tags": {
+        "ram_plus": {
+          "must_include": ["building", "window"],
+          "should_include": ["factory", "industrial", "brick", "wall"],
+          "should_not_include": ["person", "animal", "food"]
+        },
+        "florence_2": {
+          "caption_must_mention": ["building", "industrial"],
+          "objects_detected": ["window", "wall"]
+        }
+      }
+    },
+    "testimage06.jpg": {
+      "description": "Abandoned factory interior with machinery",
+      "dimensions": "6016x4016",
+      "file_size_mb": 10.49,
+      "camera": null,
+      "scene_type": "indoor",
+      "primary_subjects": ["factory", "industrial", "machine"],
+      "expected_tags": {
+        "ram_plus": {
+          "must_include": ["factory", "window"],
+          "should_include": ["industrial", "machine", "building", "floor"],
+          "should_not_include": ["outdoor", "car", "person"]
+        },
+        "florence_2": {
+          "caption_must_mention": ["factory", "industrial"],
+          "objects_detected": ["machine", "window"]
+        }
+      }
+    },
+    "testimage07.jpg": {
+      "description": "Building exterior with architectural details",
+      "dimensions": "6000x4000",
+      "file_size_mb": 8.50,
+      "camera": null,
+      "scene_type": "outdoor",
+      "primary_subjects": ["building", "architecture", "sky"],
+      "expected_tags": {
+        "ram_plus": {
+          "must_include": ["building", "sky"],
+          "should_include": ["architecture", "window", "facade"],
+          "should_not_include": ["indoor", "car", "person"]
+        },
+        "florence_2": {
+          "caption_must_mention": ["building", "architecture"],
+          "objects_detected": ["building", "window", "sky"]
+        }
+      }
+    },
+    "testimage08.jpg": {
+      "description": "Interior with peeling paint and decay",
+      "dimensions": "4794x3175",
+      "file_size_mb": 6.24,
+      "camera": null,
+      "scene_type": "indoor",
+      "primary_subjects": ["wall", "paint", "decay", "room"],
+      "expected_tags": {
+        "ram_plus": {
+          "must_include": ["wall", "room", "floor"],
+          "should_include": ["paint", "window", "decay", "abandoned"],
+          "should_not_include": ["outdoor", "car", "person"]
+        },
+        "florence_2": {
+          "caption_must_mention": ["room", "wall"],
+          "objects_detected": ["wall", "window", "floor"]
+        }
+      }
+    },
+    "testimage09.jpg": {
+      "description": "Parking lot with cars surrounded by trees",
+      "dimensions": "6016x4016",
+      "file_size_mb": 11.61,
+      "camera": null,
+      "scene_type": "outdoor",
+      "primary_subjects": ["car", "parking lot", "tree", "vehicle"],
+      "expected_tags": {
+        "ram_plus": {
+          "must_include": ["car", "tree"],
+          "should_include": ["parking lot", "vehicle", "forest", "road"],
+          "should_not_include": ["indoor", "person", "building interior"]
+        },
+        "florence_2": {
+          "caption_must_mention": ["car", "parking", "tree"],
+          "objects_detected": ["car", "tree"]
+        }
+      }
+    },
+    "testimage10.jpg": {
+      "description": "Factory building by a river",
+      "dimensions": "6016x4016",
+      "file_size_mb": 5.53,
+      "camera": null,
+      "scene_type": "outdoor",
+      "primary_subjects": ["factory", "building", "water", "river"],
+      "expected_tags": {
+        "ram_plus": {
+          "must_include": ["building", "water"],
+          "should_include": ["factory", "river", "chimney", "industrial"],
+          "should_not_include": ["indoor", "person", "car"]
+        },
+        "florence_2": {
+          "caption_must_mention": ["factory", "building", "water"],
+          "objects_detected": ["building", "water", "chimney"]
+        }
+      }
+    }
+  },
+  "test_profiles": {
+    "ram_plus": {
+      "note": "Resolution has NO impact - model resizes to 384x384 internally. Only threshold matters.",
+      "common_settings": {
+        "size": "little",
+        "limit": 0
+      },
+      "thresholds": {
+        "0.4": {
+          "description": "Maximum discovery",
+          "expected_tags_range": [150, 200],
+          "expected_avg_confidence": 0.58
+        },
+        "0.5": {
+          "description": "Comprehensive coverage",
+          "expected_tags_range": [130, 175],
+          "expected_avg_confidence": 0.60
+        },
+        "0.6": {
+          "description": "Balanced (recommended)",
+          "expected_tags_range": [100, 150],
+          "expected_avg_confidence": 0.65
+        },
+        "0.7": {
+          "description": "High confidence only",
+          "expected_tags_range": [60, 100],
+          "expected_avg_confidence": 0.72
+        },
+        "0.8": {
+          "description": "Very selective",
+          "expected_tags_range": [30, 60],
+          "expected_avg_confidence": 0.82
+        }
+      }
+    },
+    "florence_2": {
+      "note": "Florence-2 is TASK-BASED, not threshold-based. Does NOT provide confidence scores.",
+      "key_differences_from_ram_plus": {
+        "confidence_scores": "NO - tags have no confidence values",
+        "configuration": "Task-based, not threshold-based",
+        "compound_phrases": "Built-in slugification (white_house, abandoned_building)"
+      },
+      "model_variants": ["base", "large", "base-ft", "large-ft"],
+      "profiles": {
+        "fast": {
+          "description": "Quick preview - single brief caption",
+          "model_variant": "base-ft",
+          "tasks": ["<CAPTION>"],
+          "num_beams": 1,
+          "expected_tags_range": [5, 15],
+          "expected_time_ms": 100
+        },
+        "good": {
+          "description": "Balanced quality - single detailed caption (RECOMMENDED)",
+          "model_variant": "large-ft",
+          "tasks": ["<DETAILED_CAPTION>"],
+          "num_beams": 3,
+          "expected_tags_range": [15, 30],
+          "expected_time_ms": 300
+        },
+        "ultimate": {
+          "description": "Three tasks combined - comprehensive",
+          "model_variant": "large-ft",
+          "tasks": ["<MORE_DETAILED_CAPTION>", "<OD>", "<DENSE_REGION_CAPTION>"],
+          "num_beams": 5,
+          "expected_tags_range": [40, 80],
+          "expected_time_ms": 800
+        },
+        "caption_stack": {
+          "description": "All caption tasks stacked (no detection)",
+          "model_variant": "large-ft",
+          "tasks": ["<CAPTION>", "<DETAILED_CAPTION>", "<MORE_DETAILED_CAPTION>"],
+          "num_beams": 3,
+          "expected_tags_range": [35, 60],
+          "expected_time_ms": 600
+        },
+        "detection_stack": {
+          "description": "Detection + region descriptions",
+          "model_variant": "large-ft",
+          "tasks": ["<OD>", "<DENSE_REGION_CAPTION>"],
+          "num_beams": 3,
+          "expected_tags_range": [15, 35],
+          "expected_time_ms": 400
+        },
+        "all": {
+          "description": "EVERY task combined - maximum extraction",
+          "model_variant": "large-ft",
+          "tasks": ["<CAPTION>", "<DETAILED_CAPTION>", "<MORE_DETAILED_CAPTION>", "<OD>", "<DENSE_REGION_CAPTION>"],
+          "num_beams": 3,
+          "expected_tags_range": [60, 100],
+          "expected_time_ms": 1200
+        }
+      },
+      "tasks": {
+        "caption": {
+          "task": "<CAPTION>",
+          "expected_tags": [5, 10],
+          "description": "Brief description"
+        },
+        "detailed_caption": {
+          "task": "<DETAILED_CAPTION>",
+          "expected_tags": [15, 25],
+          "description": "Extended description"
+        },
+        "more_detailed_caption": {
+          "task": "<MORE_DETAILED_CAPTION>",
+          "expected_tags": [25, 50],
+          "description": "Comprehensive description"
+        },
+        "object_detection": {
+          "task": "<OD>",
+          "expected_tags": [2, 5],
+          "description": "WARNING: Very limited! Only 2-5 object labels",
+          "not_recommended_for_tagging": true
+        },
+        "dense_region_caption": {
+          "task": "<DENSE_REGION_CAPTION>",
+          "expected_tags": [15, 30],
+          "description": "Region-specific descriptions"
+        },
+        "ocr": {
+          "task": "<OCR>",
+          "description": "Text extraction (returns text:content format)",
+          "expected_for_images": ["testimage01.jpg"]
+        }
+      },
+      "key_insights": [
+        "Use ALL profile for maximum tag extraction",
+        "Do NOT use <OD> alone - only returns 2-5 labels",
+        "No confidence scores - use RAM++ if you need filtering",
+        "Compound phrases (white_house) are built-in via slugification"
+      ]
+    }
+  },
+  "validation_rules": {
+    "tag_confidence_range": [0.0, 1.0],
+    "inference_time_max_ms": 5000,
+    "min_tags_per_image": 5,
+    "must_include_match_threshold": 0.8
+  }
+}

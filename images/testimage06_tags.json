@@ -1,0 +1,128 @@
+{
+  "file": "/Volumes/projects/visual-buffet/images/testimage06.jpg",
+  "filename": "testimage06.jpg",
+  "tagged_at": "2025-12-24T16:05:22.439711+00:00",
+  "threshold": 0.5,
+  "size": "original",
+  "inference_time_ms": 899.02,
+  "results": {
+    "florence_2": {
+      "tags": [],
+      "model": "florence_2"
+    },
+    "siglip": {
+      "tags": [
+        {
+          "label": "dilapidated_white",
+          "confidence": 0.9500644207000732,
+          "plugin": "siglip"
+        },
+        {
+          "label": "dilapidated",
+          "confidence": 0.9286125898361206,
+          "plugin": "siglip"
+        },
+        {
+          "label": "abandoned",
+          "confidence": 0.6381912231445312,
+          "plugin": "siglip"
+        },
+        {
+          "label": "farmhouse",
+          "confidence": 0.5214616656303406,
+          "plugin": "siglip"
+        },
+        {
+          "label": "neglected",
+          "confidence": 0.25734928250312805,
+          "plugin": "siglip"
+        },
+        {
+          "label": "white house",
+          "confidence": 0.1693151891231537,
+          "plugin": "siglip"
+        },
+        {
+          "label": "country house",
+          "confidence": 0.1067553237080574,
+          "plugin": "siglip"
+        },
+        {
+          "label": "rural",
+          "confidence": 0.08724343776702881,
+          "plugin": "siglip"
+        },
+        {
+          "label": "home",
+          "confidence": 0.08009716123342514,
+          "plugin": "siglip"
+        },
+        {
+          "label": "house",
+          "confidence": 0.0740690603852272,
+          "plugin": "siglip"
+        },
+        {
+          "label": "old",
+          "confidence": 0.05324580892920494,
+          "plugin": "siglip"
+        },
+        {
+          "label": "white_house",
+          "confidence": 0.04325128719210625,
+          "plugin": "siglip"
+        },
+        {
+          "label": "house exterior",
+          "confidence": 0.029007451608777046,
+          "plugin": "siglip"
+        },
+        {
+          "label": "stone house",
+          "confidence": 0.022527379915118217,
+          "plugin": "siglip"
+        },
+        {
+          "label": "hillside",
+          "confidence": 0.02025090530514717,
+          "plugin": "siglip"
+        },
+        {
+          "label": "estate",
+          "confidence": 0.018355095759034157,
+          "plugin": "siglip"
+        },
+        {
+          "label": "structure",
+          "confidence": 0.01677929051220417,
+          "plugin": "siglip"
+        },
+        {
+          "label": "farm",
+          "confidence": 0.01597481779754162,
+          "plugin": "siglip"
+        },
+        {
+          "label": "large_porch",
+          "confidence": 0.015114549547433853,
+          "plugin": "siglip"
+        },
+        {
+          "label": "countryside",
+          "confidence": 0.01383470743894577,
+          "plugin": "siglip"
+        },
+        {
+          "label": "front_facade",
+          "confidence": 0.0101566007360816,
+          "plugin": "siglip"
+        }
+      ],
+      "model": "siglip"
+    },
+    "ram_plus": {
+      "tags": [],
+      "model": "ram_plus"
+    }
+  }
+}
