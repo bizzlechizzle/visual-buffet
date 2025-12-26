@@ -1,6 +1,6 @@
 [project]
 name = "visual-buffet"
-version = "0.1.10"
+version = "0.1.16"
 description = "Visual Buffet - Compare visual tagging results from local ML tools"
 readme = "README.md"
 license = { text = "MIT" }
@@ -34,6 +34,7 @@ dependencies = [
     "packaging>=21.0",
     "paddlepaddle>=3.2.2",
     "paddleocr>=3.3.2",
+    "vocablearn",
 ]
 
 [project.optional-dependencies]
@@ -140,6 +141,9 @@ build-backend = "hatchling.build"
 # Only resolve for the current platform (avoids cross-platform conflicts)
 environments = ["sys_platform == 'linux'"]
 
+[tool.uv.sources]
+vocablearn = { path = "libs/surveillance-van", editable = true }
+
 [tool.hatch.metadata]
 allow-direct-references = true
 
@@ -149,7 +153,7 @@ packages = ["src/visual_buffet"]
 [tool.ruff]
 target-version = "py311"
 line-length = 100
-src = ["src", "tests"]
+src = ["src", "tests", "libs/surveillance-van/src"]
 
 [tool.ruff.lint]
 select = [
@@ -163,7 +167,7 @@ select = [
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-pythonpath = ["src"]
+pythonpath = ["src", "libs/surveillance-van/src"]
 markers = [
     "slow: marks tests as slow (deselect with '-m \"not slow\"')",
     "gpu: marks tests requiring GPU",

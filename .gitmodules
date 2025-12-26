@@ -1,0 +1,3 @@
+[submodule "libs/surveillance-van"]
+	path = libs/surveillance-van
+	url = https://github.com/bizzlechizzle/surveillance-van.git
